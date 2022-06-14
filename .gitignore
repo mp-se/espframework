@@ -1,3 +1,4 @@
 # Prerequisites
 .pio/*
 .vscode/*
+example/test/__pycache__
