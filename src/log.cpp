@@ -23,8 +23,6 @@ SOFTWARE.
  */
 #include <log.hpp>
 
-SerialDebug mySerial;
-
 SerialDebug::SerialDebug(const uint32_t serialSpeed) {
   // Start serial with auto-detected rate (default to defined BAUD)
   Serial.flush();
