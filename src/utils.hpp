@@ -29,6 +29,8 @@ SOFTWARE.
 float convertCtoF(float c);
 float convertFtoC(float f);
 float reduceFloatPrecision(float f, int dec);
+void tcp_cleanup();
+void deepSleep(int t);
 
 #endif  // SRC_UTILS_HPP_
 

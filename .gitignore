@@ -2,3 +2,8 @@
 .pio/*
 .vscode/*
 example/test/__pycache__
+# These files are under examples and should not be checked in.
+src/demo*.*
+platformio.ini
+html/*
+test/*

@@ -40,15 +40,18 @@ BaseConfig::BaseConfig(String baseMDNS, String fileName) {
 #endif
 }
 
-void BaseConfig::createJsonWifi(DynamicJsonDocument& doc) {
+void BaseConfig::createJsonWifi(DynamicJsonDocument& doc, bool skipSecrets) {
 #if LOG_LEVEL == 6
   Log.verbose(F("CFG : Create json (wifi)." CR));
 #endif
   doc[PARAM_MDNS] = getMDNS();
   doc[PARAM_SSID] = getWifiSSID(0);
-  doc[PARAM_PASS] = getWifiPass(0);
   doc[PARAM_SSID2] = getWifiSSID(1);
-  doc[PARAM_PASS2] = getWifiPass(1);
+  
+  if (!skipSecrets) {
+    doc[PARAM_PASS] = getWifiPass(0);
+    doc[PARAM_PASS2] = getWifiPass(1);
+  }
 }
 
 void BaseConfig::parseJsonWifi(DynamicJsonDocument& doc) {
@@ -62,9 +65,11 @@ void BaseConfig::parseJsonWifi(DynamicJsonDocument& doc) {
 
   if (!doc[PARAM_SSID2].isNull()) setWifiSSID(doc[PARAM_SSID2], 1);
   if (!doc[PARAM_PASS2].isNull()) setWifiPass(doc[PARAM_PASS2], 1);
+
+  _saveNeeded = true;
 }
 
-void BaseConfig::createJsonOta(DynamicJsonDocument& doc) {
+void BaseConfig::createJsonOta(DynamicJsonDocument& doc, bool skipSecrets) {
 #if LOG_LEVEL == 6
   Log.verbose(F("CFG : Create json (ota)." CR));
 #endif
@@ -80,14 +85,57 @@ void BaseConfig::parseJsonOta(DynamicJsonDocument& doc) {
   _saveNeeded = true;
 }
 
-void BaseConfig::createJsonBase(DynamicJsonDocument& doc) {
+void BaseConfig::createJsonPush(DynamicJsonDocument& doc, bool skipSecrets) {
+#if LOG_LEVEL == 6
+  Log.verbose(F("CFG : Create json (push)." CR));
+#endif
+  JsonArray headers;
+
+  doc[PARAM_TARGET_HTTP_POST] = getTargetHttpPost();
+  doc[PARAM_HEADER1_HTTP_POST] = getHeader1HttpPost();
+  doc[PARAM_HEADER2_HTTP_POST] = getHeader2HttpPost();
+  doc[PARAM_TARGET_HTTP_GET] = getTargetHttpGet();
+  doc[PARAM_HEADER1_HTTP_GET] = getHeader1HttpGet();
+  doc[PARAM_HEADER2_HTTP_GET] = getHeader2HttpGet();
+  doc[PARAM_TARGET_INFLUXDB2] = getTargetInfluxDB2();
+  doc[PARAM_ORG_INFLUXDB2] = getOrgInfluxDB2();
+  doc[PARAM_BUCKET_INFLUXDB2] = getBucketInfluxDB2();
+  doc[PARAM_TOKEN_INFLUXDB2] = getTokenInfluxDB2();
+  doc[PARAM_TARGET_MQTT] = getTargetMqtt();
+  doc[PARAM_PORT_MQTT] = getPortMqtt();
+  doc[PARAM_USER_MQTT] = getUserMqtt();
+  doc[PARAM_PASS_MQTT] = getPassMqtt();
+}
+
+void BaseConfig::parseJsonPush(DynamicJsonDocument& doc) {
+#if LOG_LEVEL == 6
+  Log.verbose(F("CFG : Parsing json (push)." CR));
+#endif
+
+  if (!doc[PARAM_TARGET_HTTP_POST].isNull()) { setTargetHttpPost(doc[PARAM_TARGET_HTTP_POST]); }
+  if (!doc[PARAM_HEADER1_HTTP_POST].isNull()) { setHeader1HttpPost(doc[PARAM_HEADER1_HTTP_POST]); }
+  if (!doc[PARAM_HEADER2_HTTP_POST].isNull()) { setHeader2HttpPost(doc[PARAM_HEADER2_HTTP_POST]); }
+  if (!doc[PARAM_HEADER1_HTTP_GET].isNull()) { setHeader1HttpGet(doc[PARAM_HEADER1_HTTP_GET]); }
+  if (!doc[PARAM_HEADER2_HTTP_GET].isNull()) { setHeader2HttpGet(doc[PARAM_HEADER2_HTTP_GET]); }
+  if (!doc[PARAM_TARGET_HTTP_GET].isNull()) { setTargetHttpGet(doc[PARAM_TARGET_HTTP_GET]); }
+  if (!doc[PARAM_TARGET_INFLUXDB2].isNull()) { setTargetInfluxDB2(doc[PARAM_TARGET_INFLUXDB2]); }
+  if (!doc[PARAM_ORG_INFLUXDB2].isNull()) { setOrgInfluxDB2(doc[PARAM_ORG_INFLUXDB2]); }
+  if (!doc[PARAM_BUCKET_INFLUXDB2].isNull()) { setBucketInfluxDB2(doc[PARAM_BUCKET_INFLUXDB2]); }
+  if (!doc[PARAM_TOKEN_INFLUXDB2].isNull()) { setTokenInfluxDB2(doc[PARAM_TOKEN_INFLUXDB2]); }
+  if (!doc[PARAM_TARGET_MQTT].isNull()) { setTargetMqtt(doc[PARAM_TARGET_MQTT]); }
+  if (!doc[PARAM_PORT_MQTT].isNull()) { setPortMqtt(doc[PARAM_PORT_MQTT].as<int>()); }
+  if (!doc[PARAM_USER_MQTT].isNull()) { setUserMqtt(doc[PARAM_USER_MQTT]); }
+  if (!doc[PARAM_PASS_MQTT].isNull()) { setPassMqtt(doc[PARAM_PASS_MQTT]); }
+
+  _saveNeeded = true;
+}
+
+void BaseConfig::createJsonBase(DynamicJsonDocument& doc, bool skipSecrets) {
 #if LOG_LEVEL == 6
   Log.verbose(F("CFG : Create json (base)." CR));
 #endif
   doc[PARAM_ID] = getID();
   doc[PARAM_TEMP_FORMAT] = String(getTempFormat());
-
-  _saveNeeded = true;
 }
 
 void BaseConfig::parseJsonBase(DynamicJsonDocument& doc) {
@@ -122,7 +170,7 @@ bool BaseConfig::saveFile() {
   }
 
   DynamicJsonDocument doc(2048);
-  createJson(doc);
+  createJson(doc, false); // Include secrets
 #if LOG_LEVEL == 6
   serializeJson(doc, Serial);
   Serial.print(CR);

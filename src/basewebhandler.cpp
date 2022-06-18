@@ -40,11 +40,7 @@ void BaseWebHandler::webHandleConfigRead() {
   Log.notice(F("WEB : BaseWebHandler callback for /api/config(get)." CR));
 
   DynamicJsonDocument doc(2048);
-  _webConfig->createJson(doc);
-
-  // mask wifi passwords
-  doc[PARAM_PASS] = "**hidden**";
-  doc[PARAM_PASS2] = "**hidden**";
+  _webConfig->createJson(doc, true); // will not include ssid passwords
 
 #if LOG_LEVEL == 6
   serializeJson(doc, Serial);

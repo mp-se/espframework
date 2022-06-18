@@ -25,21 +25,28 @@ SOFTWARE.
 #define SRC_DEMO_WEBHANDLER_HPP_
 
 #include <incbin.h>
-
 #include <basewebhandler.hpp>
+#include <demo-push.hpp>
 
 INCBIN_EXTERN(TestHtm);
 
 class DemoWebHandler : public BaseWebHandler {
  private:
+  DemoPush* _push;
+
   void webReturnTestHtm() {
     _server->send_P(200, "text/html", (const char*)gTestHtmData, gTestHtmSize);
   }
 
   void setupWebHandlers();
+  
+  void webHandlePushHttpPost();
+  void webHandlePushHttpGet();
+  void webHandlePushHttpMqtt();
+  void webHandlePushHttpInfluxDb2();
 
  public:
-  explicit DemoWebHandler(WebConfig* config);
+  explicit DemoWebHandler(WebConfig* config, DemoPush* push);
 };
 
 #endif  // SRC_DEMO_WEBHANDLER_HPP_
