@@ -47,7 +47,7 @@ void BaseConfig::createJsonWifi(DynamicJsonDocument& doc, bool skipSecrets) {
   doc[PARAM_MDNS] = getMDNS();
   doc[PARAM_SSID] = getWifiSSID(0);
   doc[PARAM_SSID2] = getWifiSSID(1);
-  
+
   if (!skipSecrets) {
     doc[PARAM_PASS] = getWifiPass(0);
     doc[PARAM_PASS2] = getWifiPass(1);
@@ -112,20 +112,48 @@ void BaseConfig::parseJsonPush(DynamicJsonDocument& doc) {
   Log.verbose(F("CFG : Parsing json (push)." CR));
 #endif
 
-  if (!doc[PARAM_TARGET_HTTP_POST].isNull()) { setTargetHttpPost(doc[PARAM_TARGET_HTTP_POST]); }
-  if (!doc[PARAM_HEADER1_HTTP_POST].isNull()) { setHeader1HttpPost(doc[PARAM_HEADER1_HTTP_POST]); }
-  if (!doc[PARAM_HEADER2_HTTP_POST].isNull()) { setHeader2HttpPost(doc[PARAM_HEADER2_HTTP_POST]); }
-  if (!doc[PARAM_HEADER1_HTTP_GET].isNull()) { setHeader1HttpGet(doc[PARAM_HEADER1_HTTP_GET]); }
-  if (!doc[PARAM_HEADER2_HTTP_GET].isNull()) { setHeader2HttpGet(doc[PARAM_HEADER2_HTTP_GET]); }
-  if (!doc[PARAM_TARGET_HTTP_GET].isNull()) { setTargetHttpGet(doc[PARAM_TARGET_HTTP_GET]); }
-  if (!doc[PARAM_TARGET_INFLUXDB2].isNull()) { setTargetInfluxDB2(doc[PARAM_TARGET_INFLUXDB2]); }
-  if (!doc[PARAM_ORG_INFLUXDB2].isNull()) { setOrgInfluxDB2(doc[PARAM_ORG_INFLUXDB2]); }
-  if (!doc[PARAM_BUCKET_INFLUXDB2].isNull()) { setBucketInfluxDB2(doc[PARAM_BUCKET_INFLUXDB2]); }
-  if (!doc[PARAM_TOKEN_INFLUXDB2].isNull()) { setTokenInfluxDB2(doc[PARAM_TOKEN_INFLUXDB2]); }
-  if (!doc[PARAM_TARGET_MQTT].isNull()) { setTargetMqtt(doc[PARAM_TARGET_MQTT]); }
-  if (!doc[PARAM_PORT_MQTT].isNull()) { setPortMqtt(doc[PARAM_PORT_MQTT].as<int>()); }
-  if (!doc[PARAM_USER_MQTT].isNull()) { setUserMqtt(doc[PARAM_USER_MQTT]); }
-  if (!doc[PARAM_PASS_MQTT].isNull()) { setPassMqtt(doc[PARAM_PASS_MQTT]); }
+  if (!doc[PARAM_TARGET_HTTP_POST].isNull()) {
+    setTargetHttpPost(doc[PARAM_TARGET_HTTP_POST]);
+  }
+  if (!doc[PARAM_HEADER1_HTTP_POST].isNull()) {
+    setHeader1HttpPost(doc[PARAM_HEADER1_HTTP_POST]);
+  }
+  if (!doc[PARAM_HEADER2_HTTP_POST].isNull()) {
+    setHeader2HttpPost(doc[PARAM_HEADER2_HTTP_POST]);
+  }
+  if (!doc[PARAM_HEADER1_HTTP_GET].isNull()) {
+    setHeader1HttpGet(doc[PARAM_HEADER1_HTTP_GET]);
+  }
+  if (!doc[PARAM_HEADER2_HTTP_GET].isNull()) {
+    setHeader2HttpGet(doc[PARAM_HEADER2_HTTP_GET]);
+  }
+  if (!doc[PARAM_TARGET_HTTP_GET].isNull()) {
+    setTargetHttpGet(doc[PARAM_TARGET_HTTP_GET]);
+  }
+  if (!doc[PARAM_TARGET_INFLUXDB2].isNull()) {
+    setTargetInfluxDB2(doc[PARAM_TARGET_INFLUXDB2]);
+  }
+  if (!doc[PARAM_ORG_INFLUXDB2].isNull()) {
+    setOrgInfluxDB2(doc[PARAM_ORG_INFLUXDB2]);
+  }
+  if (!doc[PARAM_BUCKET_INFLUXDB2].isNull()) {
+    setBucketInfluxDB2(doc[PARAM_BUCKET_INFLUXDB2]);
+  }
+  if (!doc[PARAM_TOKEN_INFLUXDB2].isNull()) {
+    setTokenInfluxDB2(doc[PARAM_TOKEN_INFLUXDB2]);
+  }
+  if (!doc[PARAM_TARGET_MQTT].isNull()) {
+    setTargetMqtt(doc[PARAM_TARGET_MQTT]);
+  }
+  if (!doc[PARAM_PORT_MQTT].isNull()) {
+    setPortMqtt(doc[PARAM_PORT_MQTT].as<int>());
+  }
+  if (!doc[PARAM_USER_MQTT].isNull()) {
+    setUserMqtt(doc[PARAM_USER_MQTT]);
+  }
+  if (!doc[PARAM_PASS_MQTT].isNull()) {
+    setPassMqtt(doc[PARAM_PASS_MQTT]);
+  }
 
   _saveNeeded = true;
 }
@@ -170,7 +198,7 @@ bool BaseConfig::saveFile() {
   }
 
   DynamicJsonDocument doc(2048);
-  createJson(doc, false); // Include secrets
+  createJson(doc, false);  // Include secrets
 #if LOG_LEVEL == 6
   serializeJson(doc, Serial);
   Serial.print(CR);

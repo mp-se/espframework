@@ -21,23 +21,24 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
+#include <ESP8266mDNS.h>
+#include <MQTT.h>
+
 #include <basepush.hpp>
 #include <log.hpp>
 #include <utils.hpp>
 
-#include <ESP8266mDNS.h>
-#include <MQTT.h>
-
 void BasePush::probeMFLN(String serverPath) {
   // serverPath=: http:://servername:port/path
 
-  int port = 443; // default SSL port
+  int port = 443;                         // default SSL port
   String host = serverPath.substring(8);  // remove the prefix or the probe will
                                           // fail, it needs a pure host name.
   int idx = host.indexOf("/");
   if (idx != -1) host = host.substring(0, idx);
 
-  idx = host.indexOf(":"); // If a server port is defined, lets extract that part
+  idx =
+      host.indexOf(":");  // If a server port is defined, lets extract that part
   if (idx != -1) {
     String p = host.substring(idx + 1);
     port = p.toInt();
@@ -52,12 +53,15 @@ void BasePush::probeMFLN(String serverPath) {
   }
 }
 
-void BasePush::sendInfluxDb2(String& payload, const char* target, const char* org, const char* bucket, const char* token) {
+void BasePush::sendInfluxDb2(String& payload, const char* target,
+                             const char* org, const char* bucket,
+                             const char* token) {
   Log.notice(F("PUSH: Sending values to influxdb2." CR));
   _lastResponseCode = 0;
   _lastSuccess = false;
 
-  String serverPath = String(target) + "/api/v2/write?org=" + String(org) + "&bucket=" + String(bucket);
+  String serverPath = String(target) + "/api/v2/write?org=" + String(org) +
+                      "&bucket=" + String(bucket);
 
 #if LOG_LEVEL == 6
   Log.verbose(F("PUSH: url %s." CR), serverPath.c_str());
@@ -83,9 +87,11 @@ void BasePush::sendInfluxDb2(String& payload, const char* target, const char* or
 
   if (_lastResponseCode == 204) {
     _lastSuccess = true;
-    Log.notice(F("PUSH: InfluxDB2 push successful, response=%d" CR), _lastResponseCode);
+    Log.notice(F("PUSH: InfluxDB2 push successful, response=%d" CR),
+               _lastResponseCode);
   } else {
-    Log.notice(F("PUSH: InfluxDB2 push failed, response=%d" CR), _lastResponseCode);
+    Log.notice(F("PUSH: InfluxDB2 push failed, response=%d" CR),
+               _lastResponseCode);
   }
 
   if (isSecure(target)) {
@@ -117,7 +123,8 @@ void BasePush::addHttpHeader(HTTPClient& http, String header) {
   }
 }
 
-void BasePush::sendHttpPost(String& payload, const char* target, const char* header1, const char* header2) {
+void BasePush::sendHttpPost(String& payload, const char* target,
+                            const char* header1, const char* header2) {
   Log.notice(F("PUSH: Sending values to HTTP post" CR));
   _lastResponseCode = 0;
   _lastSuccess = false;
@@ -146,7 +153,8 @@ void BasePush::sendHttpPost(String& payload, const char* target, const char* hea
 
   if (_lastResponseCode == 200) {
     _lastSuccess = true;
-    Log.notice(F("PUSH: HTTP post successful, response=%d" CR), _lastResponseCode);
+    Log.notice(F("PUSH: HTTP post successful, response=%d" CR),
+               _lastResponseCode);
   } else {
     Log.error(F("PUSH: HTTP post failed, response=%d" CR), _lastResponseCode);
   }
@@ -162,7 +170,8 @@ void BasePush::sendHttpPost(String& payload, const char* target, const char* hea
   tcp_cleanup();
 }
 
-void BasePush::sendHttpGet(String& payload, const char* target, const char* header1, const char* header2) {
+void BasePush::sendHttpGet(String& payload, const char* target,
+                           const char* header1, const char* header2) {
   // payload=: ?param=value&param=value
 
   Log.notice(F("PUSH: Sending values via HTTP get" CR));
@@ -194,7 +203,8 @@ void BasePush::sendHttpGet(String& payload, const char* target, const char* head
 
   if (_lastResponseCode == 200) {
     _lastSuccess = true;
-    Log.notice(F("PUSH: HTTP get successful, response=%d" CR), _lastResponseCode);
+    Log.notice(F("PUSH: HTTP get successful, response=%d" CR),
+               _lastResponseCode);
   } else {
     Log.error(F("PUSH: HTTP get failed, response=%d" CR), _lastResponseCode);
   }
@@ -210,7 +220,8 @@ void BasePush::sendHttpGet(String& payload, const char* target, const char* head
   tcp_cleanup();
 }
 
-void BasePush::sendMqtt(String& payload, const char* target, int port, const char* user, const char* pass) {
+void BasePush::sendMqtt(String& payload, const char* target, int port,
+                        const char* user, const char* pass) {
   // payload=: topic1,data1|topic2,data2|...
 
   Log.notice(F("PUSH: Sending values to mqtt." CR));
@@ -267,7 +278,8 @@ void BasePush::sendMqtt(String& payload, const char* target, int port, const cha
       _lastResponseCode = 0;
     } else {
       _lastResponseCode = mqtt.lastError();
-      Log.error(F("PUSH: MQTT publish failed on %s with error %d" CR), topic.c_str(), mqtt.lastError());
+      Log.error(F("PUSH: MQTT publish failed on %s with error %d" CR),
+                topic.c_str(), mqtt.lastError());
     }
 
     index = next + 1;
@@ -275,33 +287,38 @@ void BasePush::sendMqtt(String& payload, const char* target, int port, const cha
   }
 
   mqtt.disconnect();
- 
+
   if (port > 8000) {
     _wifiSecure.stop();
   } else {
     _wifi.stop();
   }
- 
+
   tcp_cleanup();
 }
 
 bool BasePush::sendHttpPost(String& payload) {
-  sendHttpPost(payload, _config->getTargetHttpPost(), _config->getHeader1HttpPost(), _config->getHeader2HttpPost());
+  sendHttpPost(payload, _config->getTargetHttpPost(),
+               _config->getHeader1HttpPost(), _config->getHeader2HttpPost());
   return _lastSuccess;
 }
 
 bool BasePush::sendHttpGet(String& payload) {
-  sendHttpGet(payload, _config->getTargetHttpGet(), _config->getHeader1HttpGet(), _config->getHeader2HttpGet());
+  sendHttpGet(payload, _config->getTargetHttpGet(),
+              _config->getHeader1HttpGet(), _config->getHeader2HttpGet());
   return _lastSuccess;
 }
 
 bool BasePush::sendInfluxDb2(String& payload) {
-  sendInfluxDb2(payload, _config->getTargetInfluxDB2(), _config->getOrgInfluxDB2(), _config->getBucketInfluxDB2(), _config->getTokenInfluxDB2());
+  sendInfluxDb2(payload, _config->getTargetInfluxDB2(),
+                _config->getOrgInfluxDB2(), _config->getBucketInfluxDB2(),
+                _config->getTokenInfluxDB2());
   return _lastSuccess;
 }
 
 bool BasePush::sendMqtt(String& payload) {
-  sendMqtt(payload, _config->getTargetMqtt(), _config->getPortMqtt(), _config->getUserMqtt(), _config->getPassMqtt());
+  sendMqtt(payload, _config->getTargetMqtt(), _config->getPortMqtt(),
+           _config->getUserMqtt(), _config->getPassMqtt());
   return _lastSuccess;
 }
 

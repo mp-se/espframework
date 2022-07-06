@@ -29,10 +29,12 @@ SOFTWARE.
 
 #define MAX_SKETCH_SPACE 1044464
 
-BaseWebHandler::BaseWebHandler(WebConfig* config, bool wifiSetup) { _webConfig = config; _wifiSetup = wifiSetup; }
+BaseWebHandler::BaseWebHandler(WebConfig* config) { _webConfig = config; }
 
 void BaseWebHandler::loop() {
-  // TEMPORARY MDNS.update(); 
+  if (!_server) return;
+
+  MDNS.update();
   _server->handleClient();
 }
 
@@ -40,7 +42,7 @@ void BaseWebHandler::webHandleConfigRead() {
   Log.notice(F("WEB : BaseWebHandler callback for /api/config(get)." CR));
 
   DynamicJsonDocument doc(2048);
-  _webConfig->createJson(doc, true); // will not include ssid passwords
+  _webConfig->createJson(doc, true);  // will not include ssid passwords
 
 #if LOG_LEVEL == 6
   serializeJson(doc, Serial);
@@ -188,36 +190,25 @@ void BaseWebHandler::webHandlePageNotFound() {
 }
 
 void BaseWebHandler::setupWebHandlers() {
-  if (_wifiSetup) {
-    Log.notice(F("WEB : Setting up web handlers (wifi config)." CR));
-    _server->on("/", std::bind(&BaseWebHandler::webReturnWifiHtm, this));
-  } else {
-    Log.notice(F("WEB : Setting up web handlers (normal)." CR));
-    _server->on("/", std::bind(&BaseWebHandler::webReturnIndexHtm, this));
-    _server->on("/index.htm",
-                std::bind(&BaseWebHandler::webReturnIndexHtm, this));
-    _server->on("/config.htm",
-                std::bind(&BaseWebHandler::webReturnConfigHtm, this));
-    _server->on("/about.htm",
-                std::bind(&BaseWebHandler::webReturnAboutHtm, this));
-    _server->on("/upload.htm",
-                std::bind(&BaseWebHandler::webReturnUploadHtm, this));
-    _server->on("/api/config", HTTP_GET,
-                std::bind(&BaseWebHandler::webHandleConfigRead, this));
-    _server->on("/api/upload", HTTP_POST,
-                std::bind(&BaseWebHandler::webReturnOK, this),
-                std::bind(&BaseWebHandler::webHandleUploadFile, this));
-    _server->on("/api/config", HTTP_POST,
-                std::bind(&BaseWebHandler::webHandleConfigWrite, this));
-    /* Not used since they consume to much space on an ESP8266
-    _server->on("/bootstrap.css",
-                std::bind(&BaseWebHandler::webReturnBoostrapCss, this));
-    _server->on("/bootstrap.js",
-                std::bind(&BaseWebHandler::webReturnBoostrapJs, this));
-    _server->on("/jquery.js",
-                std::bind(&BaseWebHandler::webReturnJqueryJs, this));*/
-  }
+  if (!_server) return;
 
+  Log.notice(F("WEB : Setting up web handlers." CR));
+  _server->on("/", std::bind(&BaseWebHandler::webReturnIndexHtm, this));
+  _server->on("/index.htm",
+              std::bind(&BaseWebHandler::webReturnIndexHtm, this));
+  _server->on("/config.htm",
+              std::bind(&BaseWebHandler::webReturnConfigHtm, this));
+  _server->on("/about.htm",
+              std::bind(&BaseWebHandler::webReturnAboutHtm, this));
+  _server->on("/upload.htm",
+              std::bind(&BaseWebHandler::webReturnUploadHtm, this));
+  _server->on("/api/config", HTTP_GET,
+              std::bind(&BaseWebHandler::webHandleConfigRead, this));
+  _server->on("/api/upload", HTTP_POST,
+              std::bind(&BaseWebHandler::webReturnOK, this),
+              std::bind(&BaseWebHandler::webHandleUploadFile, this));
+  _server->on("/api/config", HTTP_POST,
+              std::bind(&BaseWebHandler::webHandleConfigWrite, this));
   _server->onNotFound(std::bind(&BaseWebHandler::webHandlePageNotFound, this));
 }
 

@@ -24,10 +24,10 @@ SOFTWARE.
 #ifndef SRC_BASEPUSH_HPP_
 #define SRC_BASEPUSH_HPP_
 
-#include <interface.hpp>
-
 #include <ESP8266HTTPClient.h>
 #include <WiFiClientSecure.h>
+
+#include <interface.hpp>
 
 class BasePush {
  protected:
@@ -35,22 +35,26 @@ class BasePush {
   WiFiClientSecure _wifiSecure;
   HTTPClient _http;
   HTTPClient _httpSecure;
-  int _lastResponseCode;
-  bool _lastSuccess;
-  int _tcpTimeout = 30; // seconds
+  int _lastResponseCode = 0;
+  bool _lastSuccess = false;
+  int _tcpTimeout = 30;  // seconds
   PushConfig* _config;
 
   void probeMFLN(String serverPath);
   void addHttpHeader(HTTPClient& http, String header);
   bool isSecure(String target) { return target.startsWith("https://"); }
 
-  void sendHttpPost(String& payload, const char* target, const char* header1, const char* header2);
-  void sendHttpGet(String& payload, const char* target, const char* header1, const char* header2);
-  void sendInfluxDb2(String& payload, const char* target, const char* org, const char* bucket, const char* token);
-  void sendMqtt(String& payload, const char* target, int port, const char* user, const char* pass);
+  void sendHttpPost(String& payload, const char* target, const char* header1,
+                    const char* header2);
+  void sendHttpGet(String& payload, const char* target, const char* header1,
+                   const char* header2);
+  void sendInfluxDb2(String& payload, const char* target, const char* org,
+                     const char* bucket, const char* token);
+  void sendMqtt(String& payload, const char* target, int port, const char* user,
+                const char* pass);
 
  public:
-  BasePush(PushConfig* config) { _config = config; }
+  explicit BasePush(PushConfig* config) { _config = config; }
 
   int getLastResponseCode() { return _lastResponseCode; }
   bool wasLastSuccessful() { return _lastSuccess; }

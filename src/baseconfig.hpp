@@ -49,7 +49,10 @@ SOFTWARE.
 #define PARAM_USER_MQTT "mqtt-user"
 #define PARAM_PASS_MQTT "mqtt-pass"
 
-class BaseConfig : public WifiConfig, public OtaConfig, public WebConfig, public PushConfig {
+class BaseConfig : public WifiConfig,
+                   public OtaConfig,
+                   public WebConfig,
+                   public PushConfig {
  private:
   // WifiConfig
   String _mDNS;
@@ -71,7 +74,7 @@ class BaseConfig : public WifiConfig, public OtaConfig, public WebConfig, public
   String _bucketInfluxDb2;
   String _tokenInfluxDb2;
   String _targetMqtt;
-  int _portMqtt;
+  int _portMqtt = 1883;
   String _userMqtt;
   String _passMqtt;
 
@@ -130,77 +133,77 @@ class BaseConfig : public WifiConfig, public OtaConfig, public WebConfig, public
 
   // PushConfig
   const char* getTargetHttpPost() { return _targetHttpPost.c_str(); }
-  void setTargetHttpPost(String target) { 
-    _targetHttpPost = target; 
-    _saveNeeded = true; 
+  void setTargetHttpPost(String target) {
+    _targetHttpPost = target;
+    _saveNeeded = true;
   }
   const char* getHeader1HttpPost() { return _header1HttpPost.c_str(); }
-  void setHeader1HttpPost(String header) { 
-    _header1HttpPost = header; 
-    _saveNeeded = true; 
+  void setHeader1HttpPost(String header) {
+    _header1HttpPost = header;
+    _saveNeeded = true;
   }
   const char* getHeader2HttpPost() { return _header2HttpPost.c_str(); }
-  void setHeader2HttpPost(String header) { 
-    _header2HttpPost = header; 
-    _saveNeeded = true; 
+  void setHeader2HttpPost(String header) {
+    _header2HttpPost = header;
+    _saveNeeded = true;
   }
 
   const char* getTargetHttpGet() { return _targetHttpGet.c_str(); }
-  void setTargetHttpGet(String target)  { 
-    _targetHttpGet = target; 
-    _saveNeeded = true; 
+  void setTargetHttpGet(String target) {
+    _targetHttpGet = target;
+    _saveNeeded = true;
   }
   const char* getHeader1HttpGet() { return _header1HttpGet.c_str(); }
-  void setHeader1HttpGet(String header) { 
-    _header1HttpGet = header; 
-    _saveNeeded = true; 
+  void setHeader1HttpGet(String header) {
+    _header1HttpGet = header;
+    _saveNeeded = true;
   }
   const char* getHeader2HttpGet() { return _header2HttpGet.c_str(); }
-  void setHeader2HttpGet(String header) { 
-    _header2HttpGet = header; 
-    _saveNeeded = true; 
+  void setHeader2HttpGet(String header) {
+    _header2HttpGet = header;
+    _saveNeeded = true;
   }
 
   const char* getTargetInfluxDB2() { return _targetInfluxDb2.c_str(); }
-  void setTargetInfluxDB2(String target)  { 
-    _targetInfluxDb2 = target; 
-    _saveNeeded = true; 
+  void setTargetInfluxDB2(String target) {
+    _targetInfluxDb2 = target;
+    _saveNeeded = true;
   }
   const char* getOrgInfluxDB2() { return _orgInfluxDb2.c_str(); }
-  void setOrgInfluxDB2(String org) { 
-    _orgInfluxDb2 = org; 
-    _saveNeeded = true; 
+  void setOrgInfluxDB2(String org) {
+    _orgInfluxDb2 = org;
+    _saveNeeded = true;
   }
   const char* getBucketInfluxDB2() { return _bucketInfluxDb2.c_str(); }
-  void setBucketInfluxDB2(String bucket) { 
-    _bucketInfluxDb2 = bucket; 
-    _saveNeeded = true; 
+  void setBucketInfluxDB2(String bucket) {
+    _bucketInfluxDb2 = bucket;
+    _saveNeeded = true;
   }
   const char* getTokenInfluxDB2() { return _tokenInfluxDb2.c_str(); }
-  void setTokenInfluxDB2(String token) { 
-    _tokenInfluxDb2 = token; 
-    _saveNeeded = true; 
+  void setTokenInfluxDB2(String token) {
+    _tokenInfluxDb2 = token;
+    _saveNeeded = true;
   }
 
   const char* getTargetMqtt() { return _targetMqtt.c_str(); }
-  void setTargetMqtt(String target) { 
-    _targetMqtt = target; 
-    _saveNeeded = true; 
+  void setTargetMqtt(String target) {
+    _targetMqtt = target;
+    _saveNeeded = true;
   }
   int getPortMqtt() { return _portMqtt; }
-  void setPortMqtt(int port) { 
-    _portMqtt = port; 
-    _saveNeeded = true; 
+  void setPortMqtt(int port) {
+    _portMqtt = port;
+    _saveNeeded = true;
   }
   const char* getUserMqtt() { return _userMqtt.c_str(); }
-  void setUserMqtt(String user) { 
-    _userMqtt = user; 
-    _saveNeeded = true; 
+  void setUserMqtt(String user) {
+    _userMqtt = user;
+    _saveNeeded = true;
   }
   const char* getPassMqtt() { return _passMqtt.c_str(); }
-  void setPassMqtt(String pass) { 
-    _passMqtt = pass; 
-    _saveNeeded = true; 
+  void setPassMqtt(String pass) {
+    _passMqtt = pass;
+    _saveNeeded = true;
   }
 
   // Base

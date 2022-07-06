@@ -36,7 +36,8 @@ class OtaConfig {
 
 class WebConfig {
  public:
-  virtual void createJson(DynamicJsonDocument& doc, bool skipSecrets = true) = 0;
+  virtual void createJson(DynamicJsonDocument& doc,
+                          bool skipSecrets = true) = 0;
   virtual void parseJson(DynamicJsonDocument& doc);
 
   virtual bool saveFile();
