@@ -21,11 +21,12 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-#include <demo-webhandler.hpp>
 #include <demo-push.hpp>
+#include <demo-webhandler.hpp>
 #include <espframework.hpp>
 
-DemoWebHandler::DemoWebHandler(WebConfig* config, DemoPush* push) : BaseWebHandler(config) {
+DemoWebHandler::DemoWebHandler(WebConfig* config, DemoPush* push)
+    : BaseWebHandler(config) {
   _push = push;
 }
 
@@ -35,30 +36,52 @@ void DemoWebHandler::setupWebHandlers() {
 
   _server->on("/test.htm", std::bind(&DemoWebHandler::webReturnTestHtm, this));
 
-  _server->on("/api/push/http-post", HTTP_POST, std::bind(&DemoWebHandler::webHandlePushHttpPost, this));
-  _server->on("/api/push/http-get", HTTP_POST, std::bind(&DemoWebHandler::webHandlePushHttpGet, this));
-  _server->on("/api/push/influxdb2", HTTP_POST, std::bind(&DemoWebHandler::webHandlePushHttpInfluxDb2, this));
-  _server->on("/api/push/mqtt", HTTP_POST, std::bind(&DemoWebHandler::webHandlePushHttpMqtt, this));
+  _server->on("/api/status", HTTP_GET,
+              std::bind(&DemoWebHandler::webHandleStatus, this));
+  _server->on("/api/push/http-post", HTTP_POST,
+              std::bind(&DemoWebHandler::webHandlePushHttpPost, this));
+  _server->on("/api/push/http-get", HTTP_POST,
+              std::bind(&DemoWebHandler::webHandlePushHttpGet, this));
+  _server->on("/api/push/influxdb2", HTTP_POST,
+              std::bind(&DemoWebHandler::webHandlePushHttpInfluxDb2, this));
+  _server->on("/api/push/mqtt", HTTP_POST,
+              std::bind(&DemoWebHandler::webHandlePushHttpMqtt, this));
+}
+
+void DemoWebHandler::webHandleStatus() {
+  Log.notice(F("WEB : DemoWebHandler callback for /api/status)." CR));
+
+  DynamicJsonDocument doc(512);
+
+  doc[PARAM_ID] = _webConfig->getID();
+  doc[PARAM_MDNS] = _webConfig->getMDNS();
+  doc[PARAM_SSID] = WiFi.SSID();
+
+#if LOG_LEVEL == 6
+  serializeJson(doc, Serial);
+  Serial.print(CR);
+#endif
+
+  String out;
+  out.reserve(2048);
+  serializeJson(doc, out);
+  _server->send(200, "application/json", out.c_str());
 }
 
 void DemoWebHandler::webHandlePushHttpPost() {
-  Log.notice(F("WEB : BaseWebHandler callback for /api/push/http-post." CR));
-
+  Log.notice(F("WEB : DemoWebHandler callback for /api/push/http-post." CR));
 }
 
 void DemoWebHandler::webHandlePushHttpGet() {
-  Log.notice(F("WEB : BaseWebHandler callback for /api/push/http-get." CR));
-  
+  Log.notice(F("WEB : DemoWebHandler callback for /api/push/http-get." CR));
 }
 
 void DemoWebHandler::webHandlePushHttpMqtt() {
-  Log.notice(F("WEB : BaseWebHandler callback for /api/push/mqtt." CR));
-
+  Log.notice(F("WEB : DemoWebHandler callback for /api/push/mqtt." CR));
 }
 
 void DemoWebHandler::webHandlePushHttpInfluxDb2() {
-  Log.notice(F("WEB : BaseWebHandler callback for /api/push/influxdb2." CR));
-
+  Log.notice(F("WEB : DemoWebHandler callback for /api/push/influxdb2." CR));
 }
 
 // EOF

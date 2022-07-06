@@ -173,8 +173,8 @@ bool OtaUpdate::checkFirmwareVersion() {
   http.end();
 
 #if LOG_LEVEL == 6
-  Log.verbose(F("OTA : OTA found new version %s." CR),
-              _newFirmware ? "true" : "false");
+  Log.verbose(F("OTA : New version %s." CR),
+              _newFirmware ? "found" : "NOT found");
 #endif
 
   return _newFirmware;

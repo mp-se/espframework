@@ -23,8 +23,8 @@ SOFTWARE.
  */
 #include <demo-config.hpp>
 #include <demo-main.hpp>
-#include <demo-webhandler.hpp>
 #include <demo-push.hpp>
+#include <demo-webhandler.hpp>
 #include <espframework.hpp>
 #include <ota.hpp>
 #include <wificonnection.hpp>

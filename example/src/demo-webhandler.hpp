@@ -25,6 +25,7 @@ SOFTWARE.
 #define SRC_DEMO_WEBHANDLER_HPP_
 
 #include <incbin.h>
+
 #include <basewebhandler.hpp>
 #include <demo-push.hpp>
 
@@ -39,7 +40,8 @@ class DemoWebHandler : public BaseWebHandler {
   }
 
   void setupWebHandlers();
-  
+
+  void webHandleStatus();
   void webHandlePushHttpPost();
   void webHandlePushHttpGet();
   void webHandlePushHttpMqtt();

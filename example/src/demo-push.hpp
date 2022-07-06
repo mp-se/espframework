@@ -24,15 +24,15 @@ SOFTWARE.
 #ifndef SRC_DEMO_PUSH_HPP_
 #define SRC_DEMO_PUSH_HPP_
 
-#include <demo-config.hpp>
 #include <basepush.hpp>
+#include <demo-config.hpp>
 
 class DemoPush : public BasePush {
  private:
   DemoConfig* _demoConfig;
 
  public:
-  DemoPush(DemoConfig* config);
+  explicit DemoPush(DemoConfig* config);
 };
 
 #endif  // SRC_DEMO_PUSH_HPP_

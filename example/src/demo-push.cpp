@@ -21,13 +21,12 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-#include <demo-push.hpp>
 #include <demo-config.hpp>
+#include <demo-push.hpp>
 #include <espframework.hpp>
 
-DemoPush::DemoPush(DemoConfig* config)
-  : BasePush(config) {
-    _demoConfig = config;
+DemoPush::DemoPush(DemoConfig* config) : BasePush(config) {
+  _demoConfig = config;
 }
 
 // EOF
