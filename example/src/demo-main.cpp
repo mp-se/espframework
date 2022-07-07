@@ -23,6 +23,7 @@ SOFTWARE.
  */
 #include <demo-config.hpp>
 #include <demo-main.hpp>
+#include <demo-push.hpp>
 #include <demo-webhandler.hpp>
 #include <espframework.hpp>
 #include <ota.hpp>
@@ -32,7 +33,8 @@ SerialDebug mySerial(115200L);
 DemoConfig myConfig("mdnsbase", "/esplib.cfg");
 WifiConnection myWifi(&myConfig, "espSSID", "password", "esplib", "", "");
 OtaUpdate myOta(&myConfig, "0.0.0");
-DemoWebHandler myWebHandler(&myConfig);
+DemoPush myPush(&myConfig);
+DemoWebHandler myWebHandler(&myConfig, &myPush);
 
 void setup() {
   Log.notice(F("Main: Started setup for %s." CR),

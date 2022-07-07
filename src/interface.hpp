@@ -36,7 +36,8 @@ class OtaConfig {
 
 class WebConfig {
  public:
-  virtual void createJson(DynamicJsonDocument& doc) = 0;
+  virtual void createJson(DynamicJsonDocument& doc,
+                          bool skipSecrets = true) = 0;
   virtual void parseJson(DynamicJsonDocument& doc);
 
   virtual bool saveFile();
@@ -58,6 +59,43 @@ class WifiConfig {
   virtual void setWifiPass(String s, int idx);
 
   virtual bool saveFile();
+};
+
+class PushConfig {
+ public:
+  virtual const char* getMDNS();
+
+  virtual const char* getTargetHttpPost() = 0;
+  virtual void setTargetHttpPost(String target);
+  virtual const char* getHeader1HttpPost();
+  virtual void setHeader1HttpPost(String header);
+  virtual const char* getHeader2HttpPost();
+  virtual void setHeader2HttpPost(String header);
+
+  virtual const char* getTargetHttpGet();
+  virtual void setTargetHttpGet(String target);
+  virtual const char* getHeader1HttpGet();
+  virtual void setHeader1HttpGet(String header);
+  virtual const char* getHeader2HttpGet();
+  virtual void setHeader2HttpGet(String header);
+
+  virtual const char* getTargetInfluxDB2();
+  virtual void setTargetInfluxDB2(String target);
+  virtual const char* getOrgInfluxDB2();
+  virtual void setOrgInfluxDB2(String org);
+  virtual const char* getBucketInfluxDB2();
+  virtual void setBucketInfluxDB2(String bucket);
+  virtual const char* getTokenInfluxDB2();
+  virtual void setTokenInfluxDB2(String token);
+
+  virtual const char* getTargetMqtt();
+  virtual void setTargetMqtt(String target);
+  virtual int getPortMqtt();
+  virtual void setPortMqtt(int port);
+  virtual const char* getUserMqtt();
+  virtual void setUserMqtt(String user);
+  virtual const char* getPassMqtt();
+  virtual void setPassMqtt(String pass);
 };
 
 #endif  // SRC_INTERFACE_HPP_

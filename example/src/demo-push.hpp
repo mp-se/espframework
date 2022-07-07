@@ -21,36 +21,20 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-#ifndef SRC_DEMO_WEBHANDLER_HPP_
-#define SRC_DEMO_WEBHANDLER_HPP_
+#ifndef SRC_DEMO_PUSH_HPP_
+#define SRC_DEMO_PUSH_HPP_
 
-#include <incbin.h>
+#include <basepush.hpp>
+#include <demo-config.hpp>
 
-#include <basewebhandler.hpp>
-#include <demo-push.hpp>
-
-INCBIN_EXTERN(TestHtm);
-
-class DemoWebHandler : public BaseWebHandler {
+class DemoPush : public BasePush {
  private:
-  DemoPush* _push;
-
-  void webReturnTestHtm() {
-    _server->send_P(200, "text/html", (const char*)gTestHtmData, gTestHtmSize);
-  }
-
-  void setupWebHandlers();
-
-  void webHandleStatus();
-  void webHandlePushHttpPost();
-  void webHandlePushHttpGet();
-  void webHandlePushHttpMqtt();
-  void webHandlePushHttpInfluxDb2();
+  DemoConfig* _demoConfig;
 
  public:
-  explicit DemoWebHandler(WebConfig* config, DemoPush* push);
+  explicit DemoPush(DemoConfig* config);
 };
 
-#endif  // SRC_DEMO_WEBHANDLER_HPP_
+#endif  // SRC_DEMO_PUSH_HPP_
 
 // EOF

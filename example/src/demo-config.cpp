@@ -29,11 +29,12 @@ SOFTWARE.
 DemoConfig::DemoConfig(String baseMDNS, String fileName)
     : BaseConfig(baseMDNS, fileName) {}
 
-void DemoConfig::createJson(DynamicJsonDocument& doc) {
+void DemoConfig::createJson(DynamicJsonDocument& doc, bool skipSecrets) {
   // Call base class functions
-  createJsonBase(doc);
-  createJsonWifi(doc);
-  createJsonOta(doc);
+  createJsonBase(doc, skipSecrets);
+  createJsonWifi(doc, skipSecrets);
+  createJsonOta(doc, skipSecrets);
+  createJsonPush(doc, skipSecrets);
 
   // Handle project specific config
 }
@@ -43,6 +44,7 @@ void DemoConfig::parseJson(DynamicJsonDocument& doc) {
   parseJsonBase(doc);
   parseJsonWifi(doc);
   parseJsonOta(doc);
+  parseJsonPush(doc);
 
   // Handle project specific config
 }
