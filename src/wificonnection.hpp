@@ -25,6 +25,7 @@ SOFTWARE.
 #define SRC_WIFICONNECTION_HPP_
 
 #include <ESP8266HTTPClient.h>
+#include <WiFiUdp.h>
 
 #include <interface.hpp>
 
@@ -44,6 +45,7 @@ class WifiConnection {
   WifiConnection(WifiConfig* cfg, String apSSID, String apPWD, String apMDNS,
                  String userSSID = "", String userPWD = "");
   void init();
+  void timeSync();
 
   bool connect();
   bool disconnect();
@@ -53,6 +55,7 @@ class WifiConnection {
   bool hasConfig();
   String getIPAddress();
   void startPortal();
+
   void loop();
 };
 

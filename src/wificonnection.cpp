@@ -45,6 +45,8 @@ SOFTWARE.
 ESP_WiFiManager *myWifiManager;
 DoubleResetDetector *myDRD;
 
+const int NTP_PACKET_SIZE = 48; // NTP time stamp is in the first 48 bytes of the message
+
 WifiConnection::WifiConnection(WifiConfig *cfg, String apSSID, String apPWD,
                                String apMDNS, String userSSID, String userPWD) {
   _wifiConfig = cfg;
@@ -145,7 +147,9 @@ void WifiConnection::startPortal() {
   ESP_RESET();
 }
 
-void WifiConnection::loop() { myDRD->loop(); }
+void WifiConnection::loop() { 
+  myDRD->loop(); 
+}
 
 void WifiConnection::connectAsync(int wifiIndex) {
   WiFi.persistent(true);
@@ -214,6 +218,25 @@ bool WifiConnection::connect() {
 bool WifiConnection::disconnect() {
   Log.notice(F("WIFI: Erasing stored WIFI credentials." CR));
   return WiFi.disconnect(true);  // Erase WIFI credentials
+}
+
+void WifiConnection::timeSync() {
+  configTime(0 * 3600, 0, "pool.ntp.org", "time.nist.gov");
+
+  Log.notice(F("WIFI: Waiting for NTP sync."));
+  time_t now = time(nullptr);
+  
+  while (now < 8 * 3600 * 2) {
+    delay(500);
+    Serial.print(".");
+    now = time(nullptr);
+  }
+
+  Serial.print(CR);
+
+  struct tm timeinfo;
+  gmtime_r(&now, &timeinfo);
+  Log.notice(F("WIFI: Current time: %s."), asctime(&timeinfo));
 }
 
 // EOF
