@@ -299,6 +299,11 @@ void BasePush::sendMqtt(String& payload, const char* target, int port,
   tcp_cleanup();
 }
 
+String BasePush::recvHttpGet(String& payload) {
+  return sendHttpGet(payload, _config->getTargetHttpGet(),
+              _config->getHeader1HttpGet(), _config->getHeader2HttpGet());
+}
+
 bool BasePush::sendHttpPost(String& payload) {
   sendHttpPost(payload, _config->getTargetHttpPost(),
                _config->getHeader1HttpPost(), _config->getHeader2HttpPost());
