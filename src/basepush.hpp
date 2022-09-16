@@ -46,7 +46,7 @@ class BasePush {
 
   void sendHttpPost(String& payload, const char* target, const char* header1,
                     const char* header2);
-  void sendHttpGet(String& payload, const char* target, const char* header1,
+  String sendHttpGet(String& payload, const char* target, const char* header1,
                    const char* header2);
   void sendInfluxDb2(String& payload, const char* target, const char* org,
                      const char* bucket, const char* token);
@@ -60,6 +60,8 @@ class BasePush {
   bool wasLastSuccessful() { return _lastSuccess; }
 
   void setTimeout(int t) { _tcpTimeout = t; }
+
+  String recvHttpGet(String& payload);
 
   bool sendHttpPost(String& payload);
   bool sendHttpGet(String& payload);

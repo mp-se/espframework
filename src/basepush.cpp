@@ -170,13 +170,12 @@ void BasePush::sendHttpPost(String& payload, const char* target,
   tcp_cleanup();
 }
 
-void BasePush::sendHttpGet(String& payload, const char* target,
+String BasePush::sendHttpGet(String& payload, const char* target,
                            const char* header1, const char* header2) {
-  // payload=: ?param=value&param=value
-
   Log.notice(F("PUSH: Sending values via HTTP get" CR));
   _lastResponseCode = 0;
   _lastSuccess = false;
+  String _response = "{}";
 
   String url = String(target) + payload;
 
@@ -210,14 +209,17 @@ void BasePush::sendHttpGet(String& payload, const char* target,
   }
 
   if (isSecure(target)) {
+    _response = _httpSecure.getString();
     _httpSecure.end();
     _wifiSecure.stop();
   } else {
+    _response = _http.getString();
     _http.end();
     _wifi.stop();
   }
 
   tcp_cleanup();
+  return _response;
 }
 
 void BasePush::sendMqtt(String& payload, const char* target, int port,
