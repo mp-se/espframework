@@ -22,6 +22,51 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
 #include <log.hpp>
+#include <LittleFS.h>
+
+void writeErrorLog(const char *format, ...) {
+  File f = LittleFS.open(ERR_FILENAME, "a");
+
+  if (f && f.size() > ERR_FILEMAXSIZE) {
+    f.close();
+    bool b1 = LittleFS.remove(ERR_FILENAME2);
+    bool b2 = LittleFS.rename(ERR_FILENAME, ERR_FILENAME2);
+    f = LittleFS.open(ERR_FILENAME, "a");
+  }
+
+  if (f) {
+    va_list arg;
+    va_start(arg, format);
+    char buf[80];
+    vsnprintf(&buf[0], sizeof(buf), format, arg);
+    f.write(&buf[0], strlen(&buf[0]));
+    va_end(arg);
+    f.println();
+    f.close();
+  }
+}
+
+void dumpErrorLog(const char *fname) {
+  File f = LittleFS.open(fname, "r");
+
+  if (f) {
+    String s;
+    do {
+      s = f.readString();
+      Serial.print( s.c_str() );
+    } while(s.length());
+    f.close();
+  }
+  LittleFS.remove(fname);
+}
+
+void dumpErrorLog1() {
+  dumpErrorLog(ERR_FILENAME);
+}
+
+void dumpErrorLog2() {
+  dumpErrorLog(ERR_FILENAME2);
+}
 
 SerialDebug::SerialDebug(const uint32_t serialSpeed) {
   // Start serial with auto-detected rate (default to defined BAUD)

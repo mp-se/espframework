@@ -26,6 +26,10 @@ SOFTWARE.
 
 #include <ArduinoLog.h>
 
+#define ERR_FILENAME "/error.log"
+#define ERR_FILENAME2 "/error2.log"
+#define ERR_FILEMAXSIZE 2048
+
 class SerialDebug {
  public:
   explicit SerialDebug(const uint32_t serialSpeed = 115200L);
@@ -34,6 +38,10 @@ class SerialDebug {
 
 void printTimestamp(Print* _logOutput, int _logLevel);
 void printNewline(Print* _logOutput);
+
+void writeErrorLog(const char *format, ...);
+void dumpErrorLog1();
+void dumpErrorLog2();
 
 #endif  // SRC_LOG_HPP_
 
