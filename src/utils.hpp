@@ -28,7 +28,15 @@ SOFTWARE.
 
 float convertCtoF(float c);
 float convertFtoC(float f);
+float convertKGtoLBS(float kg);
+float convertLBStoKG(float lbs);
+float convertCLtoUSOZ(float cl);
+float convertCLtoUKOZ(float cl);
+float convertUSOZtoCL(float usoz);
+float convertUKOZtoCL(float ukoz);
+
 float reduceFloatPrecision(float f, int dec);
+
 void tcp_cleanup();
 void deepSleep(int t);
 
