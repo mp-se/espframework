@@ -123,11 +123,12 @@ void BasePush::addHttpHeader(HTTPClient& http, String header) {
   }
 }
 
-void BasePush::sendHttpPost(String& payload, const char* target,
+String BasePush::sendHttpPost(String& payload, const char* target,
                             const char* header1, const char* header2) {
   Log.notice(F("PUSH: Sending values to HTTP post" CR));
   _lastResponseCode = 0;
   _lastSuccess = false;
+  String _response = "{}";
 
 #if LOG_LEVEL == 6
   Log.verbose(F("PUSH: url %s." CR), target);
@@ -155,6 +156,11 @@ void BasePush::sendHttpPost(String& payload, const char* target,
     _lastSuccess = true;
     Log.notice(F("PUSH: HTTP post successful, response=%d" CR),
                _lastResponseCode);
+    if (isSecure(target)) {
+      _response = _httpSecure.getString();
+    } else {
+      _response = _http.getString();
+    }
   } else {
     Log.error(F("PUSH: HTTP post failed, response=%d" CR), _lastResponseCode);
   }
@@ -168,6 +174,7 @@ void BasePush::sendHttpPost(String& payload, const char* target,
   }
 
   tcp_cleanup();
+  return _response;
 }
 
 String BasePush::sendHttpGet(String& payload, const char* target,
@@ -204,16 +211,19 @@ String BasePush::sendHttpGet(String& payload, const char* target,
     _lastSuccess = true;
     Log.notice(F("PUSH: HTTP get successful, response=%d" CR),
                _lastResponseCode);
+    if (isSecure(target)) {
+      _response = _httpSecure.getString();
+    } else {
+      _response = _http.getString();
+    }
   } else {
     Log.error(F("PUSH: HTTP get failed, response=%d" CR), _lastResponseCode);
   }
 
   if (isSecure(target)) {
-    _response = _httpSecure.getString();
     _httpSecure.end();
     _wifiSecure.stop();
   } else {
-    _response = _http.getString();
     _http.end();
     _wifi.stop();
   }
@@ -297,11 +307,6 @@ void BasePush::sendMqtt(String& payload, const char* target, int port,
   }
 
   tcp_cleanup();
-}
-
-String BasePush::recvHttpGet(String& payload) {
-  return sendHttpGet(payload, _config->getTargetHttpGet(),
-              _config->getHeader1HttpGet(), _config->getHeader2HttpGet());
 }
 
 bool BasePush::sendHttpPost(String& payload) {

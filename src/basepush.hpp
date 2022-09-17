@@ -44,15 +44,6 @@ class BasePush {
   void addHttpHeader(HTTPClient& http, String header);
   bool isSecure(String target) { return target.startsWith("https://"); }
 
-  void sendHttpPost(String& payload, const char* target, const char* header1,
-                    const char* header2);
-  String sendHttpGet(String& payload, const char* target, const char* header1,
-                   const char* header2);
-  void sendInfluxDb2(String& payload, const char* target, const char* org,
-                     const char* bucket, const char* token);
-  void sendMqtt(String& payload, const char* target, int port, const char* user,
-                const char* pass);
-
  public:
   explicit BasePush(PushConfig* config) { _config = config; }
 
@@ -61,7 +52,14 @@ class BasePush {
 
   void setTimeout(int t) { _tcpTimeout = t; }
 
-  String recvHttpGet(String& payload);
+  String sendHttpPost(String& payload, const char* target, const char* header1,
+                    const char* header2);
+  String sendHttpGet(String& payload, const char* target, const char* header1,
+                   const char* header2);
+  void sendInfluxDb2(String& payload, const char* target, const char* org,
+                     const char* bucket, const char* token);
+  void sendMqtt(String& payload, const char* target, int port, const char* user,
+                const char* pass);
 
   bool sendHttpPost(String& payload);
   bool sendHttpGet(String& payload);
