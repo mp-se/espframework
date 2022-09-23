@@ -24,7 +24,11 @@ SOFTWARE.
 #ifndef SRC_OTA_HPP_
 #define SRC_OTA_HPP_
 
+#if defined(ESP8266)
 #include <ESP8266HTTPClient.h>
+#else
+#include <HTTPClient.h>
+#endif
 
 #include <interface.hpp>
 

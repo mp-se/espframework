@@ -21,20 +21,28 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-#include <LittleFS.h>
-
 #include <baseconfig.hpp>
 #include <basewebhandler.hpp>
 #include <espframework.hpp>
 
+#if defined(ESP8266)
+#include <LittleFS.h>
 #define MAX_SKETCH_SPACE 1044464
+#else
+#include <FS.h>
+#include <HTTPUpdate.h>
+#include <LittleFS.h>
+#define MAX_SKETCH_SPACE 1835008
+#endif
 
 BaseWebHandler::BaseWebHandler(WebConfig* config) { _webConfig = config; }
 
 void BaseWebHandler::loop() {
   if (!_server) return;
 
+#if defined(ESP8266)
   MDNS.update();
+#endif
   _server->handleClient();
 }
 
@@ -221,6 +229,7 @@ bool BaseWebHandler::setupWebServer() {
   MDNS.begin(_webConfig->getMDNS());
   MDNS.addService("http", "tcp", 80);
 
+#if defined(ESP8266)
   FSInfo fs;
   LittleFS.info(fs);
   Log.notice(F("WEB : File system Total=%d, Used=%d." CR), fs.totalBytes,
@@ -234,6 +243,21 @@ bool BaseWebHandler::setupWebServer() {
       LittleFS.remove(dir.fileName().c_str());
     }
   }
+#else
+  File root = LittleFS.open("/");
+  File f = root.openNextFile();
+  while (f) {
+    Log.notice(F("WEB : File=%s, %d bytes" CR), f.name(), f.size());
+    if (!f.size()) {
+      Log.notice(F("WEB : Empty file detected, removing file." CR));
+      LittleFS.remove(f.name());
+    }
+
+    f = root.openNextFile();
+  }
+  f.close();
+  root.close();
+#endif
 
   setupWebHandlers();
   _server->begin();

@@ -21,7 +21,11 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
+#if defined(ESP8266)
 #include <ESP8266WiFi.h>
+#else
+#include <WiFi.h>
+#endif
 
 #include <espframework.hpp>
 #include <wificonnection.hpp>
@@ -45,7 +49,8 @@ SOFTWARE.
 ESP_WiFiManager *myWifiManager;
 DoubleResetDetector *myDRD;
 
-const int NTP_PACKET_SIZE = 48; // NTP time stamp is in the first 48 bytes of the message
+const int NTP_PACKET_SIZE =
+    48;  // NTP time stamp is in the first 48 bytes of the message
 
 WifiConnection::WifiConnection(WifiConfig *cfg, String apSSID, String apPWD,
                                String apMDNS, String userSSID, String userPWD) {
@@ -147,9 +152,7 @@ void WifiConnection::startPortal() {
   ESP_RESET();
 }
 
-void WifiConnection::loop() { 
-  myDRD->loop(); 
-}
+void WifiConnection::loop() { myDRD->loop(); }
 
 void WifiConnection::connectAsync(int wifiIndex) {
   WiFi.persistent(true);
@@ -157,7 +160,7 @@ void WifiConnection::connectAsync(int wifiIndex) {
   if (_userSSID.length()) {
     Log.notice(F("WIFI: Connecting to wifi using hardcoded settings %s." CR),
                _userSSID.c_str());
-    WiFi.begin(_userSSID, _userPWD);
+    WiFi.begin(_userSSID.c_str(), _userPWD.c_str());
   } else {
     Log.notice(F("WIFI: Connecting to wifi (%d) using stored settings %s." CR),
                wifiIndex, _wifiConfig->getWifiSSID(wifiIndex));
@@ -225,7 +228,7 @@ void WifiConnection::timeSync() {
 
   Log.notice(F("WIFI: Waiting for NTP sync."));
   time_t now = time(nullptr);
-  
+
   while (now < 8 * 3600 * 2) {
     delay(500);
     Serial.print(".");

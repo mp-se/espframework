@@ -29,7 +29,9 @@ float convertCtoF(float c) { return (c * 1.8) + 32.0; }
 float convertFtoC(float f) { return (f - 32.0) / 1.8; }
 
 float convertKGtoLBS(float kg) { return kg * 2.20462262185; }
-float convertLBStoKG(float lbs) { return lbs == 0.0 ? 0.0 : lbs / 2.20462262185; }
+float convertLBStoKG(float lbs) {
+  return lbs == 0.0 ? 0.0 : lbs / 2.20462262185;
+}
 
 float convertCLtoUSOZ(float cl) { return cl * 0.34; }
 float convertCLtoUKOZ(float cl) { return cl == 0.0 ? 0.0 : cl / 2.84; }

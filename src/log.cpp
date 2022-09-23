@@ -21,8 +21,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-#include <log.hpp>
 #include <LittleFS.h>
+
+#include <log.hpp>
 
 void writeErrorLog(const char *format, ...) {
   File f = LittleFS.open(ERR_FILENAME, "a");
@@ -39,7 +40,7 @@ void writeErrorLog(const char *format, ...) {
     va_start(arg, format);
     char buf[80];
     vsnprintf(&buf[0], sizeof(buf), format, arg);
-    f.write(&buf[0], strlen(&buf[0]));
+    f.write(reinterpret_cast<unsigned char *>(&buf[0]), strlen(&buf[0]));
     va_end(arg);
     f.println();
     f.close();
@@ -53,20 +54,16 @@ void dumpErrorLog(const char *fname) {
     String s;
     do {
       s = f.readString();
-      Serial.print( s.c_str() );
-    } while(s.length());
+      Serial.print(s.c_str());
+    } while (s.length());
     f.close();
   }
   LittleFS.remove(fname);
 }
 
-void dumpErrorLog1() {
-  dumpErrorLog(ERR_FILENAME);
-}
+void dumpErrorLog1() { dumpErrorLog(ERR_FILENAME); }
 
-void dumpErrorLog2() {
-  dumpErrorLog(ERR_FILENAME2);
-}
+void dumpErrorLog2() { dumpErrorLog(ERR_FILENAME2); }
 
 SerialDebug::SerialDebug(const uint32_t serialSpeed) {
   // Start serial with auto-detected rate (default to defined BAUD)
@@ -78,7 +75,7 @@ SerialDebug::SerialDebug(const uint32_t serialSpeed) {
   getLog()->notice(F("SDBG: Serial logging started at %l." CR), serialSpeed);
 }
 
-void printTimestamp(Print* _logOutput, int _logLevel) {
+void printTimestamp(Print *_logOutput, int _logLevel) {
   char c[12];
   snprintf(c, sizeof(c), "%10lu ", millis());
   _logOutput->print(c);

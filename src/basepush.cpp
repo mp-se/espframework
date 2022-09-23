@@ -21,7 +21,11 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
+#if defined(ESP8266)
 #include <ESP8266mDNS.h>
+#else
+#include <ESPmDNS.h>
+#endif
 #include <MQTT.h>
 
 #include <basepush.hpp>
@@ -29,8 +33,8 @@ SOFTWARE.
 #include <utils.hpp>
 
 void BasePush::probeMFLN(String serverPath) {
+#if defined(ESP8266)
   // serverPath=: http:://servername:port/path
-
   int port = 443;                         // default SSL port
   String host = serverPath.substring(8);  // remove the prefix or the probe will
                                           // fail, it needs a pure host name.
@@ -51,6 +55,7 @@ void BasePush::probeMFLN(String serverPath) {
     Log.notice(F("PUSH: Server supports smaller SSL buffer." CR));
     _wifiSecure.setBufferSizes(512, 512);
   }
+#endif
 }
 
 void BasePush::sendInfluxDb2(String& payload, const char* target,
@@ -124,7 +129,7 @@ void BasePush::addHttpHeader(HTTPClient& http, String header) {
 }
 
 String BasePush::sendHttpPost(String& payload, const char* target,
-                            const char* header1, const char* header2) {
+                              const char* header1, const char* header2) {
   Log.notice(F("PUSH: Sending values to HTTP post" CR));
   _lastResponseCode = 0;
   _lastSuccess = false;
@@ -178,7 +183,7 @@ String BasePush::sendHttpPost(String& payload, const char* target,
 }
 
 String BasePush::sendHttpGet(String& payload, const char* target,
-                           const char* header1, const char* header2) {
+                             const char* header1, const char* header2) {
   Log.notice(F("PUSH: Sending values via HTTP get" CR));
   _lastResponseCode = 0;
   _lastSuccess = false;
@@ -246,10 +251,12 @@ void BasePush::sendMqtt(String& payload, const char* target, int port,
     Log.notice(F("PUSH: MQTT, SSL enabled without validation." CR));
     _wifiSecure.setInsecure();
 
+#if defined(ESP8266)
     if (_wifiSecure.probeMaxFragmentLength(target, port, 512)) {
       Log.notice(F("PUSH: MQTT server supports smaller SSL buffer." CR));
       _wifiSecure.setBufferSizes(512, 512);
     }
+#endif
 
     mqtt.setTimeout(_tcpTimeout * 1000);
     mqtt.begin(target, port, _wifiSecure);

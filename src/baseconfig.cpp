@@ -21,14 +21,27 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-#include <LittleFS.h>
-
 #include <baseconfig.hpp>
 #include <espframework.hpp>
 
+#if defined(ESP8266)
+#include <LittleFS.h>
+#else
+#include <FS.h>
+#include <LittleFS.h>
+#endif
+
 BaseConfig::BaseConfig(String baseMDNS, String fileName) {
   char buf[30];
+#if defined(ESP8266)
   snprintf(buf, sizeof(buf), "%6x", (unsigned int)ESP.getChipId());
+#else  // defined (ESP32)
+  uint32_t chipId = 0;
+  for (int i = 0; i < 17; i = i + 8) {
+    chipId |= ((ESP.getEfuseMac() >> (40 - i)) & 0xff) << i;
+  }
+  snprintf(&buf[0], sizeof(buf), "%06x", chipId);
+#endif
   _id = String(buf);
   snprintf(buf, sizeof(buf), "%s%s", baseMDNS.c_str(), _id.c_str());
   _mDNS = String(buf);

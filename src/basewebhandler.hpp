@@ -24,9 +24,17 @@ SOFTWARE.
 #ifndef SRC_BASEWEBHANDLER_HPP_
 #define SRC_BASEWEBHANDLER_HPP_
 
+#if defined(ESP8266)
 #include <ESP8266WebServer.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
+#else
+#include <ESPmDNS.h>
+#include <WebServer.h>
+#include <WiFi.h>
+#define ESP8266WebServer WebServer
+#include <FS.h>
+#endif
 #include <incbin.h>
 
 #include <interface.hpp>

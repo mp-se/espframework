@@ -24,7 +24,11 @@ SOFTWARE.
 #ifndef SRC_WIFICONNECTION_HPP_
 #define SRC_WIFICONNECTION_HPP_
 
+#if defined(ESP8266)
 #include <ESP8266HTTPClient.h>
+#else
+#include <HTTPClient.h>
+#endif
 #include <WiFiUdp.h>
 
 #include <interface.hpp>

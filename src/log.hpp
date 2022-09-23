@@ -39,7 +39,7 @@ class SerialDebug {
 void printTimestamp(Print* _logOutput, int _logLevel);
 void printNewline(Print* _logOutput);
 
-void writeErrorLog(const char *format, ...);
+void writeErrorLog(const char* format, ...);
 void dumpErrorLog1();
 void dumpErrorLog2();
 

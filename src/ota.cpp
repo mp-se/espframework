@@ -21,8 +21,15 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
+#if defined(ESP8266)
 #include <ESP8266WiFi.h>
 #include <ESP8266httpUpdate.h>
+#else
+#include <HTTPUpdate.h>
+#include <WiFi.h>
+#define ESPhttpUpdate httpUpdate
+#endif
+
 #include <LittleFS.h>
 
 #include <espframework.hpp>

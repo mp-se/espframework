@@ -27,8 +27,13 @@ SOFTWARE.
 #include <interface.hpp>
 #include <log.hpp>
 
-#define ESPFWK_VER "0.0.1"
+#if defined(ESP8266)
 #define ESP_RESET ESP.reset
+#else
+#define ESP_RESET ESP.restart
+#endif
+
+#define ESPFWK_VER "0.0.1"
 #define PIN_LED 2
 
 #endif  // SRC_ESPFRAMEWORK_HPP_
