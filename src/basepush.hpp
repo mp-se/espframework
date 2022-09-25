@@ -40,7 +40,6 @@ class BasePush {
   HTTPClient _httpSecure;
   int _lastResponseCode = 0;
   bool _lastSuccess = false;
-  int _tcpTimeout = 30;  // seconds
   PushConfig* _config;
 
   void probeMFLN(String serverPath);
@@ -52,8 +51,6 @@ class BasePush {
 
   int getLastResponseCode() { return _lastResponseCode; }
   bool wasLastSuccessful() { return _lastSuccess; }
-
-  void setTimeout(int t) { _tcpTimeout = t; }
 
   String sendHttpPost(String& payload, const char* target, const char* header1,
                       const char* header2);

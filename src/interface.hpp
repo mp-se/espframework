@@ -49,7 +49,9 @@ class WebConfig {
 class WifiConfig {
  public:
   virtual int getWifiConnectionTimeout() = 0;
+  virtual void setWifiConnectionTimeout(int t);
   virtual int getWifiPortalTimeout();
+  virtual void setWifiPortalTimeout(int t);
 
   virtual const char* getMDNS();
   virtual void setMDNS(String s);
@@ -64,6 +66,9 @@ class WifiConfig {
 class PushConfig {
  public:
   virtual const char* getMDNS();
+
+  virtual int getPushTimeout();
+  virtual void setPushTimeout(int t);
 
   virtual const char* getTargetHttpPost() = 0;
   virtual void setTargetHttpPost(String target);

@@ -58,6 +58,8 @@ class BaseConfig : public WifiConfig,
   String _mDNS;
   String _wifiSSID[2] = {"", ""};
   String _wifiPASS[2] = {"", ""};
+  int _wifiConnectionTimeout = 30;
+  int _wifiPortalTimeout = 120;
 
   // OtaConfig
   String _otaURL;
@@ -77,6 +79,7 @@ class BaseConfig : public WifiConfig,
   int _portMqtt = 1883;
   String _userMqtt;
   String _passMqtt;
+  int _pushTimeout;
 
   // BaseConfig
   String _id;
@@ -119,8 +122,19 @@ class BaseConfig : public WifiConfig,
     _wifiPASS[idx] = s;
     _saveNeeded = true;
   }
-  int getWifiConnectionTimeout() { return 30; }
-  int getWifiPortalTimeout() { return 120; }
+  int getWifiConnectionTimeout() { return _wifiConnectionTimeout; }
+  void setWifiConnectionTimeout(int t) {
+    _wifiConnectionTimeout = t;
+    _saveNeeded = true;
+  }
+  int getWifiPortalTimeout() { return _wifiPortalTimeout; }
+  void setWifiPortalTimeout(int t) {
+    _wifiPortalTimeout = t;
+    _saveNeeded = true;
+  }
+
+  int getPushTimeout() { return _pushTimeout; }
+  void setPushTimeout(int t) { _pushTimeout = t; }
 
   // OtaConfig
   const char* getOtaURL() { return _otaURL.c_str(); }

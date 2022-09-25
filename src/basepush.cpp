@@ -79,12 +79,12 @@ void BasePush::sendInfluxDb2(String& payload, const char* target,
     Log.notice(F("PUSH: InfluxDB, SSL enabled without validation." CR));
     _wifiSecure.setInsecure();
     probeMFLN(serverPath);
-    _httpSecure.setTimeout(_tcpTimeout * 1000);
+    _httpSecure.setTimeout(_config->getPushTimeout() * 1000);
     _httpSecure.begin(_wifiSecure, serverPath);
     _httpSecure.addHeader(F("Authorization"), authHeader.c_str());
     _lastResponseCode = _httpSecure.POST(payload);
   } else {
-    _http.setTimeout(_tcpTimeout * 1000);
+    _http.setTimeout(_config->getPushTimeout() * 1000);
     _http.begin(_wifi, serverPath);
     _http.addHeader(F("Authorization"), authHeader.c_str());
     _lastResponseCode = _http.POST(payload);
@@ -144,13 +144,13 @@ String BasePush::sendHttpPost(String& payload, const char* target,
     Log.notice(F("PUSH: HTTP, SSL enabled without validation." CR));
     _wifiSecure.setInsecure();
     probeMFLN(target);
-    _httpSecure.setTimeout(_tcpTimeout * 1000);
+    _httpSecure.setTimeout(_config->getPushTimeout() * 1000);
     _httpSecure.begin(_wifiSecure, target);
     addHttpHeader(_httpSecure, header1);
     addHttpHeader(_httpSecure, header2);
     _lastResponseCode = _httpSecure.POST(payload);
   } else {
-    _http.setTimeout(_tcpTimeout * 1000);
+    _http.setTimeout(_config->getPushTimeout() * 1000);
     _http.begin(_wifi, target);
     addHttpHeader(_http, header1);
     addHttpHeader(_http, header2);
@@ -199,13 +199,13 @@ String BasePush::sendHttpGet(String& payload, const char* target,
     Log.notice(F("PUSH: HTTP, SSL enabled without validation." CR));
     _wifiSecure.setInsecure();
     probeMFLN(target);
-    _httpSecure.setTimeout(_tcpTimeout * 1000);
+    _httpSecure.setTimeout(_config->getPushTimeout() * 1000);
     _httpSecure.begin(_wifiSecure, url);
     addHttpHeader(_httpSecure, header1);
     addHttpHeader(_httpSecure, header2);
     _lastResponseCode = _httpSecure.GET();
   } else {
-    _http.setTimeout(_tcpTimeout * 1000);
+    _http.setTimeout(_config->getPushTimeout() * 1000);
     _http.begin(_wifi, url);
     addHttpHeader(_http, header1);
     addHttpHeader(_http, header2);
@@ -258,10 +258,10 @@ void BasePush::sendMqtt(String& payload, const char* target, int port,
     }
 #endif
 
-    mqtt.setTimeout(_tcpTimeout * 1000);
+    mqtt.setTimeout(_config->getPushTimeout() * 1000);
     mqtt.begin(target, port, _wifiSecure);
   } else {
-    mqtt.setTimeout(_tcpTimeout * 1000);
+    mqtt.setTimeout(_config->getPushTimeout() * 1000);
     mqtt.begin(target, port, _wifi);
   }
 
