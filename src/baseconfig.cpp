@@ -65,6 +65,9 @@ void BaseConfig::createJsonWifi(DynamicJsonDocument& doc, bool skipSecrets) {
     doc[PARAM_PASS] = getWifiPass(0);
     doc[PARAM_PASS2] = getWifiPass(1);
   }
+
+  doc[PARAM_WIFI_PORTAL_TIMEOUT] = getWifiPortalTimeout();
+  doc[PARAM_WIFI_CONNECT_TIMEOUT] = getWifiConnectionTimeout();
 }
 
 void BaseConfig::parseJsonWifi(DynamicJsonDocument& doc) {
@@ -78,6 +81,11 @@ void BaseConfig::parseJsonWifi(DynamicJsonDocument& doc) {
 
   if (!doc[PARAM_SSID2].isNull()) setWifiSSID(doc[PARAM_SSID2], 1);
   if (!doc[PARAM_PASS2].isNull()) setWifiPass(doc[PARAM_PASS2], 1);
+
+  if (!doc[PARAM_WIFI_PORTAL_TIMEOUT].isNull())
+    this->setWifiPortalTimeout(doc[PARAM_WIFI_PORTAL_TIMEOUT].as<int>());
+  if (!doc[PARAM_WIFI_CONNECT_TIMEOUT].isNull())
+    this->setWifiConnectionTimeout(doc[PARAM_WIFI_CONNECT_TIMEOUT].as<int>());
 
   _saveNeeded = true;
 }
@@ -118,6 +126,7 @@ void BaseConfig::createJsonPush(DynamicJsonDocument& doc, bool skipSecrets) {
   doc[PARAM_PORT_MQTT] = getPortMqtt();
   doc[PARAM_USER_MQTT] = getUserMqtt();
   doc[PARAM_PASS_MQTT] = getPassMqtt();
+  doc[PARAM_PUSH_TIMEOUT] = getPushTimeout();
 }
 
 void BaseConfig::parseJsonPush(DynamicJsonDocument& doc) {
@@ -166,6 +175,9 @@ void BaseConfig::parseJsonPush(DynamicJsonDocument& doc) {
   }
   if (!doc[PARAM_PASS_MQTT].isNull()) {
     setPassMqtt(doc[PARAM_PASS_MQTT]);
+  }
+  if (!doc[PARAM_PUSH_TIMEOUT].isNull()) {
+    setPushTimeout(doc[PARAM_PUSH_TIMEOUT].as<int>());
   }
 
   _saveNeeded = true;

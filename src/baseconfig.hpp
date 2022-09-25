@@ -48,6 +48,9 @@ SOFTWARE.
 #define PARAM_PORT_MQTT "mqtt-port"
 #define PARAM_USER_MQTT "mqtt-user"
 #define PARAM_PASS_MQTT "mqtt-pass"
+#define PARAM_WIFI_PORTAL_TIMEOUT "wifi-portal-timeout"
+#define PARAM_WIFI_CONNECT_TIMEOUT "wifi-connect-timeout"
+#define PARAM_PUSH_TIMEOUT "push-timeout"
 
 class BaseConfig : public WifiConfig,
                    public OtaConfig,
@@ -146,6 +149,11 @@ class BaseConfig : public WifiConfig,
   bool isOtaSSL() { return _otaURL.startsWith("https://"); }
 
   // PushConfig
+  bool hasTargetHttpPost() { _targetHttpPost.length() ? true : false; }
+  bool hasTargetHttpGet() { _targetHttpGet.length() ? true : false; }
+  bool hasTargetInfluxDb2() { _targetInfluxDb2.length() ? true : false; }
+  bool hasTargetMqtt(){ _targetMqtt.length() ? true : false; } 
+
   const char* getTargetHttpPost() { return _targetHttpPost.c_str(); }
   void setTargetHttpPost(String target) {
     _targetHttpPost = target;

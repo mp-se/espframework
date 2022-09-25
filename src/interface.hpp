@@ -76,6 +76,7 @@ class PushConfig {
   virtual void setHeader1HttpPost(String header);
   virtual const char* getHeader2HttpPost();
   virtual void setHeader2HttpPost(String header);
+  virtual bool hasTargetHttpPost();
 
   virtual const char* getTargetHttpGet();
   virtual void setTargetHttpGet(String target);
@@ -83,6 +84,7 @@ class PushConfig {
   virtual void setHeader1HttpGet(String header);
   virtual const char* getHeader2HttpGet();
   virtual void setHeader2HttpGet(String header);
+  virtual bool hasTargetHttpGet();
 
   virtual const char* getTargetInfluxDB2();
   virtual void setTargetInfluxDB2(String target);
@@ -92,6 +94,7 @@ class PushConfig {
   virtual void setBucketInfluxDB2(String bucket);
   virtual const char* getTokenInfluxDB2();
   virtual void setTokenInfluxDB2(String token);
+  virtual bool hasTargetInfluxDb2();
 
   virtual const char* getTargetMqtt();
   virtual void setTargetMqtt(String target);
@@ -101,6 +104,7 @@ class PushConfig {
   virtual void setUserMqtt(String user);
   virtual const char* getPassMqtt();
   virtual void setPassMqtt(String pass);
+  virtual bool hasTargetMqtt();
 };
 
 #endif  // SRC_INTERFACE_HPP_

@@ -36,6 +36,7 @@ float convertUSOZtoCL(float usoz);
 float convertUKOZtoCL(float ukoz);
 
 float reduceFloatPrecision(float f, int dec);
+char* convertFloatToString(float f, char* buf, int dec = 2);
 
 void tcp_cleanup();
 void deepSleep(int t);

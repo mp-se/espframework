@@ -44,6 +44,11 @@ float reduceFloatPrecision(float f, int dec) {
   return atof(&buffer[0]);
 }
 
+char* convertFloatToString(float f, char* buffer, int dec) {
+  dtostrf(f, 6, dec, buffer);
+  return buffer;
+}
+
 struct tcp_pcb;
 extern struct tcp_pcb* tcp_tw_pcbs;
 extern "C" void tcp_abort(struct tcp_pcb* pcb);
