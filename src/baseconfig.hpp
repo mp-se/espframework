@@ -149,10 +149,10 @@ class BaseConfig : public WifiConfig,
   bool isOtaSSL() { return _otaURL.startsWith("https://"); }
 
   // PushConfig
-  bool hasTargetHttpPost() { _targetHttpPost.length() ? true : false; }
-  bool hasTargetHttpGet() { _targetHttpGet.length() ? true : false; }
-  bool hasTargetInfluxDb2() { _targetInfluxDb2.length() ? true : false; }
-  bool hasTargetMqtt(){ _targetMqtt.length() ? true : false; } 
+  bool hasTargetHttpPost() { return _targetHttpPost.length() ? true : false; }
+  bool hasTargetHttpGet() { return _targetHttpGet.length() ? true : false; }
+  bool hasTargetInfluxDb2() { return _targetInfluxDb2.length() ? true : false; }
+  bool hasTargetMqtt() { return _targetMqtt.length() ? true : false; }
 
   const char* getTargetHttpPost() { return _targetHttpPost.c_str(); }
   void setTargetHttpPost(String target) {
