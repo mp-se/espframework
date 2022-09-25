@@ -82,7 +82,7 @@ class BaseConfig : public WifiConfig,
   int _portMqtt = 1883;
   String _userMqtt;
   String _passMqtt;
-  int _pushTimeout;
+  int _pushTimeout = 10;
 
   // BaseConfig
   String _id;
