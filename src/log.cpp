@@ -30,8 +30,8 @@ void writeErrorLog(const char *format, ...) {
 
   if (f && f.size() > ERR_FILEMAXSIZE) {
     f.close();
-    bool b1 = LittleFS.remove(ERR_FILENAME2);
-    bool b2 = LittleFS.rename(ERR_FILENAME, ERR_FILENAME2);
+    LittleFS.remove(ERR_FILENAME2);
+    LittleFS.rename(ERR_FILENAME, ERR_FILENAME2);
     f = LittleFS.open(ERR_FILENAME, "a");
   }
 
