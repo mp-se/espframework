@@ -31,7 +31,9 @@ SOFTWARE.
 #include <LittleFS.h>
 #endif
 
-BaseConfig::BaseConfig(String baseMDNS, String fileName) {
+BaseConfig::BaseConfig(String baseMDNS, String fileName, int dynamicJsonSize) {
+  _dynamicJsonSize = dynamicJsonSize;
+
   char buf[30];
 #if defined(ESP8266)
   snprintf(buf, sizeof(buf), "%6x", (unsigned int)ESP.getChipId());
@@ -222,7 +224,7 @@ bool BaseConfig::saveFile() {
     return false;
   }
 
-  DynamicJsonDocument doc(2048);
+  DynamicJsonDocument doc(_dynamicJsonSize);
   createJson(doc, false);  // Include secrets
 #if LOG_LEVEL == 6
   serializeJson(doc, Serial);
@@ -254,7 +256,7 @@ bool BaseConfig::loadFile() {
     return false;
   }
 
-  DynamicJsonDocument doc(2048);
+  DynamicJsonDocument doc(_dynamicJsonSize);
   DeserializationError err = deserializeJson(doc, configFile);
 #if LOG_LEVEL == 6
   serializeJson(doc, Serial);

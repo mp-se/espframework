@@ -50,6 +50,7 @@ class BaseWebHandler {
   File _uploadFile;
   WebConfig* _webConfig;
   int _uploadReturn = 200;
+  int _dynamicJsonSize = 2000;
 
   void webReturnOK() { _server->send(_uploadReturn); }
   void webReturnIndexHtm() {
@@ -76,7 +77,7 @@ class BaseWebHandler {
   virtual void setupWebHandlers();
 
  public:
-  explicit BaseWebHandler(WebConfig* config);
+  explicit BaseWebHandler(WebConfig* config, int dynamicJsonSize = 2000);
   virtual bool setupWebServer();
   virtual void loop();
 };

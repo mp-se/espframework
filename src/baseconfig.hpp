@@ -87,8 +87,8 @@ class BaseConfig : public WifiConfig,
   // BaseConfig
   String _id;
   char _tempFormat = 'C';
-
   String _fileName;
+  int _dynamicJsonSize = 2000;
 
   void formatFileSystem();
 
@@ -107,7 +107,7 @@ class BaseConfig : public WifiConfig,
   void parseJsonPush(DynamicJsonDocument& doc);
 
  public:
-  BaseConfig(String baseMDNS, String fileName);
+  BaseConfig(String baseMDNS, String fileName, int dynamicJsonSize = 2000);
 
   // WifiConfig
   const char* getMDNS() { return _mDNS.c_str(); }

@@ -35,7 +35,7 @@ SOFTWARE.
 #define MAX_SKETCH_SPACE 1835008
 #endif
 
-BaseWebHandler::BaseWebHandler(WebConfig* config) { _webConfig = config; }
+BaseWebHandler::BaseWebHandler(WebConfig* config, int dynamicJsonSize) { _webConfig = config; _dynamicJsonSize = dynamicJsonSize; }
 
 void BaseWebHandler::loop() {
   if (!_server) return;
@@ -49,7 +49,7 @@ void BaseWebHandler::loop() {
 void BaseWebHandler::webHandleConfigRead() {
   Log.notice(F("WEB : BaseWebHandler callback for /api/config(get)." CR));
 
-  DynamicJsonDocument doc(2000);
+  DynamicJsonDocument doc(_dynamicJsonSize);
   _webConfig->createJson(doc, true);  // will not include ssid passwords
 
 #if LOG_LEVEL == 6
@@ -58,7 +58,7 @@ void BaseWebHandler::webHandleConfigRead() {
 #endif
 
   String out;
-  out.reserve(2000);
+  out.reserve(_dynamicJsonSize);
   serializeJson(doc, out);
   doc.clear();
   _server->send(200, "application/json", out.c_str());
@@ -75,7 +75,7 @@ void BaseWebHandler::webHandleConfigWrite() {
     return;
   }
 
-  DynamicJsonDocument doc(2000);
+  DynamicJsonDocument doc(_dynamicJsonSize);
 
   // Mapping post format to json for parsing in config class
   for (int i = 0; i < _server->args(); i++) {
@@ -98,6 +98,7 @@ void BaseWebHandler::webHandleConfigWrite() {
 #endif
 
   _webConfig->parseJson(doc);
+  doc.clear();
   _webConfig->saveFile();
 
   String path = "/config.htm";
