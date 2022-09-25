@@ -41,6 +41,8 @@ char* convertFloatToString(float f, char* buf, int dec = 2);
 void tcp_cleanup();
 void deepSleep(int t);
 
+void printHeap(String prefix);
+
 #endif  // SRC_UTILS_HPP_
 
 // EOF

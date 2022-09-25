@@ -64,4 +64,17 @@ void deepSleep(int t) {
   ESP.deepSleep(wake);
 }
 
+void printHeap(String prefix) {
+#if defined(ESP8266)
+  Log.notice(
+      F("%s: Free-heap %d kb, Heap-rag %d %%, Max-block %d kb Stack=%d b." CR),
+      prefix.c_str(), ESP.getFreeHeap() / 1024, ESP.getHeapFragmentation(),
+      ESP.getMaxFreeBlockSize() / 1024, ESP.getFreeContStack());
+#else  // defined (ESP32)
+  Log.verbose(F("HELP: Heap %d kb, FreeSketch %d kb." CR),
+              ESP.getFreeHeap() / 1024, ESP.getFreeSketchSpace() / 1024);
+#endif
+}
+
+
 // EOF
