@@ -36,7 +36,7 @@ BaseConfig::BaseConfig(String baseMDNS, String fileName, int dynamicJsonSize) {
 
   char buf[30];
 #if defined(ESP8266)
-  snprintf(buf, sizeof(buf), "%6x", (unsigned int)ESP.getChipId());
+  snprintf(buf, sizeof(buf), "%06x", (unsigned int)ESP.getChipId());
 #else  // defined (ESP32)
   uint32_t chipId = 0;
   for (int i = 0; i < 17; i = i + 8) {
