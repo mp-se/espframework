@@ -108,16 +108,16 @@ class PerfLogging {
 extern PerfLogging gblPerfLogging;
 
 // Use these to collect performance data from various parts of the code
-#define PERF_START(s) gblPerfLogging.getInstance().start(s)
-#define PERF_STOP(s) gblPerfLogging.getInstance().stop(s)
+#define PERF_BEGIN(s) gblPerfLogging.getInstance().start(s)
+#define PERF_END(s) gblPerfLogging.getInstance().stop(s)
 #define PERF_CLEAR() gblPerfLogging.getInstance().clear()
 #define PERF_PUSH() gblPerfLogging.getInstance().pushInflux()
 
 #else
 
 // These will disable the performance collection function
-#define PERF_START(s)
-#define PERF_STOP(s)
+#define PERF_BEGIN(s)
+#define PERF_END(s)
 #define PERF_CLEAR()
 #define PERF_PUSH()
 
