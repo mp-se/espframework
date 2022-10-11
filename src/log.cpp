@@ -66,9 +66,8 @@ void dumpErrorLog1() { dumpErrorLog(ERR_FILENAME); }
 void dumpErrorLog2() { dumpErrorLog(ERR_FILENAME2); }
 
 SerialDebug::SerialDebug(const uint32_t serialSpeed) {
-  // Start serial with auto-detected rate (default to defined BAUD)
-  Serial.flush();
   Serial.begin(serialSpeed);
+  Serial.println("Serial console activated.");
 
   getLog()->begin(LOG_LEVEL, &Serial, true);
   getLog()->setPrefix(printTimestamp);

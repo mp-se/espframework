@@ -113,7 +113,9 @@ void WifiConnection::startPortal() {
   mdns += ".local<p>";
   ESP_WMParameter deviceName(mdns.c_str());
   myWifiManager->addParameter(&deviceName);
-
+#if defined(ESP32C3)
+  WiFi.setTxPower(WIFI_POWER_8_5dBm); // Required for ESP32C3 Mini
+#endif
   myWifiManager->startConfigPortal(_apSSID.c_str(), _apPWD.c_str());
 
   if (myWifiManager->getSSID(0).length()) {
@@ -157,6 +159,9 @@ void WifiConnection::loop() { myDRD->loop(); }
 void WifiConnection::connectAsync(int wifiIndex) {
   WiFi.persistent(true);
   WiFi.mode(WIFI_STA);
+#if defined(ESP32C3)
+  WiFi.setTxPower(WIFI_POWER_8_5dBm); // Required for ESP32C3 Mini
+#endif
   if (_userSSID.length()) {
     Log.notice(F("WIFI: Connecting to wifi using hardcoded settings %s." CR),
                _userSSID.c_str());

@@ -24,20 +24,30 @@ SOFTWARE.
 #ifndef SRC_DEMO_WEBHANDLER_HPP_
 #define SRC_DEMO_WEBHANDLER_HPP_
 
-#include <incbin.h>
-
 #include <basewebhandler.hpp>
 #include <demo-push.hpp>
 
+#if defined(ESP8266)
+#include <incbin.h>
 INCBIN_EXTERN(TestHtm);
+#else
+extern const uint8_t testHtmStart[] asm("_binary_html_test_min_htm_start");
+extern const uint8_t testHtmEnd[] asm("_binary_html_test_min_htm_end");
+#endif
 
 class DemoWebHandler : public BaseWebHandler {
  private:
   DemoPush* _push;
 
+#if defined(ESP8266)
   void webReturnTestHtm() {
     _server->send_P(200, "text/html", (const char*)gTestHtmData, gTestHtmSize);
   }
+#else
+  void webReturnTestHtm() {
+    _server->send_P(200, "text/html", (const char*)testHtmStart, testHtmEnd-testHtmStart);
+  }
+#endif
 
   void setupWebHandlers();
 

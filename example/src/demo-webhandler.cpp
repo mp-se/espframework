@@ -21,6 +21,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
+#include <LittleFS.h>
+
 #include <demo-push.hpp>
 #include <demo-webhandler.hpp>
 #include <espframework.hpp>
@@ -35,6 +37,9 @@ void DemoWebHandler::setupWebHandlers() {
   BaseWebHandler::setupWebHandlers();
 
   _server->on("/test.htm", std::bind(&DemoWebHandler::webReturnTestHtm, this));
+
+  _server->serveStatic("/log", LittleFS, ERR_FILENAME);
+  _server->serveStatic("/log2", LittleFS, ERR_FILENAME2);
 
   _server->on("/api/status", HTTP_GET,
               std::bind(&DemoWebHandler::webHandleStatus, this));

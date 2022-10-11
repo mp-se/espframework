@@ -21,6 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
+#if defined(ESP8266)
 #define INCBIN_OUTPUT_SECTION ".irom.text"
 #include <incbin.h>
 
@@ -32,5 +33,6 @@ INCBIN(UploadHtm, "html/upload.min.htm");
 
 // Extensions for the demo web handler
 INCBIN(TestHtm, "html/test.min.htm");
+#endif
 
 // EOF

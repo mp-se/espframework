@@ -27,6 +27,7 @@ SOFTWARE.
 #include <demo-webhandler.hpp>
 #include <espframework.hpp>
 #include <ota.hpp>
+#include <perf.hpp>
 #include <wificonnection.hpp>
 
 SerialDebug mySerial(115200L);
@@ -37,13 +38,20 @@ DemoPush myPush(&myConfig);
 DemoWebHandler myWebHandler(&myConfig, &myPush);
 
 void setup() {
-  Log.notice(F("Main: Started setup for %s." CR),
-             String(ESP.getChipId(), HEX).c_str());
+  delay(2000);
+  Log.notice(F("Main: Started setup." CR));
 
+#if defined(PERF_ENABLE)
+  PerfLogging perf;
+  perf.getInstance().setBaseConfig(&myConfig);
+#endif
   myConfig.checkFileSystem();
   myConfig.loadFile();
-  myWifi.init();
 
+  PERF_BEGIN("wifi-connect");
+  myWifi.init();
+  PERF_END("wifi-connect");
+  PERF_PUSH();
   if (!myWifi.hasConfig() || myWifi.isDoubleResetDetected()) {
     Log.notice(
         F("Main: Missing wifi config or double reset detected, entering wifi "
@@ -52,6 +60,7 @@ void setup() {
   }
 
   myWifi.connect();
+  myWifi.timeSync();
 
   if (!myWifi.isConnected() || myOta.checkFirmwareVersion()) {
     Log.notice(F("Main: New firmware available via OTA, doing update." CR));
@@ -62,6 +71,7 @@ void setup() {
     myWebHandler.setupWebServer();
   }
 
+  Serial.println("Setup() complete");
   Log.notice(F("Main: Setup is completed." CR));
 }
 
