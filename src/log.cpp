@@ -66,10 +66,9 @@ void dumpErrorLog1() { dumpErrorLog(ERR_FILENAME); }
 void dumpErrorLog2() { dumpErrorLog(ERR_FILENAME2); }
 
 SerialDebug::SerialDebug(const uint32_t serialSpeed) {
-  Serial.begin(serialSpeed);
-  Serial.println("Serial console activated.");
-
-  getLog()->begin(LOG_LEVEL, &Serial, true);
+  EspSerial.begin(serialSpeed);
+  EspSerial.println("Serial console activated.");
+  getLog()->begin(LOG_LEVEL, &EspSerial, true);
   getLog()->setPrefix(printTimestamp);
   getLog()->notice(F("SDBG: Serial logging started at %l." CR), serialSpeed);
 }

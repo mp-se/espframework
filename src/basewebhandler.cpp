@@ -53,8 +53,8 @@ void BaseWebHandler::webHandleConfigRead() {
   _webConfig->createJson(doc, true);  // will not include ssid passwords
 
 #if LOG_LEVEL == 6
-  serializeJson(doc, Serial);
-  Serial.print(CR);
+  serializeJson(doc, EspSerial);
+  EspSerial.print(CR);
 #endif
 
   String out;
@@ -93,8 +93,8 @@ void BaseWebHandler::webHandleConfigWrite() {
   }
 
 #if LOG_LEVEL == 6
-  serializeJson(doc, Serial);
-  Serial.print(CR);
+  serializeJson(doc, EspSerial);
+  EspSerial.print(CR);
 #endif
 
   _webConfig->parseJson(doc);

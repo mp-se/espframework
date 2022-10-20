@@ -43,6 +43,12 @@ void writeErrorLog(const char* format, ...);
 void dumpErrorLog1();
 void dumpErrorLog2();
 
+#if defined(USE_SERIAL_PINS) && defined(ESP32)
+#define EspSerial Serial0
+#else
+#define EspSerial Serial
+#endif
+
 #endif  // SRC_LOG_HPP_
 
 // EOF

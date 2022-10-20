@@ -227,8 +227,8 @@ bool BaseConfig::saveFile() {
   DynamicJsonDocument doc(_dynamicJsonSize);
   createJson(doc, false);  // Include secrets
 #if LOG_LEVEL == 6
-  serializeJson(doc, Serial);
-  Serial.print(CR);
+  serializeJson(doc, EspSerial);
+  EspSerial.print(CR);
 #endif
   serializeJson(doc, configFile);
   configFile.flush();
@@ -259,8 +259,8 @@ bool BaseConfig::loadFile() {
   DynamicJsonDocument doc(_dynamicJsonSize);
   DeserializationError err = deserializeJson(doc, configFile);
 #if LOG_LEVEL == 6
-  serializeJson(doc, Serial);
-  Serial.print(CR);
+  serializeJson(doc, EspSerial);
+  EspSerial.print(CR);
 #endif
   configFile.close();
 

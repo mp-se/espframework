@@ -70,9 +70,15 @@ bool WifiConnection::hasConfig() {
   if (strlen(_wifiConfig->getWifiSSID(0))) return true;
   if (_userSSID.length()) return true;
 
-  // Check if there are stored WIFI Settings we can use (only works for
-  // esp8266).
+  // Check if there are stored WIFI Settings we can use
+#if defined(ESP8266)
   String ssid = WiFi.SSID();
+  String pwd = WiFi.psk();
+#else
+  ESP_WiFiManager wifiMgr;
+  String ssid = wifiMgr.WiFi_SSID();
+  String pwd = wifiMgr.WiFi_Pass();
+#endif
   if (ssid.length()) {
     Log.notice(F("WIFI: Found credentials in EEPORM." CR));
     _wifiConfig->setWifiSSID(ssid, 0);
@@ -114,6 +120,7 @@ void WifiConnection::startPortal() {
   ESP_WMParameter deviceName(mdns.c_str());
   myWifiManager->addParameter(&deviceName);
 #if defined(ESP32C3)
+  Log.notice(F("WIFI: Reducing wifi power for c3 chip." CR));
   WiFi.setTxPower(WIFI_POWER_8_5dBm); // Required for ESP32C3 Mini
 #endif
   myWifiManager->startConfigPortal(_apSSID.c_str(), _apPWD.c_str());
@@ -160,6 +167,7 @@ void WifiConnection::connectAsync(int wifiIndex) {
   WiFi.persistent(true);
   WiFi.mode(WIFI_STA);
 #if defined(ESP32C3)
+  Log.notice(F("WIFI: Reducing wifi power for c3 chip." CR));
   WiFi.setTxPower(WIFI_POWER_8_5dBm); // Required for ESP32C3 Mini
 #endif
   if (_userSSID.length()) {
@@ -176,22 +184,22 @@ void WifiConnection::connectAsync(int wifiIndex) {
 
 bool WifiConnection::waitForConnection(int maxTime) {
 #if LOG_LEVEL == 6
-  WiFi.printDiag(Serial);
+  WiFi.printDiag(EspSerial);
 #endif
   int i = 0;
   while (WiFi.status() != WL_CONNECTED) {
     delay(100);
 
-    if (i % 10) Serial.print(".");
+    if (i % 10) EspSerial.print(".");
 
     if (i++ > (maxTime * 10)) {
       Log.error(F("WIFI: Failed to connect to wifi %d" CR), WiFi.status());
       WiFi.disconnect();
-      Serial.print(CR);
+      EspSerial.print(CR);
       return false;  // Return to main that we have failed to connect.
     }
   }
-  Serial.print(CR);
+  EspSerial.print(CR);
   Log.notice(F("WIFI: Connected to wifi %s ip=%s." CR), WiFi.SSID().c_str(),
              getIPAddress().c_str());
   Log.notice(F("WIFI: Using mDNS name %s." CR), _wifiConfig->getMDNS());
@@ -236,11 +244,11 @@ void WifiConnection::timeSync() {
 
   while (now < 8 * 3600 * 2) {
     delay(500);
-    Serial.print(".");
+    EspSerial.print(".");
     now = time(nullptr);
   }
 
-  Serial.print(CR);
+  EspSerial.print(CR);
 
   struct tm timeinfo;
   gmtime_r(&now, &timeinfo);
