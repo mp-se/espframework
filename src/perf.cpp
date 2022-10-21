@@ -133,7 +133,7 @@ void PerfLogging::pushInflux() {
 
   String auth = "Token " + String(PERF_INFLUX_TOKEN);
   http.addHeader(F("Authorization"), auth.c_str());
-  http.setTimeout(5);
+  http.setTimeout(_config->getPushTimeout() * 1000);
   int httpResponseCode = http.POST(body);
 
   if (httpResponseCode == 204) {
