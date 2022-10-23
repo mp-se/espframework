@@ -66,7 +66,25 @@ void dumpErrorLog1() { dumpErrorLog(ERR_FILENAME); }
 void dumpErrorLog2() { dumpErrorLog(ERR_FILENAME2); }
 
 SerialDebug::SerialDebug(const uint32_t serialSpeed) {
+#if defined(USE_SERIAL_PINS) && defined(ESP8266)
+  // EspSerial.begin(serialSpeed, SERIAL_8N1, 3, 1);
   EspSerial.begin(serialSpeed);
+#warning "SerialPins is not implemented on ESP8266"
+#elif defined(ESP8266)
+  EspSerial.begin(serialSpeed);
+#elif defined(USE_SERIAL_PINS) && defined(ESP32C3)
+  EspSerial.begin(115200L, SERIAL_8N1, 20, 21);
+#elif defined(ESP32C3)
+  EspSerial.begin(115200L);
+#elif defined(USE_SERIAL_PINS) && defined(ESP32S2)
+  EspSerial.begin(115200L, SERIAL_8N1, 37, 39);
+#elif defined(ESP32S2)
+  EspSerial.begin(115200L);
+#elif defined(USE_SERIAL_PINS) && defined(ESP32)
+  EspSerial.begin(serialSpeed, SERIAL_8N1, 3, 1);
+#elif defined(ESP32)
+  EspSerial.begin(115200L);
+#endif
   EspSerial.println("Serial console activated.");
   getLog()->begin(LOG_LEVEL, &EspSerial, true);
   getLog()->setPrefix(printTimestamp);
