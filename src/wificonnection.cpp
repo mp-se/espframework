@@ -70,7 +70,7 @@ bool WifiConnection::hasConfig() {
   if (strlen(_wifiConfig->getWifiSSID(0))) return true;
   if (_userSSID.length()) return true;
 
-  // Check if there are stored WIFI Settings we can use
+    // Check if there are stored WIFI Settings we can use
 #if defined(ESP8266)
   String ssid = WiFi.SSID();
   String pwd = WiFi.psk();
@@ -121,7 +121,7 @@ void WifiConnection::startPortal() {
   myWifiManager->addParameter(&deviceName);
 #if defined(ESP32C3)
   Log.notice(F("WIFI: Reducing wifi power for c3 chip." CR));
-  WiFi.setTxPower(WIFI_POWER_8_5dBm); // Required for ESP32C3 Mini
+  WiFi.setTxPower(WIFI_POWER_8_5dBm);  // Required for ESP32C3 Mini
 #endif
   myWifiManager->startConfigPortal(_apSSID.c_str(), _apPWD.c_str());
 
@@ -168,7 +168,7 @@ void WifiConnection::connectAsync(int wifiIndex) {
   WiFi.mode(WIFI_STA);
 #if defined(ESP32C3)
   Log.notice(F("WIFI: Reducing wifi power for c3 chip." CR));
-  WiFi.setTxPower(WIFI_POWER_8_5dBm); // Required for ESP32C3 Mini
+  WiFi.setTxPower(WIFI_POWER_8_5dBm);  // Required for ESP32C3 Mini
 #endif
   if (_userSSID.length()) {
     Log.notice(F("WIFI: Connecting to wifi using hardcoded settings %s." CR),

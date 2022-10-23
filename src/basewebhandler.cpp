@@ -35,7 +35,10 @@ SOFTWARE.
 #define MAX_SKETCH_SPACE 1835008
 #endif
 
-BaseWebHandler::BaseWebHandler(WebConfig* config, int dynamicJsonSize) { _webConfig = config; _dynamicJsonSize = dynamicJsonSize; }
+BaseWebHandler::BaseWebHandler(WebConfig* config, int dynamicJsonSize) {
+  _webConfig = config;
+  _dynamicJsonSize = dynamicJsonSize;
+}
 
 void BaseWebHandler::loop() {
   if (!_server) return;

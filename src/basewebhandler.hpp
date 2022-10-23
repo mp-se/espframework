@@ -83,16 +83,20 @@ class BaseWebHandler {
   }
 #else
   void webReturnIndexHtm() {
-    _server->send_P(200, "text/html", (const char*)indexHtmStart, indexHtmEnd-indexHtmStart);
+    _server->send_P(200, "text/html", (const char*)indexHtmStart,
+                    strlen(reinterpret_cast<const char*>(&indexHtmStart[0])));
   }
   void webReturnConfigHtm() {
-    _server->send_P(200, "text/html", (const char*)configHtmStart, configHtmEnd-configHtmStart);
+    _server->send_P(200, "text/html", (const char*)configHtmStart,
+                    strlen(reinterpret_cast<const char*>(&configHtmStart[0])));
   }
   void webReturnAboutHtm() {
-    _server->send_P(200, "text/html", (const char*)aboutHtmStart, aboutHtmEnd-aboutHtmStart);
+    _server->send_P(200, "text/html", (const char*)aboutHtmStart,
+                    strlen(reinterpret_cast<const char*>(&aboutHtmStart[0])));
   }
   void webReturnUploadHtm() {
-    _server->send_P(200, "text/html", (const char*)uploadHtmStart, uploadHtmEnd-uploadHtmStart);
+    _server->send_P(200, "text/html", (const char*)uploadHtmStart,
+                    strlen(reinterpret_cast<const char*>(&uploadHtmStart[0])));
   }
 #endif
   void webHandlePageNotFound();

@@ -34,7 +34,7 @@ SOFTWARE.
 #define PIN_LED 2
 #elif defined(ESP32)
 #define ESP_RESET ESP.restart
-#define PIN_LED LED_BUILTIN 
+#define PIN_LED LED_BUILTIN
 #endif
 
 #endif  // SRC_ESPFRAMEWORK_HPP_
