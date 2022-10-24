@@ -34,6 +34,7 @@ SOFTWARE.
 
 #include <espframework.hpp>
 #include <ota.hpp>
+#include <log.hpp>
 
 OtaUpdate::OtaUpdate(OtaConfig *cfg, String ver) {
   _otaConfig = cfg;

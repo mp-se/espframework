@@ -71,7 +71,7 @@ void printHeap(String prefix) {
       prefix.c_str(), ESP.getFreeHeap() / 1024, ESP.getHeapFragmentation(),
       ESP.getMaxFreeBlockSize() / 1024, ESP.getFreeContStack());
 #else  // defined (ESP32)
-  Log.verbose(F("HELP: Heap %d kb, FreeSketch %d kb." CR),
+  Log.notice(F("HELP: Heap %d kb, FreeSketch %d kb." CR),
               ESP.getFreeHeap() / 1024, ESP.getFreeSketchSpace() / 1024);
 #endif
 }

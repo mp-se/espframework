@@ -24,9 +24,6 @@ SOFTWARE.
 #ifndef SRC_ESPFRAMEWORK_HPP_
 #define SRC_ESPFRAMEWORK_HPP_
 
-#include <interface.hpp>
-#include <log.hpp>
-
 #define ESPFWK_VER "0.3.0"
 
 #if defined(ESP8266)

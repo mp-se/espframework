@@ -24,6 +24,7 @@ SOFTWARE.
 #include <baseconfig.hpp>
 #include <basewebhandler.hpp>
 #include <espframework.hpp>
+#include <log.hpp>
 
 #if defined(ESP8266)
 #include <LittleFS.h>
