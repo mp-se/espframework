@@ -206,6 +206,8 @@ void BaseWebHandler::webHandlePageNotFound() {
 void BaseWebHandler::setupWebHandlers() {
   if (!_server) return;
 
+  MDNS.begin(_webConfig->getMDNS());
+
   Log.notice(F("WEB : Setting up web handlers." CR));
   _server->on("/", std::bind(&BaseWebHandler::webReturnIndexHtm, this));
   _server->on("/index.htm",
