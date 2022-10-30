@@ -21,8 +21,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-#include <baseconfig.hpp>
 #include <baseasyncwebhandler.hpp>
+#include <baseconfig.hpp>
 #include <espframework.hpp>
 #include <log.hpp>
 
@@ -36,7 +36,8 @@ SOFTWARE.
 #define MAX_SKETCH_SPACE 1835008
 #endif
 
-BaseAsyncWebHandler::BaseAsyncWebHandler(WebConfig* config, int dynamicJsonSize) {
+BaseAsyncWebHandler::BaseAsyncWebHandler(WebConfig *config,
+                                         int dynamicJsonSize) {
   _webConfig = config;
   _dynamicJsonSize = dynamicJsonSize;
 }
@@ -59,7 +60,7 @@ void BaseAsyncWebHandler::webHandleConfigRead(AsyncWebServerRequest *request) {
   Log.notice(F("WEB : BaseWebHandler callback for /api/config(get)." CR));
 
   DynamicJsonDocument doc(_dynamicJsonSize);
-  _webConfig->createJson(doc, true); // will not include ssid passwords
+  _webConfig->createJson(doc, true);  // will not include ssid passwords
 
   String out;
   out.reserve(_dynamicJsonSize);
@@ -104,16 +105,20 @@ void BaseAsyncWebHandler::webHandleConfigWrite(AsyncWebServerRequest *request) {
 
   if (request->hasArg("section")) path += request->arg("section").c_str();
 
-  AsyncWebServerResponse *response = request->beginResponse(302, "text/plain", "Config saved"); 
+  AsyncWebServerResponse *response =
+      request->beginResponse(302, "text/plain", "Config saved");
   response->addHeader("Location", path);
   request->send(response);
 }
 
-void BaseAsyncWebHandler::webHandleUploadFile(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final) {
+void BaseAsyncWebHandler::webHandleUploadFile(AsyncWebServerRequest *request,
+                                              String filename, size_t index,
+                                              uint8_t *data, size_t len,
+                                              bool final) {
   uint32_t maxSketchSpace = MAX_SKETCH_SPACE;
   Log.verbose(F("WEB : BaseWebHandler callback for /api/upload(post)." CR));
 
-  if(!index){
+  if (!index) {
     _uploadedSize = 0;
     Update.runAsync(true);
     if (!Update.begin(maxSketchSpace, U_FLASH, PIN_LED)) {
@@ -133,19 +138,20 @@ void BaseAsyncWebHandler::webHandleUploadFile(AsyncWebServerRequest *request, St
     Log.error(F("WEB : Firmware file is to large." CR));
   } else if (Update.write(data, len) != len) {
     _uploadReturn = 500;
-    Log.notice(F("WEB : Writing firmware upload %d (%d)." CR),
-                len, maxSketchSpace);
+    Log.notice(F("WEB : Writing firmware upload %d (%d)." CR), len,
+               maxSketchSpace);
   } else {
     EspSerial.print(".");
   }
 
-  if(final){
+  if (final) {
     EspSerial.print("\n");
     Log.notice(F("WEB : Finished firmware upload." CR));
     request->send(200);
 
     if (Update.end(true)) {
-      // Calling reset here will not wait for all the data to be sent, lets wait a second before rebooting in loop.
+      // Calling reset here will not wait for all the data to be sent, lets wait
+      // a second before rebooting in loop.
       _rebootTimer = millis();
       _reboot = true;
     } else {
@@ -155,7 +161,8 @@ void BaseAsyncWebHandler::webHandleUploadFile(AsyncWebServerRequest *request, St
   }
 }
 
-void BaseAsyncWebHandler::webHandlePageNotFound(AsyncWebServerRequest *request) {
+void BaseAsyncWebHandler::webHandlePageNotFound(
+    AsyncWebServerRequest *request) {
   Log.error(F("WEB : URL not found %s received." CR), request->url().c_str());
   request->send(404, "text/plain", F("URL not found"));
 }
@@ -166,23 +173,36 @@ void BaseAsyncWebHandler::setupAsyncWebHandlers() {
   MDNS.begin(_webConfig->getMDNS());
 
   Log.notice(F("WEB : Setting up async web handlers." CR));
-  _server->on("/", HTTP_GET, std::bind(&BaseAsyncWebHandler::webReturnIndexHtm, this, std::placeholders::_1));
+  _server->on("/", HTTP_GET,
+              std::bind(&BaseAsyncWebHandler::webReturnIndexHtm, this,
+                        std::placeholders::_1));
   _server->on("/index.htm", HTTP_GET,
-              std::bind(&BaseAsyncWebHandler::webReturnIndexHtm, this, std::placeholders::_1));
+              std::bind(&BaseAsyncWebHandler::webReturnIndexHtm, this,
+                        std::placeholders::_1));
   _server->on("/config.htm", HTTP_GET,
-              std::bind(&BaseAsyncWebHandler::webReturnConfigHtm, this, std::placeholders::_1));
+              std::bind(&BaseAsyncWebHandler::webReturnConfigHtm, this,
+                        std::placeholders::_1));
   _server->on("/about.htm", HTTP_GET,
-              std::bind(&BaseAsyncWebHandler::webReturnAboutHtm, this, std::placeholders::_1));
+              std::bind(&BaseAsyncWebHandler::webReturnAboutHtm, this,
+                        std::placeholders::_1));
   _server->on("/upload.htm", HTTP_GET,
-              std::bind(&BaseAsyncWebHandler::webReturnUploadHtm, this, std::placeholders::_1));
+              std::bind(&BaseAsyncWebHandler::webReturnUploadHtm, this,
+                        std::placeholders::_1));
   _server->on("/api/config", HTTP_GET,
-              std::bind(&BaseAsyncWebHandler::webHandleConfigRead, this, std::placeholders::_1));
-  _server->on("/api/upload", HTTP_POST,
-              std::bind(&BaseAsyncWebHandler::webReturnOK, this, std::placeholders::_1),
-              std::bind(&BaseAsyncWebHandler::webHandleUploadFile, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6));
+              std::bind(&BaseAsyncWebHandler::webHandleConfigRead, this,
+                        std::placeholders::_1));
+  _server->on(
+      "/api/upload", HTTP_POST,
+      std::bind(&BaseAsyncWebHandler::webReturnOK, this, std::placeholders::_1),
+      std::bind(&BaseAsyncWebHandler::webHandleUploadFile, this,
+                std::placeholders::_1, std::placeholders::_2,
+                std::placeholders::_3, std::placeholders::_4,
+                std::placeholders::_5, std::placeholders::_6));
   _server->on("/api/config", HTTP_POST,
-              std::bind(&BaseAsyncWebHandler::webHandleConfigWrite, this, std::placeholders::_1));
-  _server->onNotFound(std::bind(&BaseAsyncWebHandler::webHandlePageNotFound, this, std::placeholders::_1));
+              std::bind(&BaseAsyncWebHandler::webHandleConfigWrite, this,
+                        std::placeholders::_1));
+  _server->onNotFound(std::bind(&BaseAsyncWebHandler::webHandlePageNotFound,
+                                this, std::placeholders::_1));
 }
 
 bool BaseAsyncWebHandler::setupAsyncWebServer() {

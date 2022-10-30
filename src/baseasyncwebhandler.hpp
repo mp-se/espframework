@@ -59,60 +59,63 @@ extern const uint8_t uploadHtmEnd[] asm("_binary_html_upload_min_htm_end");
 
 class BaseAsyncWebHandler {
  protected:
-  AsyncWebServer* _server = 0;
+  AsyncWebServer *_server = 0;
   File _uploadFile;
   int _uploadedSize;
-  WebConfig* _webConfig;
+  WebConfig *_webConfig;
   int _uploadReturn = 200;
   int _dynamicJsonSize = 2000;
   unsigned long _rebootTimer = 0;
   bool _reboot = false;
 
-  void webReturnOK(AsyncWebServerRequest *request) { request->send(_uploadReturn); }
+  void webReturnOK(AsyncWebServerRequest *request) {
+    request->send(_uploadReturn);
+  }
 #if defined(ESP8266)
   void webReturnIndexHtm(AsyncWebServerRequest *request) {
-    request->send_P(200, "text/html", (const uint8_t*)gIndexHtmData,
+    request->send_P(200, "text/html", (const uint8_t *)gIndexHtmData,
                     gIndexHtmSize);
   }
   void webReturnConfigHtm(AsyncWebServerRequest *request) {
-    request->send_P(200, "text/html", (const uint8_t*)gConfigHtmData,
+    request->send_P(200, "text/html", (const uint8_t *)gConfigHtmData,
                     gConfigHtmSize);
   }
   void webReturnAboutHtm(AsyncWebServerRequest *request) {
-    request->send_P(200, "text/html", (const uint8_t*)gAboutHtmData,
+    request->send_P(200, "text/html", (const uint8_t *)gAboutHtmData,
                     gAboutHtmSize);
   }
   void webReturnUploadHtm(AsyncWebServerRequest *request) {
-    request->send_P(200, "text/html", (const uint8_t*)gUploadHtmData,
+    request->send_P(200, "text/html", (const uint8_t *)gUploadHtmData,
                     gUploadHtmSize);
   }
 #else
   void webReturnIndexHtm() {
-    _server->send_P(200, "text/html", (const char*)indexHtmStart,
-                    strlen(reinterpret_cast<const char*>(&indexHtmStart[0])));
+    _server->send_P(200, "text/html", (const char *)indexHtmStart,
+                    strlen(reinterpret_cast<const char *>(&indexHtmStart[0])));
   }
   void webReturnConfigHtm() {
-    _server->send_P(200, "text/html", (const char*)configHtmStart,
-                    strlen(reinterpret_cast<const char*>(&configHtmStart[0])));
+    _server->send_P(200, "text/html", (const char *)configHtmStart,
+                    strlen(reinterpret_cast<const char *>(&configHtmStart[0])));
   }
   void webReturnAboutHtm() {
-    _server->send_P(200, "text/html", (const char*)aboutHtmStart,
-                    strlen(reinterpret_cast<const char*>(&aboutHtmStart[0])));
+    _server->send_P(200, "text/html", (const char *)aboutHtmStart,
+                    strlen(reinterpret_cast<const char *>(&aboutHtmStart[0])));
   }
   void webReturnUploadHtm() {
-    _server->send_P(200, "text/html", (const char*)uploadHtmStart,
-                    strlen(reinterpret_cast<const char*>(&uploadHtmStart[0])));
+    _server->send_P(200, "text/html", (const char *)uploadHtmStart,
+                    strlen(reinterpret_cast<const char *>(&uploadHtmStart[0])));
   }
 #endif
   void webHandlePageNotFound(AsyncWebServerRequest *request);
-  void webHandleUploadFile(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final);
+  void webHandleUploadFile(AsyncWebServerRequest *request, String filename,
+                           size_t index, uint8_t *data, size_t len, bool final);
   void webHandleConfigRead(AsyncWebServerRequest *request);
   void webHandleConfigWrite(AsyncWebServerRequest *request);
 
   virtual void setupAsyncWebHandlers();
 
  public:
-  explicit BaseAsyncWebHandler(WebConfig* config, int dynamicJsonSize = 2000);
+  explicit BaseAsyncWebHandler(WebConfig *config, int dynamicJsonSize = 2000);
   virtual bool setupAsyncWebServer();
   virtual void loop();
 };

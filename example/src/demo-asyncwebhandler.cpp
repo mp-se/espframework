@@ -24,70 +24,59 @@ SOFTWARE.
 #include <LittleFS.h>
 
 #include <demo-push.hpp>
-#include <demo-webhandler.hpp>
+#include <demo-asyncwebhandler.hpp>
 #include <espframework.hpp>
 #include <log.hpp>
 
-DemoWebHandler::DemoWebHandler(WebConfig* config, DemoPush* push)
-    : BaseWebHandler(config) {
+DemoAsyncWebHandler::DemoAsyncWebHandler(WebConfig* config, DemoPush* push)
+    : BaseAsyncWebHandler(config) {
   _push = push;
 }
 
-void DemoWebHandler::setupWebHandlers() {
+void DemoAsyncWebHandler::setupAsyncWebHandlers() {
   Log.notice(F("WEB : Setting up web handlers." CR));
-  BaseWebHandler::setupWebHandlers();
+  BaseAsyncWebHandler::setupAsyncWebHandlers();
 
-  _server->on("/test.htm", std::bind(&DemoWebHandler::webReturnTestHtm, this));
+  _server->on("/test.htm", std::bind(&DemoAsyncWebHandler::webReturnTestHtm, this, std::placeholders::_1));
 
   _server->serveStatic("/log", LittleFS, ERR_FILENAME);
   _server->serveStatic("/log2", LittleFS, ERR_FILENAME2);
 
   _server->on("/api/status", HTTP_GET,
-              std::bind(&DemoWebHandler::webHandleStatus, this));
+              std::bind(&DemoAsyncWebHandler::webHandleStatus, this, std::placeholders::_1));
   _server->on("/api/push/http-post", HTTP_POST,
-              std::bind(&DemoWebHandler::webHandlePushHttpPost, this));
+              std::bind(&DemoAsyncWebHandler::webHandlePushHttpPost, this, std::placeholders::_1));
   _server->on("/api/push/http-get", HTTP_POST,
-              std::bind(&DemoWebHandler::webHandlePushHttpGet, this));
+              std::bind(&DemoAsyncWebHandler::webHandlePushHttpGet, this, std::placeholders::_1));
   _server->on("/api/push/influxdb2", HTTP_POST,
-              std::bind(&DemoWebHandler::webHandlePushHttpInfluxDb2, this));
+              std::bind(&DemoAsyncWebHandler::webHandlePushHttpInfluxDb2, this, std::placeholders::_1));
   _server->on("/api/push/mqtt", HTTP_POST,
-              std::bind(&DemoWebHandler::webHandlePushHttpMqtt, this));
+              std::bind(&DemoAsyncWebHandler::webHandlePushHttpMqtt, this, std::placeholders::_1));
 }
 
-void DemoWebHandler::webHandleStatus() {
-  Log.notice(F("WEB : DemoWebHandler callback for /api/status)." CR));
-
+void DemoAsyncWebHandler::webHandleStatus(AsyncWebServerRequest *request) {
   DynamicJsonDocument doc(512);
 
   doc[PARAM_ID] = _webConfig->getID();
   doc[PARAM_MDNS] = _webConfig->getMDNS();
   doc[PARAM_SSID] = WiFi.SSID();
 
-#if LOG_LEVEL == 6
-  serializeJson(doc, Serial);
-  Serial.print(CR);
-#endif
-
   String out;
   out.reserve(2048);
   serializeJson(doc, out);
-  _server->send(200, "application/json", out.c_str());
+  request->send(200, "application/json", out.c_str());
 }
 
-void DemoWebHandler::webHandlePushHttpPost() {
-  Log.notice(F("WEB : DemoWebHandler callback for /api/push/http-post." CR));
+void DemoAsyncWebHandler::webHandlePushHttpPost(AsyncWebServerRequest *request) {
 }
 
-void DemoWebHandler::webHandlePushHttpGet() {
-  Log.notice(F("WEB : DemoWebHandler callback for /api/push/http-get." CR));
+void DemoAsyncWebHandler::webHandlePushHttpGet(AsyncWebServerRequest *request) {
 }
 
-void DemoWebHandler::webHandlePushHttpMqtt() {
-  Log.notice(F("WEB : DemoWebHandler callback for /api/push/mqtt." CR));
+void DemoAsyncWebHandler::webHandlePushHttpMqtt(AsyncWebServerRequest *request) {
 }
 
-void DemoWebHandler::webHandlePushHttpInfluxDb2() {
-  Log.notice(F("WEB : DemoWebHandler callback for /api/push/influxdb2." CR));
+void DemoAsyncWebHandler::webHandlePushHttpInfluxDb2(AsyncWebServerRequest *request) {
 }
 
 // EOF

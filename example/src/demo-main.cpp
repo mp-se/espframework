@@ -21,21 +21,30 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
+#define USE_ASYNC_WEB 1
+
 #include <demo-config.hpp>
 #include <demo-main.hpp>
 #include <demo-push.hpp>
-#include <demo-webhandler.hpp>
 #include <espframework.hpp>
 #include <ota.hpp>
 #include <perf.hpp>
 #include <wificonnection.hpp>
+#include <log.hpp>
 
 SerialDebug mySerial(115200L);
 DemoConfig myConfig("mdnsbase", "/esplib.cfg");
 WifiConnection myWifi(&myConfig, "espSSID", "password", "esplib", "", "");
 OtaUpdate myOta(&myConfig, "0.0.0");
 DemoPush myPush(&myConfig);
+
+#if defined(USE_ASYNC_WEB)
+#include <demo-asyncwebhandler.hpp>
+DemoAsyncWebHandler myAsyncWebHandler(&myConfig, &myPush);
+#else
+#include <demo-webhandler.hpp>
 DemoWebHandler myWebHandler(&myConfig, &myPush);
+#endif
 
 void setup() {
   delay(2000);
@@ -48,10 +57,7 @@ void setup() {
   myConfig.checkFileSystem();
   myConfig.loadFile();
 
-  PERF_BEGIN("wifi-connect");
   myWifi.init();
-  PERF_END("wifi-connect");
-  PERF_PUSH();
   if (!myWifi.hasConfig() || myWifi.isDoubleResetDetected()) {
     Log.notice(
         F("Main: Missing wifi config or double reset detected, entering wifi "
@@ -59,7 +65,10 @@ void setup() {
     myWifi.startPortal();
   }
 
+  PERF_BEGIN("wifi-connect");
   myWifi.connect();
+  PERF_END("wifi-connect");
+  PERF_PUSH();
   myWifi.timeSync();
 
   if (!myWifi.isConnected() || myOta.checkFirmwareVersion()) {
@@ -68,7 +77,11 @@ void setup() {
   }
 
   if (myWifi.isConnected()) {
+#if defined(USE_ASYNC_WEB)
+    myAsyncWebHandler.setupAsyncWebServer();
+#else
     myWebHandler.setupWebServer();
+#endif
   }
 
   Serial.println("Setup() complete");
@@ -77,7 +90,11 @@ void setup() {
 
 void loop() {
   myWifi.loop();
+#if defined(USE_ASYNC_WEB)
+  myAsyncWebHandler.loop();
+#else
   myWebHandler.loop();
+#endif
 }
 
 // EOF

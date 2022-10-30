@@ -72,7 +72,7 @@ void printHeap(String prefix) {
       ESP.getMaxFreeBlockSize() / 1024, ESP.getFreeContStack());
 #else  // defined (ESP32)
   Log.notice(F("HELP: Heap %d kb, FreeSketch %d kb." CR),
-              ESP.getFreeHeap() / 1024, ESP.getFreeSketchSpace() / 1024);
+             ESP.getFreeHeap() / 1024, ESP.getFreeSketchSpace() / 1024);
 #endif
 }
 

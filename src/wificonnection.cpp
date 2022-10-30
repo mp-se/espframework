@@ -28,8 +28,8 @@ SOFTWARE.
 #endif
 
 #include <espframework.hpp>
-#include <wificonnection.hpp>
 #include <log.hpp>
+#include <wificonnection.hpp>
 
 // Settings for DRD
 #define ESP_DRD_USE_LITTLEFS true

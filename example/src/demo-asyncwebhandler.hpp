@@ -21,10 +21,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-#ifndef SRC_DEMO_WEBHANDLER_HPP_
-#define SRC_DEMO_WEBHANDLER_HPP_
+#ifndef SRC_DEMO_ASYNCWEBHANDLER_HPP_
+#define SRC_DEMO_ASYNCWEBHANDLER_HPP_
 
-#include <basewebhandler.hpp>
+#include <baseasyncwebhandler.hpp>
 #include <demo-push.hpp>
 
 #if defined(ESP8266)
@@ -35,13 +35,13 @@ extern const uint8_t testHtmStart[] asm("_binary_html_test_min_htm_start");
 extern const uint8_t testHtmEnd[] asm("_binary_html_test_min_htm_end");
 #endif
 
-class DemoWebHandler : public BaseWebHandler {
+class DemoAsyncWebHandler : public BaseAsyncWebHandler {
  private:
   DemoPush* _push;
 
 #if defined(ESP8266)
-  void webReturnTestHtm() {
-    _server->send_P(200, "text/html", (const char*)gTestHtmData, gTestHtmSize);
+  void webReturnTestHtm(AsyncWebServerRequest *request) {
+    request->send_P(200, "text/html", (const uint8_t*)gTestHtmData, gTestHtmSize);
   }
 #else
   void webReturnTestHtm() {
@@ -50,18 +50,18 @@ class DemoWebHandler : public BaseWebHandler {
   }
 #endif
 
-  void setupWebHandlers();
+  void setupAsyncWebHandlers();
 
-  void webHandleStatus();
-  void webHandlePushHttpPost();
-  void webHandlePushHttpGet();
-  void webHandlePushHttpMqtt();
-  void webHandlePushHttpInfluxDb2();
+  void webHandleStatus(AsyncWebServerRequest *request);
+  void webHandlePushHttpPost(AsyncWebServerRequest *request);
+  void webHandlePushHttpGet(AsyncWebServerRequest *request);
+  void webHandlePushHttpMqtt(AsyncWebServerRequest *request);
+  void webHandlePushHttpInfluxDb2(AsyncWebServerRequest *request);
 
  public:
-  explicit DemoWebHandler(WebConfig* config, DemoPush* push);
+  explicit DemoAsyncWebHandler(WebConfig* config, DemoPush* push);
 };
 
-#endif  // SRC_DEMO_WEBHANDLER_HPP_
+#endif  // SRC_DEMO_ASYNCWEBHANDLER_HPP_
 
 // EOF

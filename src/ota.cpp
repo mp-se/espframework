@@ -33,8 +33,8 @@ SOFTWARE.
 #include <LittleFS.h>
 
 #include <espframework.hpp>
-#include <ota.hpp>
 #include <log.hpp>
+#include <ota.hpp>
 
 OtaUpdate::OtaUpdate(OtaConfig *cfg, String ver) {
   _otaConfig = cfg;
