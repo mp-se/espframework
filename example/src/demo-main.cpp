@@ -27,24 +27,18 @@ SOFTWARE.
 #include <demo-main.hpp>
 #include <demo-push.hpp>
 #include <espframework.hpp>
+#include <log.hpp>
 #include <ota.hpp>
 #include <perf.hpp>
 #include <wificonnection.hpp>
-#include <log.hpp>
+#include <demo-webhandler.hpp>
 
 SerialDebug mySerial(115200L);
 DemoConfig myConfig("mdnsbase", "/esplib.cfg");
 WifiConnection myWifi(&myConfig, "espSSID", "password", "esplib", "", "");
 OtaUpdate myOta(&myConfig, "0.0.0");
 DemoPush myPush(&myConfig);
-
-#if defined(USE_ASYNC_WEB)
-#include <demo-asyncwebhandler.hpp>
-DemoAsyncWebHandler myAsyncWebHandler(&myConfig, &myPush);
-#else
-#include <demo-webhandler.hpp>
 DemoWebHandler myWebHandler(&myConfig, &myPush);
-#endif
 
 void setup() {
   delay(2000);
@@ -77,11 +71,7 @@ void setup() {
   }
 
   if (myWifi.isConnected()) {
-#if defined(USE_ASYNC_WEB)
-    myAsyncWebHandler.setupAsyncWebServer();
-#else
     myWebHandler.setupWebServer();
-#endif
   }
 
   Serial.println("Setup() complete");
@@ -90,11 +80,7 @@ void setup() {
 
 void loop() {
   myWifi.loop();
-#if defined(USE_ASYNC_WEB)
-  myAsyncWebHandler.loop();
-#else
   myWebHandler.loop();
-#endif
 }
 
 // EOF
