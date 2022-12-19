@@ -91,7 +91,6 @@ class TemplatingEngine {
               strncat(_output, format + k, j - k);
               strncat(_output, _items[i].val.c_str(), _items[i].val.length());
               k = j + _items[i].key.length();
-              Serial.printf("Found key: %s\n", _items[i].key.c_str());
             }
           }
         }
