@@ -96,7 +96,8 @@ class TemplatingEngine {
         }
       }
     }
-    strncat(_output, format + k, size - k);
+    // strncat(_output, format + k, size - k);
+    strncat(_output, format + k, strlen(format + k));
     Log.notice(F("TPL : Transformed template %d chars to %d chars" CR),
                strlen(format), strlen(_output));
   }
