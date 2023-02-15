@@ -21,6 +21,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
+#if defined(USE_ASYNC_WEB)
+
 #include <baseasyncwebhandler.hpp>
 #include <baseconfig.hpp>
 #include <espframework.hpp>
@@ -248,5 +250,7 @@ bool BaseAsyncWebHandler::setupAsyncWebServer() {
   Log.notice(F("WEB : Web server started." CR));
   return true;
 }
+
+#endif // USE_ASYNC_WEB
 
 // EOF

@@ -21,6 +21,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
+#if !defined(USE_ASYNC_WEB)
+
 #include <LittleFS.h>
 
 #include <demo-push.hpp>
@@ -89,5 +91,7 @@ void DemoWebHandler::webHandlePushHttpMqtt() {
 void DemoWebHandler::webHandlePushHttpInfluxDb2() {
   Log.notice(F("WEB : DemoWebHandler callback for /api/push/influxdb2." CR));
 }
+
+#endif // USE_ASYNC_WEB
 
 // EOF
