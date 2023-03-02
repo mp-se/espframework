@@ -30,7 +30,7 @@ SOFTWARE.
 #include <HTTPClient.h>
 #endif
 #include <WiFiUdp.h>
-
+#include <LittleFS.h>
 #include <interface.hpp>
 
 class WifiConnection {
@@ -42,8 +42,16 @@ class WifiConnection {
   String _userPWD;
   WifiConfig* _wifiConfig;
 
+  // Double reset
+  uint32_t _timer = 0;
+  uint32_t _timeout = 3000;  // 3 seconds
+  uint8_t _resetCounter = 0;
+  const uint8_t _minResetCount = 2;
+
   void connectAsync(int wifiIndex);
   bool waitForConnection(int maxTime);
+  void readReset();
+  void writeReset();
 
  public:
   WifiConnection(WifiConfig* cfg, String apSSID, String apPWD, String apMDNS,
