@@ -122,14 +122,16 @@ void BaseAsyncWebHandler::webHandleUploadFile(AsyncWebServerRequest *request,
 
   if (!index) {
     _uploadedSize = 0;
+#if defined(ESP8266)
     Update.runAsync(true);
-    if (!Update.begin(maxSketchSpace, U_FLASH, PIN_LED)) {
+#endif
+    if (!Update.begin(request->contentLength(), U_FLASH, PIN_LED)) {
       _uploadReturn = 500;
       Log.error(F("WEB : Not enough space to store for this firmware." CR));
     } else {
       _uploadReturn = 200;
-      Log.notice(F("WEB : Start firmware upload, max sketch size %d kb." CR),
-                 maxSketchSpace / 1024);
+      Log.notice(F("WEB : Start firmware upload, max sketch size %d kb, size %d." CR),
+                 maxSketchSpace / 1024, request->contentLength());
     }
   }
 
@@ -157,7 +159,7 @@ void BaseAsyncWebHandler::webHandleUploadFile(AsyncWebServerRequest *request,
       _rebootTimer = millis();
       _reboot = true;
     } else {
-      Log.error(F("WEB : Failed to finish firmware flashing" CR));
+      Log.error(F("WEB : Failed to finish firmware flashing, error %d" CR), Update.getError());
       _uploadReturn = 500;
     }
   }

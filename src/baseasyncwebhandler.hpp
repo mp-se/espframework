@@ -30,12 +30,19 @@ SOFTWARE.
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #else
-/*#include <ESPmDNS.h>
+/*
+#include <ESPmDNS.h>
 #include <WebServer.h>
 #include <WiFi.h>
 #define ESP8266WebServer WebServer
-#include <FS.h>*/
-#error "Not yet implemented"
+#include <FS.h>
+*/
+#include <ESPmDNS.h>
+#include <WiFi.h>
+#include <AsyncTCP.h>
+#include <ESPAsyncWebServer.h>
+#include <FS.h>
+#define ESP8266WebServer WebServer
 #endif
 
 #include <interface.hpp>
@@ -89,20 +96,20 @@ class BaseAsyncWebHandler {
                     gUploadHtmSize);
   }
 #else
-  void webReturnIndexHtm() {
-    _server->send_P(200, "text/html", (const char *)indexHtmStart,
+  void webReturnIndexHtm(AsyncWebServerRequest *request) {
+    request->send_P(200, "text/html", (const uint8_t *)indexHtmStart,
                     strlen(reinterpret_cast<const char *>(&indexHtmStart[0])));
   }
-  void webReturnConfigHtm() {
-    _server->send_P(200, "text/html", (const char *)configHtmStart,
+  void webReturnConfigHtm(AsyncWebServerRequest *request) {
+    request->send_P(200, "text/html", (const uint8_t *)configHtmStart,
                     strlen(reinterpret_cast<const char *>(&configHtmStart[0])));
   }
-  void webReturnAboutHtm() {
-    _server->send_P(200, "text/html", (const char *)aboutHtmStart,
+  void webReturnAboutHtm(AsyncWebServerRequest *request) {
+    request->send_P(200, "text/html", (const uint8_t *)aboutHtmStart,
                     strlen(reinterpret_cast<const char *>(&aboutHtmStart[0])));
   }
-  void webReturnUploadHtm() {
-    _server->send_P(200, "text/html", (const char *)uploadHtmStart,
+  void webReturnUploadHtm(AsyncWebServerRequest *request) {
+    request->send_P(200, "text/html", (const uint8_t *)uploadHtmStart,
                     strlen(reinterpret_cast<const char *>(&uploadHtmStart[0])));
   }
 #endif
