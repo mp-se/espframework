@@ -257,8 +257,7 @@ class ESP_WiFiManager {
     _pass1 = String(pwd1);
   }
 
-  void setCredentials(String& ssid, String& pwd, String& ssid1,
-                             String& pwd1) {
+  void setCredentials(String& ssid, String& pwd, String& ssid1, String& pwd1) {
     _ssid = ssid;
     _pass = pwd;
     _ssid1 = ssid1;
@@ -394,7 +393,7 @@ class ESP_WiFiManager {
   bool isIp(const String& str);
   String toStringIp(const IPAddress& ip);
 
-  bool connect;
+  bool connect = false;
   bool stopConfigPortal = false;
 
   void (*_apcallback)(ESP_WiFiManager*) = NULL;

@@ -29,8 +29,9 @@ SOFTWARE.
 #else
 #include <HTTPClient.h>
 #endif
-#include <WiFiUdp.h>
 #include <LittleFS.h>
+#include <WiFiUdp.h>
+
 #include <interface.hpp>
 
 class WifiConnection {

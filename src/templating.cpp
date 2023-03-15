@@ -24,7 +24,7 @@ SOFTWARE.
 #include <templating.hpp>
 
 // the useDefaultTemplate param is there to support unit tests.
-const char* TemplatingEngine::create(const char *base) {
+const char* TemplatingEngine::create(const char* base) {
 #if LOG_LEVEL == 6
   // Log.verbose(F("TPL : Base '%s'." CR), baseTemplate.c_str());
 #endif

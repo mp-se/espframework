@@ -492,17 +492,17 @@ uint8_t ESP_WiFiManager::waitForConnectResult() {
 const char* ESP_WiFiManager::getStatus(const int& status) {
   switch (status) {
     case WL_IDLE_STATUS:
-    return "WL_IDLE_STATUS";
+      return "WL_IDLE_STATUS";
     case WL_NO_SSID_AVAIL:
-    return "WL_NO_SSID_AVAIL";
+      return "WL_NO_SSID_AVAIL";
     case WL_CONNECTED:
-    return "WL_CONNECTED";
+      return "WL_CONNECTED";
     case WL_CONNECT_FAILED:
-    return "WL_CONNECT_FAILED";
+      return "WL_CONNECT_FAILED";
     case WL_DISCONNECTED:
-    return "WL_DISCONNECTED";
+      return "WL_DISCONNECTED";
     default:
-    return "UNKNOWN";
+      return "UNKNOWN";
   }
 }
 
@@ -1234,8 +1234,7 @@ int ESP_WiFiManager::scanWifiNetworks(int** indicesptr) {
 
       for (int j = i + 1; j < n; j++) {
         if (cssid == WiFi.SSID(indices[j])) {
-          Log.verbose(F("WM  : DUP AP: %s" CR),
-                      WiFi.SSID(indices[j]).c_str());
+          Log.verbose(F("WM  : DUP AP: %s" CR), WiFi.SSID(indices[j]).c_str());
           indices[j] = -1;  // set dup aps to index -1
         }
       }

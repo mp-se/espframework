@@ -103,7 +103,7 @@ class TemplatingEngine {
   }
 
  public:
-  TemplatingEngine() { }
+  TemplatingEngine() {}
   ~TemplatingEngine() { freeMemory(); }
 
   void setVal(String key, float val, int dec = 2) {
@@ -137,7 +137,7 @@ class TemplatingEngine {
         EspSerial.print(_items[i].key.c_str());
         EspSerial.print("\', Val=\'");
         EspSerial.print(_items[i].val.c_str());
-        EspSerial.println("\'");          
+        EspSerial.println("\'");
       }
     }
   }
