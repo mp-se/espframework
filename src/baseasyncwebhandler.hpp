@@ -30,18 +30,12 @@ SOFTWARE.
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #else
-/*
-#include <ESPmDNS.h>
-#include <WebServer.h>
-#include <WiFi.h>
-#define ESP8266WebServer WebServer
-#include <FS.h>
-*/
-#include <ESPmDNS.h>
-#include <WiFi.h>
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
+#include <ESPmDNS.h>
 #include <FS.h>
+#include <FreeRTOS.h>
+#include <WiFi.h>
 #define ESP8266WebServer WebServer
 #endif
 
@@ -68,11 +62,11 @@ class BaseAsyncWebHandler {
  protected:
   AsyncWebServer *_server = 0;
   File _uploadFile;
-  int _uploadedSize;
+  int _uploadedSize = 0;
   WebConfig *_webConfig;
   int _uploadReturn = 200;
   int _dynamicJsonSize = 2000;
-  unsigned long _rebootTimer = 0;
+  uint32_t _rebootTimer = 0;
   bool _reboot = false;
 
   void webReturnOK(AsyncWebServerRequest *request) {
@@ -124,6 +118,7 @@ class BaseAsyncWebHandler {
  public:
   explicit BaseAsyncWebHandler(WebConfig *config, int dynamicJsonSize = 2000);
   virtual bool setupAsyncWebServer();
+  virtual AsyncWebServer *getWebServer() { return _server; }
   virtual void loop();
 };
 

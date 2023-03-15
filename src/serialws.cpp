@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2021-22 Magnus
+Copyright (c) 2023 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -21,35 +21,46 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-#ifndef SRC_LOG_HPP_
-#define SRC_LOG_HPP_
+#if defined(USE_ASYNC_WEB)
+#include <log.hpp>
+#include <serialws.hpp>
 
-#include <ArduinoLog.h>
-
-#define ERR_FILENAME "/error.log"
-#define ERR_FILENAME2 "/error2.log"
-#define ERR_FILEMAXSIZE 2048
-
-class SerialDebug {
- public:
-  explicit SerialDebug(const uint32_t serialSpeed = 115200L);
-  void begin(Print* p) { getLog()->begin(LOG_LEVEL, p, true); }
-  static Logging* getLog() { return &Log; }
-};
-
-void printTimestamp(Print* _logOutput, int _logLevel);
-void printNewline(Print* _logOutput);
-
-void writeErrorLog(const char* format, ...);
-void dumpErrorLog1();
-void dumpErrorLog2();
-
-#if defined(USE_SERIAL_PINS) && defined(ESP32)
-#define EspSerial Serial0
-#else
-#define EspSerial Serial
+#if defined(ESP8266)
+#include <incbin.h>
+INCBIN(WebSocketHtm, "html/ws.min.htm");
 #endif
 
-#endif  // SRC_LOG_HPP_
+void SerialWebSocket::begin(AsyncWebServer *server, Print *secondary) {
+  Log.notice(F("WS  : Starting serial websocket" CR));
+
+  _server = server;
+  _secondayLog = secondary;
+  _server->on("/serial", HTTP_GET,
+              std::bind(&SerialWebSocket::webReturnWebSocketHtm, this,
+                        std::placeholders::_1));
+
+  _webSocket = new AsyncWebSocket("/serialws");
+  _server->addHandler(_webSocket);
+}
+
+size_t SerialWebSocket::write(uint8_t c) {
+  _buf[_bufSize++] = c;
+
+  if (_bufSize >= sizeof(_buf) || c == '\n') {
+    flush();
+  }
+
+  return sizeof(c);
+}
+
+void SerialWebSocket::flush() {
+  if (_secondayLog) _secondayLog->write(_buf, _bufSize);
+
+  _webSocket->textAll(reinterpret_cast<const char *>(_buf), _bufSize);
+  memset(_buf, 0, sizeof(_buf));
+  _bufSize = 0;
+}
+
+#endif  // USE_ASYNC_WEB
 
 // EOF

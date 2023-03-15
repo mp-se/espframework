@@ -86,7 +86,8 @@ SerialDebug::SerialDebug(const uint32_t serialSpeed) {
   EspSerial.begin(115200L);
 #endif
   EspSerial.println("Serial console activated.");
-  getLog()->begin(LOG_LEVEL, &EspSerial, true);
+
+  begin(&EspSerial);
   getLog()->setPrefix(printTimestamp);
   getLog()->notice(F("SDBG: Serial logging started at %l." CR), serialSpeed);
 }

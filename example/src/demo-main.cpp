@@ -21,8 +21,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-#define USE_ASYNC_WEB 1
-
 #include <demo-config.hpp>
 #include <demo-main.hpp>
 #include <demo-push.hpp>
@@ -30,18 +28,26 @@ SOFTWARE.
 #include <log.hpp>
 #include <ota.hpp>
 #include <perf.hpp>
+#include <serialws.hpp>
 #include <wificonnection.hpp>
-#include <demo-webhandler.hpp>
 
 SerialDebug mySerial(115200L);
 DemoConfig myConfig("mdnsbase", "/esplib.cfg");
 WifiConnection myWifi(&myConfig, "espSSID", "password", "esplib", "", "");
 OtaUpdate myOta(&myConfig, "0.0.0");
 DemoPush myPush(&myConfig);
+
+#if defined(USE_ASYNC_WEB)
+#include <demo-asyncwebhandler.hpp>
+DemoAsyncWebHandler myAsyncWebHandler(&myConfig, &myPush);
+SerialWebSocket mySerialWebSocket;
+#else
+#include <demo-webhandler.hpp>
 DemoWebHandler myWebHandler(&myConfig, &myPush);
+#endif
 
 void setup() {
-  delay(2000);
+  // delay(2000);
   Log.notice(F("Main: Started setup." CR));
 
 #if defined(PERF_ENABLE)
@@ -71,7 +77,13 @@ void setup() {
   }
 
   if (myWifi.isConnected()) {
+#if defined(USE_ASYNC_WEB)
+    myAsyncWebHandler.setupAsyncWebServer();
+    mySerialWebSocket.begin(myAsyncWebHandler.getWebServer(), &Serial);
+    mySerial.begin(&mySerialWebSocket);
+#else
     myWebHandler.setupWebServer();
+#endif
   }
 
   Serial.println("Setup() complete");
@@ -80,7 +92,15 @@ void setup() {
 
 void loop() {
   myWifi.loop();
+#if defined(USE_ASYNC_WEB)
+  myAsyncWebHandler.loop();
+  mySerialWebSocket.loop();
+#else
   myWebHandler.loop();
+#endif
+
+  Log.notice(F("Loop:" CR));
+  delay(2000);
 }
 
 // EOF

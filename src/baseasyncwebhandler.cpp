@@ -130,8 +130,9 @@ void BaseAsyncWebHandler::webHandleUploadFile(AsyncWebServerRequest *request,
       Log.error(F("WEB : Not enough space to store for this firmware." CR));
     } else {
       _uploadReturn = 200;
-      Log.notice(F("WEB : Start firmware upload, max sketch size %d kb, size %d." CR),
-                 maxSketchSpace / 1024, request->contentLength());
+      Log.notice(
+          F("WEB : Start firmware upload, max sketch size %d kb, size %d." CR),
+          maxSketchSpace / 1024, request->contentLength());
     }
   }
 
@@ -159,7 +160,8 @@ void BaseAsyncWebHandler::webHandleUploadFile(AsyncWebServerRequest *request,
       _rebootTimer = millis();
       _reboot = true;
     } else {
-      Log.error(F("WEB : Failed to finish firmware flashing, error %d" CR), Update.getError());
+      Log.error(F("WEB : Failed to finish firmware flashing, error %d" CR),
+                Update.getError());
       _uploadReturn = 500;
     }
   }
@@ -253,6 +255,6 @@ bool BaseAsyncWebHandler::setupAsyncWebServer() {
   return true;
 }
 
-#endif // USE_ASYNC_WEB
+#endif  // USE_ASYNC_WEB
 
 // EOF
