@@ -24,6 +24,10 @@ SOFTWARE.
 #ifndef SRC_BASEASYNCWEBHANDLER_HPP_
 #define SRC_BASEASYNCWEBHANDLER_HPP_
 
+#if defined(ESP32)
+#include <FreeRTOS.h>
+#endif
+
 #if defined(ESP8266)
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
@@ -34,7 +38,6 @@ SOFTWARE.
 #include <ESPAsyncWebServer.h>
 #include <ESPmDNS.h>
 #include <FS.h>
-#include <FreeRTOS.h>
 #include <WiFi.h>
 #define ESP8266WebServer WebServer
 #endif

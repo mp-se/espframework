@@ -24,8 +24,14 @@ SOFTWARE.
 #ifndef SRC_SERIALWS_HPP_
 #define SRC_SERIALWS_HPP_
 
+#if defined(USE_ASYNC_WEB)
+
 #include <Arduino.h>
 #include <Print.h>
+
+#if defined(ESP32)
+#include <FreeRTOS.h>
+#endif
 
 #if defined(ESP8266)
 #include <ESPAsyncTCP.h>
@@ -33,7 +39,6 @@ SOFTWARE.
 #else
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
-#include <FreeRTOS.h>
 #endif
 
 #if defined(ESP8266)
@@ -48,7 +53,7 @@ class SerialWebSocket : public Print {
   AsyncWebServer *_server = 0;
   AsyncWebSocket *_webSocket = 0;
   Print *_secondayLog = 0;
-  uint8_t _buf[40] = "";
+  uint8_t _buf[40] = {0};
   uint32_t _bufSize = 0;
 
 #if defined(ESP8266)
@@ -65,6 +70,7 @@ class SerialWebSocket : public Print {
 #endif
 
  public:
+  SerialWebSocket() {}
   void begin(AsyncWebServer *_server, Print *secondary = 0);
   size_t write(uint8_t c);
   using Print::write;
@@ -74,6 +80,8 @@ class SerialWebSocket : public Print {
     if (_webSocket) _webSocket->cleanupClients();
   }
 };
+
+#endif // USE_ASYNC_WEB
 
 #endif  // SRC_SERIALWS_HPP_
 
