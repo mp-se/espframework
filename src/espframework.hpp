@@ -24,7 +24,7 @@ SOFTWARE.
 #ifndef SRC_ESPFRAMEWORK_HPP_
 #define SRC_ESPFRAMEWORK_HPP_
 
-#define ESPFWK_VER "0.3.0"
+#define ESPFWK_VER "0.6.0"
 
 #if defined(ESP8266)
 #define ESP_RESET ESP.reset
