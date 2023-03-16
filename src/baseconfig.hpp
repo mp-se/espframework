@@ -26,31 +26,31 @@ SOFTWARE.
 
 #include <interface.hpp>
 
-#define PARAM_ID "id"
-#define PARAM_MDNS "mdns"
-#define PARAM_SSID "wifi-ssid"
-#define PARAM_PASS "wifi-pass"
-#define PARAM_SSID2 "wifi-ssid2"
-#define PARAM_PASS2 "wifi-pass2"
-#define PARAM_OTA_URL "ota-url"
-#define PARAM_TEMP_FORMAT "temp-format"
-#define PARAM_TARGET_HTTP_POST "http-post-target"
-#define PARAM_HEADER1_HTTP_POST "http-post-header1"
-#define PARAM_HEADER2_HTTP_POST "http-post-header2"
-#define PARAM_TARGET_HTTP_GET "http-get-target"
-#define PARAM_HEADER1_HTTP_GET "http-get-header1"
-#define PARAM_HEADER2_HTTP_GET "http-get-header2"
-#define PARAM_TARGET_INFLUXDB2 "influxdb2-target"
-#define PARAM_ORG_INFLUXDB2 "influxdb2-org"
-#define PARAM_BUCKET_INFLUXDB2 "influxdb2-bucket"
-#define PARAM_TOKEN_INFLUXDB2 "influxdb2-token"
-#define PARAM_TARGET_MQTT "mqtt-target"
-#define PARAM_PORT_MQTT "mqtt-port"
-#define PARAM_USER_MQTT "mqtt-user"
-#define PARAM_PASS_MQTT "mqtt-pass"
-#define PARAM_WIFI_PORTAL_TIMEOUT "wifi-portal-timeout"
-#define PARAM_WIFI_CONNECT_TIMEOUT "wifi-connect-timeout"
-#define PARAM_PUSH_TIMEOUT "push-timeout"
+constexpr auto PARAM_ID = "id";
+constexpr auto PARAM_MDNS = "mdns";
+constexpr auto PARAM_SSID = "wifi-ssid";
+constexpr auto PARAM_PASS = "wifi-pass";
+constexpr auto PARAM_SSID2 = "wifi-ssid2";
+constexpr auto PARAM_PASS2 = "wifi-pass2";
+constexpr auto PARAM_OTA_URL = "ota-url";
+constexpr auto PARAM_TEMP_FORMAT = "temp-format";
+constexpr auto PARAM_TARGET_HTTP_POST = "http-post-target";
+constexpr auto PARAM_HEADER1_HTTP_POST = "http-post-header1";
+constexpr auto PARAM_HEADER2_HTTP_POST = "http-post-header2";
+constexpr auto PARAM_TARGET_HTTP_GET = "http-get-target";
+constexpr auto PARAM_HEADER1_HTTP_GET = "http-get-header1";
+constexpr auto PARAM_HEADER2_HTTP_GET = "http-get-header2";
+constexpr auto PARAM_TARGET_INFLUXDB2 = "influxdb2-target";
+constexpr auto PARAM_ORG_INFLUXDB2 = "influxdb2-org";
+constexpr auto PARAM_BUCKET_INFLUXDB2 = "influxdb2-bucket";
+constexpr auto PARAM_TOKEN_INFLUXDB2 = "influxdb2-token";
+constexpr auto PARAM_TARGET_MQTT = "mqtt-target";
+constexpr auto PARAM_PORT_MQTT = "mqtt-port";
+constexpr auto PARAM_USER_MQTT = "mqtt-user";
+constexpr auto PARAM_PASS_MQTT = "mqtt-pass";
+constexpr auto PARAM_WIFI_PORTAL_TIMEOUT = "wifi-portal-timeout";
+constexpr auto PARAM_WIFI_CONNECT_TIMEOUT = "wifi-connect-timeout";
+constexpr auto PARAM_PUSH_TIMEOUT = "push-timeout";
 
 class BaseConfig : public WifiConfig,
                    public OtaConfig,
