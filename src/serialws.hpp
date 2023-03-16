@@ -81,7 +81,7 @@ class SerialWebSocket : public Print {
   }
 };
 
-#endif // USE_ASYNC_WEB
+#endif  // USE_ASYNC_WEB
 
 #endif  // SRC_SERIALWS_HPP_
 
