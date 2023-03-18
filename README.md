@@ -1,3 +1,8 @@
+![download](https://img.shields.io/github/downloads/mp-se/espframework/total) 
+![release](https://img.shields.io/github/v/release/mp-se/espframework?label=latest%20release)
+![issues](https://img.shields.io/github/issues/mp-se/espframework)
+![pr](https://img.shields.io/github/issues-pr/mp-se/espframework)
+
 # ESP framework
 
 This is a framework that I use in my own ESP projects as a base. It contains a lot of basic features that are needed. It has been tested with the following targets: ESP8266, ESP32, ESP32S2, ESP32C3
