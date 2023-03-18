@@ -2,10 +2,7 @@
 
 This is a framework that I use in my own ESP projects as a base. It contains a lot of basic features that are needed. It has been tested with the following targets: ESP8266, ESP32, ESP32S2, ESP32C3
 
-## TOC
-
 - [ESP framework](#esp-framework)
-  - [TOC](#toc)
   - [Features](#features)
 - [Code samples](#code-samples)
   - [class BaseConfig](#class-baseconfig)
