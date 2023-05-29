@@ -68,7 +68,11 @@ void BaseAsyncWebHandler::webHandleConfigRead(AsyncWebServerRequest *request) {
   out.reserve(_dynamicJsonSize);
   serializeJson(doc, out);
   doc.clear();
-  request->send(200, "application/json", out.c_str());
+  // request->send(200, "application/json", out.c_str());
+  AsyncWebServerResponse *response =
+      request->beginResponse(200, "application/json", out.c_str());
+  response->addHeader("Access-Control-Allow-Origin", "*");
+  request->send(response);
 }
 
 void BaseAsyncWebHandler::webHandleConfigWrite(AsyncWebServerRequest *request) {
@@ -78,7 +82,11 @@ void BaseAsyncWebHandler::webHandleConfigWrite(AsyncWebServerRequest *request) {
   if (!id.equalsIgnoreCase(_webConfig->getID())) {
     Log.error(F("WEB : Wrong ID received %s, expected %s" CR), id.c_str(),
               _webConfig->getID());
-    request->send(400, "text/plain", "Invalid ID.");
+    // request->send(400, "text/plain", "Invalid ID.");
+    AsyncWebServerResponse *response =
+        request->beginResponse(400, "text/plain", "Invalid ID.");
+    response->addHeader("Access-Control-Allow-Origin", "*");
+    request->send(response);
     return;
   }
 
@@ -109,6 +117,7 @@ void BaseAsyncWebHandler::webHandleConfigWrite(AsyncWebServerRequest *request) {
 
   AsyncWebServerResponse *response =
       request->beginResponse(302, "text/plain", "Config saved");
+  response->addHeader("Access-Control-Allow-Origin", "*");
   response->addHeader("Location", path);
   request->send(response);
 }
@@ -170,7 +179,11 @@ void BaseAsyncWebHandler::webHandleUploadFile(AsyncWebServerRequest *request,
 void BaseAsyncWebHandler::webHandlePageNotFound(
     AsyncWebServerRequest *request) {
   Log.error(F("WEB : URL not found %s received." CR), request->url().c_str());
-  request->send(404, "text/plain", F("URL not found"));
+  // request->send(404, "text/plain", F("URL not found"));
+  AsyncWebServerResponse *response =
+      request->beginResponse(404, "text/plain", "URL not found");
+  response->addHeader("Access-Control-Allow-Origin", "*");
+  request->send(response);
 }
 
 void BaseAsyncWebHandler::setupAsyncWebHandlers() {
