@@ -208,6 +208,8 @@ void BaseWebHandler::setupWebHandlers() {
 
   MDNS.begin(_webConfig->getMDNS());
 
+  _server->enableCORS(true);
+
   Log.notice(F("WEB : Setting up web handlers." CR));
   _server->on("/", std::bind(&BaseWebHandler::webReturnIndexHtm, this));
   _server->on("/index.htm",
