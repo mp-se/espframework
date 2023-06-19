@@ -56,7 +56,11 @@ size_t SerialWebSocket::write(uint8_t c) {
 void SerialWebSocket::flush() {
   if (_secondayLog) _secondayLog->write(_buf, _bufSize);
 
-  _webSocket->textAll(reinterpret_cast<const char *>(_buf), _bufSize);
+  if (_webSocket->count()) {
+    // Only send data to socket if there are connected clients
+    _webSocket->textAll(reinterpret_cast<const char *>(_buf), _bufSize);
+  }
+
   memset(_buf, 0, sizeof(_buf));
   _bufSize = 0;
 }
