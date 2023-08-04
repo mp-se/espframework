@@ -183,7 +183,7 @@ Creating a global instance for serial websocket listener
 SerialWebSocket mySerialWebSocket;
 ```
 
-To connect the serial websocket you need to get the webserver pointer from the async webhandler. The second param allows you to specify a secondary port that data is also written to. 
+To connect the serial websocket you need to get the webserver pointer from the async webhandler. The second param allows you to specify a secondary port that data is also written to, for example sending data to the serial port as well as the WebSocket.
 ```cpp
 // This example will stream the serial console both to hardware serial and the 
 // websocket (NULL will disable that port). 
