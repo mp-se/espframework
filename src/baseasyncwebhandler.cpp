@@ -53,6 +53,8 @@ void BaseAsyncWebHandler::loop() {
 
   if (_reboot) {
     if (abs((int32_t)(millis() - _rebootTimer)) > 1000) {
+      Log.notice(F("WEB : Rebooting..." CR));
+      delay(500);
       ESP_RESET();
     }
   }
@@ -166,6 +168,7 @@ void BaseAsyncWebHandler::webHandleUploadFile(AsyncWebServerRequest *request,
     if (Update.end(true)) {
       // Calling reset here will not wait for all the data to be sent, lets wait
       // a second before rebooting in loop.
+      Log.notice(F("WEB : Scheduling reboot." CR));
       _rebootTimer = millis();
       _reboot = true;
     } else {
