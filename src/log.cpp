@@ -73,7 +73,8 @@ SerialDebug::SerialDebug(const uint32_t serialSpeed) {
 #elif defined(ESP8266)
   EspSerial.begin(serialSpeed);
 #elif defined(USE_SERIAL_PINS) && defined(ESP32C3)
-  EspSerial.begin(115200L, SERIAL_8N1, 20, 21);
+  //EspSerial.begin(115200L, SERIAL_8N1, 20, 21);
+  EspSerial.begin(115200L);
 #elif defined(ESP32C3)
   EspSerial.begin(115200L);
 #elif defined(USE_SERIAL_PINS) && defined(ESP32S2)

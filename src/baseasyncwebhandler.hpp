@@ -25,7 +25,7 @@ SOFTWARE.
 #define SRC_BASEASYNCWEBHANDLER_HPP_
 
 #if defined(ESP32)
-#include <FreeRTOS.h>
+#include <freertos/FreeRTOS.h>
 #endif
 
 #if defined(ESP8266)
