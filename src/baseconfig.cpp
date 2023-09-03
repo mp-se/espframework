@@ -287,6 +287,7 @@ void BaseConfig::checkFileSystem() {
 #if LOG_LEVEL == 6
   Log.verbose(F("CFG : Checking if filesystem is valid." CR));
 #endif
+#ifdef ESP8266
   if (LittleFS.begin()) {
 #if LOG_LEVEL == 6
     Log.verbose(F("CFG : Filesystem mounted." CR));
@@ -294,7 +295,18 @@ void BaseConfig::checkFileSystem() {
   } else {
     Log.error(F("CFG : Unable to mount file system, formatting..." CR));
     LittleFS.format();
+    LittleFS.begin();
   }
+#else 
+  if (LittleFS.begin(true)) {
+#if LOG_LEVEL == 6
+    Log.verbose(F("CFG : Filesystem mounted." CR));
+#endif
+  } else {
+    Log.error(F("CFG : Unable to mount/format file system..." CR));
+  }
+#endif
+
 }
 
 // EOF

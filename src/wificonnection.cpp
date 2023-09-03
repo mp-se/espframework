@@ -82,8 +82,8 @@ void WifiConnection::writeReset() {
   }
 }
 bool WifiConnection::hasConfig() {
-  if (strlen(_wifiConfig->getWifiSSID(0))) return true;
   if (_userSSID.length()) return true;
+  if (strlen(_wifiConfig->getWifiSSID(0))) return true;
 
     // Check if there are stored WIFI Settings we can use
 #if defined(ESP8266)

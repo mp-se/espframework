@@ -24,14 +24,18 @@ SOFTWARE.
 #ifndef SRC_ESPFRAMEWORK_HPP_
 #define SRC_ESPFRAMEWORK_HPP_
 
-#define ESPFWK_VER "0.6.3"
+#define ESPFWK_VER "0.6.4"
 
 #if defined(ESP8266)
-#define ESP_RESET ESP.reset
-#define PIN_LED 2
+  #define ESP_RESET ESP.reset
+  #define PIN_LED 2
 #elif defined(ESP32)
 #define ESP_RESET ESP.restart
-#define PIN_LED LED_BUILTIN
+  #if defined(LED_BUILTIN)
+    #define PIN_LED LED_BUILTIN
+  #else
+    #define PIN_LED 2
+  #endif
 #endif
 
 #endif  // SRC_ESPFRAMEWORK_HPP_
