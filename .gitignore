@@ -8,7 +8,7 @@ src/demo*.*
 platformio.ini
 html/*
 test/*
-diagram.json
-wokwi.toml
-partitions.csv
-output.map
+/diagram.json
+/wokwi.toml
+/partitions.csv
+/output.map
