@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2021-22 Magnus
+Copyright (c) 2021-23 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,18 +24,18 @@ SOFTWARE.
 #ifndef SRC_ESPFRAMEWORK_HPP_
 #define SRC_ESPFRAMEWORK_HPP_
 
-#define ESPFWK_VER "0.6.4"
+#define ESPFWK_VER "0.7.0"
 
 #if defined(ESP8266)
-  #define ESP_RESET ESP.reset
-  #define PIN_LED 2
+#define ESP_RESET ESP.reset
+#define PIN_LED 2
 #elif defined(ESP32)
 #define ESP_RESET ESP.restart
-  #if defined(LED_BUILTIN)
-    #define PIN_LED LED_BUILTIN
-  #else
-    #define PIN_LED 2
-  #endif
+#if defined(LED_BUILTIN)
+#define PIN_LED LED_BUILTIN
+#else
+#define PIN_LED 2
+#endif
 #endif
 
 #endif  // SRC_ESPFRAMEWORK_HPP_

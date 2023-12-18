@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2021-22 Magnus
+Copyright (c) 2021-23 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -297,7 +297,7 @@ void BaseConfig::checkFileSystem() {
     LittleFS.format();
     LittleFS.begin();
   }
-#else 
+#else
   if (LittleFS.begin(true)) {
 #if LOG_LEVEL == 6
     Log.verbose(F("CFG : Filesystem mounted." CR));
@@ -306,7 +306,6 @@ void BaseConfig::checkFileSystem() {
     Log.error(F("CFG : Unable to mount/format file system..." CR));
   }
 #endif
-
 }
 
 // EOF

@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2021-22 Magnus
+Copyright (c) 2021-23 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -44,7 +44,8 @@ void writeErrorLog(const char* format, ...);
 void dumpErrorLog1();
 void dumpErrorLog2();
 
-#if defined(USE_SERIAL_PINS) && defined(ESP32) && !defined(ARDUINO_USB_CDC_ON_BOOT)
+#if defined(USE_SERIAL_PINS) && defined(ESP32) && \
+    !defined(ARDUINO_USB_CDC_ON_BOOT)
 #define EspSerial Serial0
 #else
 #define EspSerial Serial
