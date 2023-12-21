@@ -1,4 +1,3 @@
-![download](https://img.shields.io/github/downloads/mp-se/espframework/total) 
 ![release](https://img.shields.io/github/v/release/mp-se/espframework?label=latest%20release)
 ![issues](https://img.shields.io/github/issues/mp-se/espframework)
 ![pr](https://img.shields.io/github/issues-pr/mp-se/espframework)
@@ -21,7 +20,15 @@ This is a framework that I use in my own ESP projects as a base. It contains a l
   - [class PerfLogging](#class-perflogging)
   - [Misc helper methods](#misc-helper-methods)
 - [Credits](#credits)
-  
+
+## Supported targets
+
+- ESP8266
+- ESP32
+- ESP32S2
+- ESP32C3
+- ESP32S3
+
 ## Features
 
 1. **WIFI Connection**
@@ -388,6 +395,8 @@ Other helper methods
 void tcp_cleanup(); // Do cleanup on lingering tcp connections that can cause crash on esp8266
 void deepSleep(int t); // Sleep for t seconds.
 void printHeap(String prefix); // Print out current heap information to logger
+void ledOn(LedColor l = LedColor::WHITE); // Set the builtin led, supports RGB leds on C3/S3 boards
+void ledOff();
 ```
 
 # Credits
