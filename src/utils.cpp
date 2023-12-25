@@ -23,7 +23,6 @@ SOFTWARE.
  */
 #include <log.hpp>
 #include <utils.hpp>
-#include <Adafruit_NeoPixel.h>
 
 float convertCtoF(float c) { return (c * 1.8) + 32.0; }
 
@@ -76,34 +75,5 @@ void printHeap(String prefix) {
              ESP.getFreeHeap() / 1024, ESP.getFreeSketchSpace() / 1024);
 #endif
 }
-
-#if defined(ESP32C3) || defined(ESP32S3)
-Adafruit_NeoPixel *rgbLed = nullptr;
-
-void ledOn(LedColor l) {
-  if(rgbLed == nullptr) {
-    rgbLed = new Adafruit_NeoPixel(1, LED_BUILTIN, NEO_GRB + NEO_KHZ800);
-    rgbLed->begin(); 
-    rgbLed->setBrightness(20);
-  }
-
-  rgbLed->fill(l);
-  rgbLed->show();
-}
-#else
-bool ledInit = false;
-
-void ledOn(LedColor l) {
-  if(!ledInit) {
-    pinMode(LED_BUILTIN, OUTPUT);
-    ledInit = true;
-  }
-
-  digitalWrite(LED_BUILTIN, l);
-}
-#endif
-
-void ledOff() { ledOn(LedColor::OFF); }
-
 
 // EOF
