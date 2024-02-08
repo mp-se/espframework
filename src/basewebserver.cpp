@@ -266,7 +266,7 @@ void BaseWebServer::webHandleAuth(AsyncWebServerRequest *request) {
 }
 
 void BaseWebServer::webHandleFileSystem(AsyncWebServerRequest *request,
-                                           JsonVariant &json) {
+                                        JsonVariant &json) {
   if (!isAuthenticated(request)) {
     return;
   }
@@ -411,19 +411,21 @@ void BaseWebServer::setupWebHandlers() {
 
   AsyncCallbackJsonWebHandler *handler;
 
-  _server->on("/api/auth", HTTP_GET, std::bind(&BaseWebServer::webHandleAuth, this,
-                             std::placeholders::_1));
-  _server->on("/api/config", HTTP_GET, std::bind(&BaseWebServer::webHandleConfigRead, this,
-                             std::placeholders::_1));
+  _server->on(
+      "/api/auth", HTTP_GET,
+      std::bind(&BaseWebServer::webHandleAuth, this, std::placeholders::_1));
+  _server->on("/api/config", HTTP_GET,
+              std::bind(&BaseWebServer::webHandleConfigRead, this,
+                        std::placeholders::_1));
   _server->on("/api/wifi/scan/status", HTTP_GET,
               std::bind(&BaseWebServer::webHandleWifiScanStatus, this,
                         std::placeholders::_1));
   _server->on("/api/wifi/scan", HTTP_GET,
               std::bind(&BaseWebServer::webHandleWifiScan, this,
                         std::placeholders::_1));
-  _server->on("/api/restart", HTTP_GET,
-              std::bind(&BaseWebServer::webHandleRestart, this,
-                        std::placeholders::_1));
+  _server->on(
+      "/api/restart", HTTP_GET,
+      std::bind(&BaseWebServer::webHandleRestart, this, std::placeholders::_1));
   handler = new AsyncCallbackJsonWebHandler(
       "/api/filesystem",
       std::bind(&BaseWebServer::webHandleFileSystem, this,

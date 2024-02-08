@@ -24,8 +24,8 @@ SOFTWARE.
 #ifndef SRC_BASECONFIG_HPP_
 #define SRC_BASECONFIG_HPP_
 
-#include <interface.hpp>
 #include <espframework.hpp>
+#include <interface.hpp>
 
 constexpr auto PARAM_ID = "id";
 constexpr auto PARAM_MDNS = "mdns";

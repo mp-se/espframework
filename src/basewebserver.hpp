@@ -92,8 +92,7 @@ class BaseWebServer {
                     gIndexHtmlSize);
   }
   void webReturnAppJs(AsyncWebServerRequest *request) {
-    request->send_P(200, "text/html", (const uint8_t *)gAppJsData,
-                    gAppJsSize);
+    request->send_P(200, "text/html", (const uint8_t *)gAppJsData, gAppJsSize);
   }
   void webReturnAppCss(AsyncWebServerRequest *request) {
     request->send_P(200, "text/html", (const uint8_t *)gAppCssData,
