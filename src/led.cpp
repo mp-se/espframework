@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2023 Magnus
+Copyright (c) 2023-2024 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -21,18 +21,20 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-#include <log.hpp>
-#include <led.hpp>
 #include <Ticker.h>
+
+#include <espframework.hpp>
+#include <led.hpp>
+#include <log.hpp>
 
 #if defined(ESP32C3) || defined(ESP32S3)
 void ledOn(LedColor l) {
-  uint8_t r,g,b,pin;
+  uint8_t r, g, b, pin;
 
-  r = (l & 0xff0000)>>16;
-  g = (l & 0x00ff00)>>8;
+  r = (l & 0xff0000) >> 16;
+  g = (l & 0x00ff00) >> 8;
   b = (l & 0x0000ff);
-  pin = LED_BUILTIN;
+  pin = PIN_LED;
 
   Log.info(F("HELP: Setting led %d to RGB %d-%d-%d" CR), pin, r, g, b);
   neopixelWrite(pin, r, g, b);
@@ -41,11 +43,11 @@ void ledOn(LedColor l) {
 bool ledInit = false;
 Ticker ledTicker;
 
-void ledToggle() { digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN)); }
+void ledToggle() { digitalWrite(PIN_LED, !digitalRead(PIN_LED)); }
 
 void ledOn(LedColor l) {
   if (!ledInit) {
-    pinMode(LED_BUILTIN, OUTPUT);
+    pinMode(PIN_LED, OUTPUT);
     ledInit = true;
   }
 
@@ -55,7 +57,7 @@ void ledOn(LedColor l) {
     ledTicker.attach(0.2, ledToggle);
   } else {
     ledTicker.detach();
-    digitalWrite(LED_BUILTIN, l);
+    digitalWrite(PIN_LED, l);
   }
 }
 #endif

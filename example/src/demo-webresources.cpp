@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2021-22 Magnus
+Copyright (c) 2021-2024 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,13 +26,9 @@ SOFTWARE.
 #include <incbin.h>
 
 // These are used in the webhandler class and needs to be defined.
-INCBIN(IndexHtm, "html/index.min.htm");
-INCBIN(ConfigHtm, "html/config.min.htm");
-INCBIN(AboutHtm, "html/about.min.htm");
-INCBIN(UploadHtm, "html/upload.min.htm");
-
-// Extensions for the demo web handler
-INCBIN(TestHtm, "html/test.min.htm");
+INCBIN(IndexHtml, "html/index.html");
+INCBIN(AppJs, "html/app.js.gz");
+INCBIN(AppCss, "html/app.css.gz");
 #endif
 
 // EOF

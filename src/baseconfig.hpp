@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2021-23 Magnus
+Copyright (c) 2021-2024 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,32 +25,45 @@ SOFTWARE.
 #define SRC_BASECONFIG_HPP_
 
 #include <interface.hpp>
+#include <espframework.hpp>
 
 constexpr auto PARAM_ID = "id";
 constexpr auto PARAM_MDNS = "mdns";
-constexpr auto PARAM_SSID = "wifi-ssid";
-constexpr auto PARAM_PASS = "wifi-pass";
-constexpr auto PARAM_SSID2 = "wifi-ssid2";
-constexpr auto PARAM_PASS2 = "wifi-pass2";
-constexpr auto PARAM_OTA_URL = "ota-url";
-constexpr auto PARAM_TEMP_FORMAT = "temp-format";
-constexpr auto PARAM_TARGET_HTTP_POST = "http-post-target";
-constexpr auto PARAM_HEADER1_HTTP_POST = "http-post-header1";
-constexpr auto PARAM_HEADER2_HTTP_POST = "http-post-header2";
-constexpr auto PARAM_TARGET_HTTP_GET = "http-get-target";
-constexpr auto PARAM_HEADER1_HTTP_GET = "http-get-header1";
-constexpr auto PARAM_HEADER2_HTTP_GET = "http-get-header2";
-constexpr auto PARAM_TARGET_INFLUXDB2 = "influxdb2-target";
-constexpr auto PARAM_ORG_INFLUXDB2 = "influxdb2-org";
-constexpr auto PARAM_BUCKET_INFLUXDB2 = "influxdb2-bucket";
-constexpr auto PARAM_TOKEN_INFLUXDB2 = "influxdb2-token";
-constexpr auto PARAM_TARGET_MQTT = "mqtt-target";
-constexpr auto PARAM_PORT_MQTT = "mqtt-port";
-constexpr auto PARAM_USER_MQTT = "mqtt-user";
-constexpr auto PARAM_PASS_MQTT = "mqtt-pass";
-constexpr auto PARAM_WIFI_PORTAL_TIMEOUT = "wifi-portal-timeout";
-constexpr auto PARAM_WIFI_CONNECT_TIMEOUT = "wifi-connect-timeout";
-constexpr auto PARAM_PUSH_TIMEOUT = "push-timeout";
+constexpr auto PARAM_SSID = "wifi_ssid";
+constexpr auto PARAM_PASS = "wifi_pass";
+constexpr auto PARAM_SSID2 = "wifi_ssid2";
+constexpr auto PARAM_PASS2 = "wifi_pass2";
+constexpr auto PARAM_OTA_URL = "ota_url";
+constexpr auto PARAM_TEMP_FORMAT = "temp_format";
+constexpr auto PARAM_TARGET_HTTP_POST = "http_post_target";
+constexpr auto PARAM_HEADER1_HTTP_POST = "http_post_header1";
+constexpr auto PARAM_HEADER2_HTTP_POST = "http_post_header2";
+constexpr auto PARAM_TARGET_HTTP_GET = "http_get_target";
+constexpr auto PARAM_HEADER1_HTTP_GET = "http_get_header1";
+constexpr auto PARAM_HEADER2_HTTP_GET = "http_get_header2";
+constexpr auto PARAM_TARGET_INFLUXDB2 = "influxdb2_target";
+constexpr auto PARAM_ORG_INFLUXDB2 = "influxdb2_org";
+constexpr auto PARAM_BUCKET_INFLUXDB2 = "influxdb2_bucket";
+constexpr auto PARAM_TOKEN_INFLUXDB2 = "influxdb2_token";
+constexpr auto PARAM_TARGET_MQTT = "mqtt_target";
+constexpr auto PARAM_PORT_MQTT = "mqtt_port";
+constexpr auto PARAM_USER_MQTT = "mqtt_user";
+constexpr auto PARAM_PASS_MQTT = "mqtt_pass";
+constexpr auto PARAM_WIFI_PORTAL_TIMEOUT = "wifi_portal_timeout";
+constexpr auto PARAM_WIFI_CONNECT_TIMEOUT = "wifi_connect_timeout";
+constexpr auto PARAM_PUSH_TIMEOUT = "push_timeout";
+constexpr auto PARAM_DARK_MODE = "dark_mode";
+constexpr auto PARAM_SUCCESS = "success";
+constexpr auto PARAM_STATUS = "status";
+constexpr auto PARAM_MESSAGE = "message";
+constexpr auto PARAM_TOKEN = "token";
+constexpr auto PARAM_COMMAND = "command";
+constexpr auto PARAM_FILE = "file";
+constexpr auto PARAM_FILES = "files";
+constexpr auto PARAM_NETWORKS = "networks";
+constexpr auto PARAM_RSSI = "rssi";
+constexpr auto PARAM_CHANNEL = "channel";
+constexpr auto PARAM_ENCRYPTION = "encryption";
 
 class BaseConfig : public WifiConfig,
                    public OtaConfig,
@@ -88,7 +101,8 @@ class BaseConfig : public WifiConfig,
   String _id;
   char _tempFormat = 'C';
   String _fileName;
-  int _dynamicJsonSize = 2000;
+  int _dynamicJsonSize = JSON_BUFFER_SIZE_L;
+  bool _darkMode;
 
   void formatFileSystem();
 
@@ -96,15 +110,15 @@ class BaseConfig : public WifiConfig,
  protected:
   bool _saveNeeded;
 
-  void createJsonBase(DynamicJsonDocument& doc, bool skipSecrets);
-  void createJsonOta(DynamicJsonDocument& doc, bool skipSecrets);
-  void createJsonWifi(DynamicJsonDocument& doc, bool skipSecrets);
-  void createJsonPush(DynamicJsonDocument& doc, bool skipSecrets);
+  void createJsonBase(JsonObject& doc);
+  void createJsonOta(JsonObject& doc);
+  void createJsonWifi(JsonObject& doc);
+  void createJsonPush(JsonObject& doc);
 
-  void parseJsonBase(DynamicJsonDocument& doc);
-  void parseJsonOta(DynamicJsonDocument& doc);
-  void parseJsonWifi(DynamicJsonDocument& doc);
-  void parseJsonPush(DynamicJsonDocument& doc);
+  void parseJsonBase(JsonObject& doc);
+  void parseJsonOta(JsonObject& doc);
+  void parseJsonWifi(JsonObject& doc);
+  void parseJsonPush(JsonObject& doc);
 
  public:
   BaseConfig(String baseMDNS, String fileName, int dynamicJsonSize = 2000);
@@ -241,9 +255,15 @@ class BaseConfig : public WifiConfig,
   bool isTempFormatC() { return _tempFormat == 'C' ? true : false; }
   bool isTempFormatF() { return _tempFormat == 'F' ? true : false; }
 
+  bool getDarkMode() { return _darkMode; }
+  void setDarkMode(bool b) {
+    _darkMode = b;
+    _saveNeeded = true;
+  }
+
   // Functions
-  virtual void createJson(DynamicJsonDocument& doc, bool skipSecrets = true) {}
-  virtual void parseJson(DynamicJsonDocument& doc) {}
+  virtual void createJson(JsonObject& doc) {}
+  virtual void parseJson(JsonObject& doc) {}
 
   bool saveFile();
   bool loadFile();

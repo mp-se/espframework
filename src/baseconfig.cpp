@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2021-23 Magnus
+Copyright (c) 2021-2024 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -56,35 +56,28 @@ BaseConfig::BaseConfig(String baseMDNS, String fileName, int dynamicJsonSize) {
 #endif
 }
 
-void BaseConfig::createJsonWifi(DynamicJsonDocument& doc, bool skipSecrets) {
+void BaseConfig::createJsonWifi(JsonObject& doc) {
 #if LOG_LEVEL == 6
   Log.verbose(F("CFG : Create json (wifi)." CR));
 #endif
   doc[PARAM_MDNS] = getMDNS();
   doc[PARAM_SSID] = getWifiSSID(0);
   doc[PARAM_SSID2] = getWifiSSID(1);
-
-  if (!skipSecrets) {
-    doc[PARAM_PASS] = getWifiPass(0);
-    doc[PARAM_PASS2] = getWifiPass(1);
-  }
-
+  doc[PARAM_PASS] = getWifiPass(0);
+  doc[PARAM_PASS2] = getWifiPass(1);
   doc[PARAM_WIFI_PORTAL_TIMEOUT] = getWifiPortalTimeout();
   doc[PARAM_WIFI_CONNECT_TIMEOUT] = getWifiConnectionTimeout();
 }
 
-void BaseConfig::parseJsonWifi(DynamicJsonDocument& doc) {
+void BaseConfig::parseJsonWifi(JsonObject& doc) {
 #if LOG_LEVEL == 6
   Log.verbose(F("CFG : Parsing json (wifi)." CR));
 #endif
   if (!doc[PARAM_MDNS].isNull()) setMDNS(doc[PARAM_MDNS]);
-
   if (!doc[PARAM_SSID].isNull()) setWifiSSID(doc[PARAM_SSID], 0);
   if (!doc[PARAM_PASS].isNull()) setWifiPass(doc[PARAM_PASS], 0);
-
   if (!doc[PARAM_SSID2].isNull()) setWifiSSID(doc[PARAM_SSID2], 1);
   if (!doc[PARAM_PASS2].isNull()) setWifiPass(doc[PARAM_PASS2], 1);
-
   if (!doc[PARAM_WIFI_PORTAL_TIMEOUT].isNull())
     this->setWifiPortalTimeout(doc[PARAM_WIFI_PORTAL_TIMEOUT].as<int>());
   if (!doc[PARAM_WIFI_CONNECT_TIMEOUT].isNull())
@@ -93,14 +86,14 @@ void BaseConfig::parseJsonWifi(DynamicJsonDocument& doc) {
   _saveNeeded = true;
 }
 
-void BaseConfig::createJsonOta(DynamicJsonDocument& doc, bool skipSecrets) {
+void BaseConfig::createJsonOta(JsonObject& doc) {
 #if LOG_LEVEL == 6
   Log.verbose(F("CFG : Create json (ota)." CR));
 #endif
   doc[PARAM_OTA_URL] = getOtaURL();
 }
 
-void BaseConfig::parseJsonOta(DynamicJsonDocument& doc) {
+void BaseConfig::parseJsonOta(JsonObject& doc) {
 #if LOG_LEVEL == 6
   Log.verbose(F("CFG : Parsing json (ota)." CR));
 #endif
@@ -109,7 +102,7 @@ void BaseConfig::parseJsonOta(DynamicJsonDocument& doc) {
   _saveNeeded = true;
 }
 
-void BaseConfig::createJsonPush(DynamicJsonDocument& doc, bool skipSecrets) {
+void BaseConfig::createJsonPush(JsonObject& doc) {
 #if LOG_LEVEL == 6
   Log.verbose(F("CFG : Create json (push)." CR));
 #endif
@@ -130,63 +123,46 @@ void BaseConfig::createJsonPush(DynamicJsonDocument& doc, bool skipSecrets) {
   doc[PARAM_USER_MQTT] = getUserMqtt();
   doc[PARAM_PASS_MQTT] = getPassMqtt();
   doc[PARAM_PUSH_TIMEOUT] = getPushTimeout();
+  doc[PARAM_DARK_MODE] = getDarkMode();
 }
 
-void BaseConfig::parseJsonPush(DynamicJsonDocument& doc) {
+void BaseConfig::parseJsonPush(JsonObject& doc) {
 #if LOG_LEVEL == 6
   Log.verbose(F("CFG : Parsing json (push)." CR));
 #endif
-
-  if (!doc[PARAM_TARGET_HTTP_POST].isNull()) {
+  if (!doc[PARAM_TARGET_HTTP_POST].isNull())
     setTargetHttpPost(doc[PARAM_TARGET_HTTP_POST]);
-  }
-  if (!doc[PARAM_HEADER1_HTTP_POST].isNull()) {
+  if (!doc[PARAM_HEADER1_HTTP_POST].isNull())
     setHeader1HttpPost(doc[PARAM_HEADER1_HTTP_POST]);
-  }
-  if (!doc[PARAM_HEADER2_HTTP_POST].isNull()) {
+  if (!doc[PARAM_HEADER2_HTTP_POST].isNull())
     setHeader2HttpPost(doc[PARAM_HEADER2_HTTP_POST]);
-  }
-  if (!doc[PARAM_HEADER1_HTTP_GET].isNull()) {
+  if (!doc[PARAM_HEADER1_HTTP_GET].isNull())
     setHeader1HttpGet(doc[PARAM_HEADER1_HTTP_GET]);
-  }
-  if (!doc[PARAM_HEADER2_HTTP_GET].isNull()) {
+  if (!doc[PARAM_HEADER2_HTTP_GET].isNull())
     setHeader2HttpGet(doc[PARAM_HEADER2_HTTP_GET]);
-  }
-  if (!doc[PARAM_TARGET_HTTP_GET].isNull()) {
+  if (!doc[PARAM_TARGET_HTTP_GET].isNull())
     setTargetHttpGet(doc[PARAM_TARGET_HTTP_GET]);
-  }
-  if (!doc[PARAM_TARGET_INFLUXDB2].isNull()) {
+  if (!doc[PARAM_TARGET_INFLUXDB2].isNull())
     setTargetInfluxDB2(doc[PARAM_TARGET_INFLUXDB2]);
-  }
-  if (!doc[PARAM_ORG_INFLUXDB2].isNull()) {
+  if (!doc[PARAM_ORG_INFLUXDB2].isNull())
     setOrgInfluxDB2(doc[PARAM_ORG_INFLUXDB2]);
-  }
-  if (!doc[PARAM_BUCKET_INFLUXDB2].isNull()) {
+  if (!doc[PARAM_BUCKET_INFLUXDB2].isNull())
     setBucketInfluxDB2(doc[PARAM_BUCKET_INFLUXDB2]);
-  }
-  if (!doc[PARAM_TOKEN_INFLUXDB2].isNull()) {
+  if (!doc[PARAM_TOKEN_INFLUXDB2].isNull())
     setTokenInfluxDB2(doc[PARAM_TOKEN_INFLUXDB2]);
-  }
-  if (!doc[PARAM_TARGET_MQTT].isNull()) {
-    setTargetMqtt(doc[PARAM_TARGET_MQTT]);
-  }
-  if (!doc[PARAM_PORT_MQTT].isNull()) {
+  if (!doc[PARAM_TARGET_MQTT].isNull()) setTargetMqtt(doc[PARAM_TARGET_MQTT]);
+  if (!doc[PARAM_PORT_MQTT].isNull())
     setPortMqtt(doc[PARAM_PORT_MQTT].as<int>());
-  }
-  if (!doc[PARAM_USER_MQTT].isNull()) {
-    setUserMqtt(doc[PARAM_USER_MQTT]);
-  }
-  if (!doc[PARAM_PASS_MQTT].isNull()) {
-    setPassMqtt(doc[PARAM_PASS_MQTT]);
-  }
-  if (!doc[PARAM_PUSH_TIMEOUT].isNull()) {
+  if (!doc[PARAM_USER_MQTT].isNull()) setUserMqtt(doc[PARAM_USER_MQTT]);
+  if (!doc[PARAM_PASS_MQTT].isNull()) setPassMqtt(doc[PARAM_PASS_MQTT]);
+  if (!doc[PARAM_PUSH_TIMEOUT].isNull())
     setPushTimeout(doc[PARAM_PUSH_TIMEOUT].as<int>());
-  }
-
+  if (!doc[PARAM_DARK_MODE].isNull())
+    setDarkMode(doc[PARAM_DARK_MODE].as<bool>());
   _saveNeeded = true;
 }
 
-void BaseConfig::createJsonBase(DynamicJsonDocument& doc, bool skipSecrets) {
+void BaseConfig::createJsonBase(JsonObject& doc) {
 #if LOG_LEVEL == 6
   Log.verbose(F("CFG : Create json (base)." CR));
 #endif
@@ -194,7 +170,7 @@ void BaseConfig::createJsonBase(DynamicJsonDocument& doc, bool skipSecrets) {
   doc[PARAM_TEMP_FORMAT] = String(getTempFormat());
 }
 
-void BaseConfig::parseJsonBase(DynamicJsonDocument& doc) {
+void BaseConfig::parseJsonBase(JsonObject& doc) {
 #if LOG_LEVEL == 6
   Log.verbose(F("CFG : Parsing json (base)." CR));
 #endif
@@ -226,12 +202,13 @@ bool BaseConfig::saveFile() {
   }
 
   DynamicJsonDocument doc(_dynamicJsonSize);
-  createJson(doc, false);  // Include secrets
+  JsonObject obj = doc.createNestedObject();
+  createJson(obj);
 #if LOG_LEVEL == 6
   serializeJson(doc, EspSerial);
   EspSerial.print(CR);
 #endif
-  serializeJson(doc, configFile);
+  serializeJson(obj, configFile);
   configFile.flush();
   configFile.close();
   _saveNeeded = false;
@@ -271,7 +248,8 @@ bool BaseConfig::loadFile() {
     return false;
   }
 
-  parseJson(doc);
+  JsonObject obj = doc.as<JsonObject>();
+  parseJson(obj);
   Log.notice(F("CFG : Configuration file loaded." CR));
   return true;
 }

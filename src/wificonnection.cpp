@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2021-23 Magnus
+Copyright (c) 2021-2024 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,9 +30,6 @@ SOFTWARE.
 #include <espframework.hpp>
 #include <log.hpp>
 #include <wificonnection.hpp>
-#include <wifimanager.hpp>
-
-ESP_WiFiManager *myWifiManager;
 
 const int NTP_PACKET_SIZE =
     48;  // NTP time stamp is in the first 48 bytes of the message
@@ -81,19 +78,13 @@ void WifiConnection::writeReset() {
     _resetCounter = 0;
   }
 }
+
 bool WifiConnection::hasConfig() {
   if (_userSSID.length()) return true;
   if (strlen(_wifiConfig->getWifiSSID(0))) return true;
-
-    // Check if there are stored WIFI Settings we can use
 #if defined(ESP8266)
   String ssid = WiFi.SSID();
   String pwd = WiFi.psk();
-#else
-  ESP_WiFiManager wifiMgr;
-  String ssid = wifiMgr.WiFi_SSID();
-  String pwd = wifiMgr.WiFi_Pass();
-#endif
   if (ssid.length()) {
     Log.notice(F("WIFI: Found credentials in EEPORM." CR));
     _wifiConfig->setWifiSSID(ssid, 0);
@@ -103,6 +94,8 @@ bool WifiConnection::hasConfig() {
     _wifiConfig->saveFile();
     return true;
   }
+#else
+#endif
   return false;
 }
 
@@ -123,63 +116,27 @@ void WifiConnection::stopDoubleReset() {
   writeReset();
 }
 
-void WifiConnection::startPortal() {
-  Log.notice(F("WIFI: Starting Wifi config portal." CR));
+void WifiConnection::startWifiAP() {
+  IPAddress local(192, 168, 4, 1);
+  IPAddress gateway(192, 168, 4, 1);
+  IPAddress subnet(255, 255, 255, 0);
 
-  stopDoubleReset();
-  pinMode(PIN_LED, OUTPUT);
-  digitalWrite(PIN_LED, LOW);
-
-  if (myWifiManager == 0) myWifiManager = new ESP_WiFiManager(_apMDNS.c_str());
-  myWifiManager->setMinimumSignalQuality(-1);
-  myWifiManager->setConfigPortalChannel(0);
-  myWifiManager->setConfigPortalTimeout(_wifiConfig->getWifiPortalTimeout());
-
-  String mdns("<p>Default mDNS name is: http://");
-  mdns += _wifiConfig->getMDNS();
-  mdns += ".local<p>";
-  ESP_WMParameter deviceName(mdns.c_str());
-  myWifiManager->addParameter(&deviceName);
-#if defined(ESP32C3)
-  Log.notice(F("WIFI: Reducing wifi power for c3 chip." CR));
-  WiFi.setTxPower(WIFI_POWER_8_5dBm);  // Required for ESP32C3 Mini
-#endif
-  myWifiManager->startConfigPortal(_apSSID.c_str(), _apPWD.c_str());
-
-  if (myWifiManager->getSSID(0).length()) {
-#if LOG_LEVEL == 6
-    Log.verbose(
-        F("WIFI: Saving=%s:%s, %s:%s." CR), myWifiManager->getSSID(0).c_str(),
-        myWifiManager->getPW(0).c_str(), myWifiManager->getSSID(1).c_str(),
-        myWifiManager->getPW(1).c_str());
-#endif
-    _wifiConfig->setWifiSSID(myWifiManager->getSSID(0), 0);
-    _wifiConfig->setWifiPass(myWifiManager->getPW(0), 0);
-    _wifiConfig->setWifiSSID(myWifiManager->getSSID(1), 1);
-    _wifiConfig->setWifiPass(myWifiManager->getPW(1), 1);
-
-    // If the same SSID has been used for both entire, lets delete the second
-    if (!strcmp(_wifiConfig->getWifiSSID(0), _wifiConfig->getWifiSSID(1))) {
-#if LOG_LEVEL == 6
-      Log.verbose(
-          F("WIFI: Both SSID are the same, setting second SSID to blank." CR));
-#endif
-      _wifiConfig->setWifiSSID("", 1);
-      _wifiConfig->setWifiPass("", 1);
-    }
-
-    Log.notice(F("WIFI: Stored SSID1:'%s' SSID2:'%s'" CR),
-               _wifiConfig->getWifiSSID(0), _wifiConfig->getWifiSSID(1));
-    _wifiConfig->saveFile();
-  } else {
-    Log.notice(
-        F("WIFI: Could not find first SSID so assuming we got a timeout." CR));
+  if (!WiFi.softAPConfig(local, gateway, subnet)) {
+    Log.notice(F("WIFI: Failed to configure access point." CR));
+    return;
   }
 
-  Log.notice(F("WIFI: Exited wifi config portal. Rebooting..." CR));
-  stopDoubleReset();
-  delay(500);
-  ESP_RESET();
+  if (!WiFi.softAP(_apSSID, _apPWD)) {
+    Log.notice(F("WIFI: Failed to create access point." CR));
+    return;
+  }
+
+  DNSServer *_dns = new DNSServer();
+  _dns->setErrorReplyCode(DNSReplyCode::NoError);
+  _dns->start(53, "*", local);
+
+  Log.notice(F("WIFI: Access point created %s." CR),
+             WiFi.softAPIP().toString().c_str());
 }
 
 void WifiConnection::loop() {

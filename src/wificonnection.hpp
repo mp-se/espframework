@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2021-23 Magnus
+Copyright (c) 2021-2024 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +29,7 @@ SOFTWARE.
 #else
 #include <HTTPClient.h>
 #endif
+#include <DNSServer.h>
 #include <LittleFS.h>
 #include <WiFiUdp.h>
 
@@ -42,6 +43,7 @@ class WifiConnection {
   String _userSSID;
   String _userPWD;
   WifiConfig* _wifiConfig;
+  DNSServer* _dns = NULL;
 
   // Double reset
   uint32_t _timer = 0;
@@ -65,9 +67,9 @@ class WifiConnection {
   bool isConnected();
   bool isDoubleResetDetected();
   void stopDoubleReset();
+  void startWifiAP();
   bool hasConfig();
   String getIPAddress();
-  void startPortal();
 
   void loop();
 };

@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2021-22 Magnus
+Copyright (c) 2021-2024 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -37,17 +37,12 @@ WifiConnection myWifi(&myConfig, "espSSID", "password", "esplib", "", "");
 OtaUpdate myOta(&myConfig, "0.0.0");
 DemoPush myPush(&myConfig);
 
-#if defined(USE_ASYNC_WEB)
-#include <demo-asyncwebhandler.hpp>
-DemoAsyncWebHandler myAsyncWebHandler(&myConfig, &myPush);
+#include <demo-webserver.hpp>
+DemoWebServer myDemoWebServer(&myConfig, &myPush);
 SerialWebSocket mySerialWebSocket;
-#else
-#include <demo-webhandler.hpp>
-DemoWebHandler myWebHandler(&myConfig, &myPush);
-#endif
 
 void setup() {
-  // delay(2000);
+  delay(4000);
   Log.notice(F("Main: Started setup." CR));
 
 #if defined(PERF_ENABLE)
@@ -62,29 +57,24 @@ void setup() {
     Log.notice(
         F("Main: Missing wifi config or double reset detected, entering wifi "
           "setup." CR));
-    myWifi.startPortal();
+    myDemoWebServer.setWifiSetup(true);
+    myWifi.startWifiAP();
+  } else {
+    PERF_BEGIN("wifi-connect");
+    myWifi.connect();
+    PERF_END("wifi-connect");
+    PERF_PUSH();
+    myWifi.timeSync();
+
+    if (!myWifi.isConnected() || myOta.checkFirmwareVersion()) {
+      Log.notice(F("Main: New firmware available via OTA, doing update." CR));
+      myOta.updateFirmware();
+    }
   }
 
-  PERF_BEGIN("wifi-connect");
-  myWifi.connect();
-  PERF_END("wifi-connect");
-  PERF_PUSH();
-  myWifi.timeSync();
-
-  if (!myWifi.isConnected() || myOta.checkFirmwareVersion()) {
-    Log.notice(F("Main: New firmware available via OTA, doing update." CR));
-    myOta.updateFirmware();
-  }
-
-  if (myWifi.isConnected()) {
-#if defined(USE_ASYNC_WEB)
-    myAsyncWebHandler.setupAsyncWebServer();
-    mySerialWebSocket.begin(myAsyncWebHandler.getWebServer(), &Serial);
-    mySerial.begin(&mySerialWebSocket);
-#else
-    myWebHandler.setupWebServer();
-#endif
-  }
+  myDemoWebServer.setupWebServer();
+  mySerialWebSocket.begin(myDemoWebServer.getWebServer(), &Serial);
+  mySerial.begin(&mySerialWebSocket);
 
   Serial.println("Setup() complete");
   Log.notice(F("Main: Setup is completed." CR));
@@ -92,13 +82,8 @@ void setup() {
 
 void loop() {
   myWifi.loop();
-#if defined(USE_ASYNC_WEB)
-  myAsyncWebHandler.loop();
+  myDemoWebServer.loop();
   mySerialWebSocket.loop();
-#else
-  myWebHandler.loop();
-#endif
-
   Log.notice(F("Loop:" CR));
   delay(2000);
 }

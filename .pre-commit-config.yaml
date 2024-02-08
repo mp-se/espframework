@@ -4,8 +4,11 @@ repos:
     hooks:
     -   id: clang-format
         files: ^src/
+        exclude: 'lib/'
     -   id: cpplint
         files: ^src/
+        exclude: 'lib/'
     -   id: cppcheck
         args: [--force]
         files: ^src/
+        exclude: 'lib/'

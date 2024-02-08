@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2021-22 Magnus
+Copyright (c) 2021-2024 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,17 +29,17 @@ SOFTWARE.
 DemoConfig::DemoConfig(String baseMDNS, String fileName)
     : BaseConfig(baseMDNS, fileName) {}
 
-void DemoConfig::createJson(DynamicJsonDocument& doc, bool skipSecrets) {
+void DemoConfig::createJson(JsonObject& doc) {
   // Call base class functions
-  createJsonBase(doc, skipSecrets);
-  createJsonWifi(doc, skipSecrets);
-  createJsonOta(doc, skipSecrets);
-  createJsonPush(doc, skipSecrets);
+  createJsonBase(doc);
+  createJsonWifi(doc);
+  createJsonOta(doc);
+  createJsonPush(doc);
 
   // Handle project specific config
 }
 
-void DemoConfig::parseJson(DynamicJsonDocument& doc) {
+void DemoConfig::parseJson(JsonObject& doc) {
   // Call base class functions
   parseJsonBase(doc);
   parseJsonWifi(doc);

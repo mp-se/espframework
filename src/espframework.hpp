@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2021-23 Magnus
+Copyright (c) 2021-2024 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,7 @@ SOFTWARE.
 #ifndef SRC_ESPFRAMEWORK_HPP_
 #define SRC_ESPFRAMEWORK_HPP_
 
-#define ESPFWK_VER "0.7.0"
+#define ESPFWK_VER "1.0.0-alfa1"
 
 #if defined(ESP8266)
 #define ESP_RESET ESP.reset
@@ -37,6 +37,11 @@ SOFTWARE.
 #define PIN_LED 2
 #endif
 #endif
+
+constexpr auto JSON_BUFFER_SIZE_S = 500;
+constexpr auto JSON_BUFFER_SIZE_M = 1000;
+constexpr auto JSON_BUFFER_SIZE_L = 3000;
+constexpr auto JSON_BUFFER_SIZE_XL = 5000;
 
 #endif  // SRC_ESPFRAMEWORK_HPP_
 
