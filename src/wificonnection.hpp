@@ -43,7 +43,7 @@ class WifiConnection {
   String _userSSID;
   String _userPWD;
   WifiConfig* _wifiConfig;
-  DNSServer* _dns = NULL;
+  DNSServer* _dnsServer = NULL;
 
   // Double reset
   uint32_t _timer = 0;

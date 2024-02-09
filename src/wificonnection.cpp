@@ -118,10 +118,9 @@ void WifiConnection::stopDoubleReset() {
 
 void WifiConnection::startWifiAP() {
   IPAddress local(192, 168, 4, 1);
-  IPAddress gateway(192, 168, 4, 1);
   IPAddress subnet(255, 255, 255, 0);
 
-  if (!WiFi.softAPConfig(local, gateway, subnet)) {
+  if (!WiFi.softAPConfig(local, local, subnet)) {
     Log.notice(F("WIFI: Failed to configure access point." CR));
     return;
   }
@@ -131,9 +130,16 @@ void WifiConnection::startWifiAP() {
     return;
   }
 
-  DNSServer *_dns = new DNSServer();
-  _dns->setErrorReplyCode(DNSReplyCode::NoError);
-  _dns->start(53, "*", local);
+  Log.notice(F("WIFI: Starting dns server." CR));
+  _dnsServer = new DNSServer();
+  if(_dnsServer) {
+    _dnsServer->setErrorReplyCode(DNSReplyCode::NoError);
+    if(!_dnsServer->start(53, "*", local)) {
+      Log.error(F("WIFI: Failed to start dns server." CR));
+    }
+  } else {
+      Log.error(F("WIFI: Failed to create dns server." CR));
+  }
 
   Log.notice(F("WIFI: Access point created %s." CR),
              WiFi.softAPIP().toString().c_str());
@@ -144,6 +150,10 @@ void WifiConnection::loop() {
     _timer = millis();
     _resetCounter = 0;
     writeReset();
+  }
+
+  if(_dnsServer) {
+    _dnsServer->processNextRequest();
   }
 }
 
