@@ -78,7 +78,7 @@ void BaseWebServer::loop() {
     }
   }
 
-  if (_reboot) {
+  if (_rebootTask) {
     if (abs((int32_t)(millis() - _rebootTimer)) > 1000) {
       Log.notice(F("WEB : Rebooting..." CR));
       delay(500);
@@ -202,7 +202,7 @@ void BaseWebServer::webHandleUploadFile(AsyncWebServerRequest *request,
       // a second before rebooting in loop.
       Log.notice(F("WEB : Scheduling reboot." CR));
       _rebootTimer = millis();
-      _reboot = true;
+      _rebootTask = true;
     } else {
       Log.error(F("WEB : Failed to finish firmware flashing, error %d" CR),
                 Update.getError());

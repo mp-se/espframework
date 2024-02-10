@@ -84,13 +84,13 @@ class BaseWebServer {
   WebConfig *_webConfig;
   int _uploadReturn = 200;
   int _dynamicJsonSize = 2000;
-  bool _reboot = false;
   bool _wifiSetup = false;
   uint32_t _uploadedSize = 0;
   uint32_t _rebootTimer = 0;
   uint32_t _wifiPortalTimer = 0;
   String _wifiScanData;
   volatile bool _wifiScanTask = false;
+  volatile bool _rebootTask = false;
 
   void resetWifiPortalTimer() { _wifiPortalTimer = millis(); }
   bool isAuthenticated(AsyncWebServerRequest *request);
