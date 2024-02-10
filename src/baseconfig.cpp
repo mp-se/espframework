@@ -108,20 +108,23 @@ void BaseConfig::createJsonPush(JsonObject& doc) {
 #endif
   JsonArray headers;
 
-  doc[PARAM_TARGET_HTTP_POST] = getTargetHttpPost();
-  doc[PARAM_HEADER1_HTTP_POST] = getHeader1HttpPost();
-  doc[PARAM_HEADER2_HTTP_POST] = getHeader2HttpPost();
-  doc[PARAM_TARGET_HTTP_GET] = getTargetHttpGet();
-  doc[PARAM_HEADER1_HTTP_GET] = getHeader1HttpGet();
-  doc[PARAM_HEADER2_HTTP_GET] = getHeader2HttpGet();
-  doc[PARAM_TARGET_INFLUXDB2] = getTargetInfluxDB2();
-  doc[PARAM_ORG_INFLUXDB2] = getOrgInfluxDB2();
-  doc[PARAM_BUCKET_INFLUXDB2] = getBucketInfluxDB2();
-  doc[PARAM_TOKEN_INFLUXDB2] = getTokenInfluxDB2();
-  doc[PARAM_TARGET_MQTT] = getTargetMqtt();
-  doc[PARAM_PORT_MQTT] = getPortMqtt();
-  doc[PARAM_USER_MQTT] = getUserMqtt();
-  doc[PARAM_PASS_MQTT] = getPassMqtt();
+  doc[PARAM_HTTP_POST_TARGET] = getTargetHttpPost();
+  doc[PARAM_HTTP_POST_HEADER1] = getHeader1HttpPost();
+  doc[PARAM_HTTP_POST_HEADER2] = getHeader2HttpPost();
+  doc[PARAM_HTTP_POST2_TARGET] = getTargetHttpPost2();
+  doc[PARAM_HTTP_POST2_HEADER1] = getHeader1HttpPost2();
+  doc[PARAM_HTTP_POST2_HEADER2] = getHeader2HttpPost2();
+  doc[PARAM_HTTP_GET_TARGET] = getTargetHttpGet();
+  doc[PARAM_HTTP_GET_HEADER1] = getHeader1HttpGet();
+  doc[PARAM_HTTP_GET_HEADER2] = getHeader2HttpGet();
+  doc[PARAM_INFLUXDB2_TARGET] = getTargetInfluxDB2();
+  doc[PARAM_INFLUXDB2_ORG] = getOrgInfluxDB2();
+  doc[PARAM_INFLUXDB2_BUCKET] = getBucketInfluxDB2();
+  doc[PARAM_INFLUXDB2_TOKEN] = getTokenInfluxDB2();
+  doc[PARAM_MQTT_TARGET] = getTargetMqtt();
+  doc[PARAM_MQTT_PORT] = getPortMqtt();
+  doc[PARAM_MQTT_USER] = getUserMqtt();
+  doc[PARAM_MQTT_PASS] = getPassMqtt();
   doc[PARAM_PUSH_TIMEOUT] = getPushTimeout();
   doc[PARAM_DARK_MODE] = getDarkMode();
 }
@@ -130,35 +133,48 @@ void BaseConfig::parseJsonPush(JsonObject& doc) {
 #if LOG_LEVEL == 6
   Log.verbose(F("CFG : Parsing json (push)." CR));
 #endif
-  if (!doc[PARAM_TARGET_HTTP_POST].isNull())
-    setTargetHttpPost(doc[PARAM_TARGET_HTTP_POST]);
-  if (!doc[PARAM_HEADER1_HTTP_POST].isNull())
-    setHeader1HttpPost(doc[PARAM_HEADER1_HTTP_POST]);
-  if (!doc[PARAM_HEADER2_HTTP_POST].isNull())
-    setHeader2HttpPost(doc[PARAM_HEADER2_HTTP_POST]);
-  if (!doc[PARAM_HEADER1_HTTP_GET].isNull())
-    setHeader1HttpGet(doc[PARAM_HEADER1_HTTP_GET]);
-  if (!doc[PARAM_HEADER2_HTTP_GET].isNull())
-    setHeader2HttpGet(doc[PARAM_HEADER2_HTTP_GET]);
-  if (!doc[PARAM_TARGET_HTTP_GET].isNull())
-    setTargetHttpGet(doc[PARAM_TARGET_HTTP_GET]);
-  if (!doc[PARAM_TARGET_INFLUXDB2].isNull())
-    setTargetInfluxDB2(doc[PARAM_TARGET_INFLUXDB2]);
-  if (!doc[PARAM_ORG_INFLUXDB2].isNull())
-    setOrgInfluxDB2(doc[PARAM_ORG_INFLUXDB2]);
-  if (!doc[PARAM_BUCKET_INFLUXDB2].isNull())
-    setBucketInfluxDB2(doc[PARAM_BUCKET_INFLUXDB2]);
-  if (!doc[PARAM_TOKEN_INFLUXDB2].isNull())
-    setTokenInfluxDB2(doc[PARAM_TOKEN_INFLUXDB2]);
-  if (!doc[PARAM_TARGET_MQTT].isNull()) setTargetMqtt(doc[PARAM_TARGET_MQTT]);
-  if (!doc[PARAM_PORT_MQTT].isNull())
-    setPortMqtt(doc[PARAM_PORT_MQTT].as<int>());
-  if (!doc[PARAM_USER_MQTT].isNull()) setUserMqtt(doc[PARAM_USER_MQTT]);
-  if (!doc[PARAM_PASS_MQTT].isNull()) setPassMqtt(doc[PARAM_PASS_MQTT]);
+  if (!doc[PARAM_HTTP_POST_TARGET].isNull())
+    setTargetHttpPost(doc[PARAM_HTTP_POST_TARGET]);
+  if (!doc[PARAM_HTTP_POST_HEADER1].isNull())
+    setHeader1HttpPost(doc[PARAM_HTTP_POST_HEADER1]);
+  if (!doc[PARAM_HTTP_POST_HEADER2].isNull())
+    setHeader2HttpPost(doc[PARAM_HTTP_POST_HEADER2]);
+
+  if (!doc[PARAM_HTTP_POST2_TARGET].isNull())
+    setTargetHttpPost2(doc[PARAM_HTTP_POST2_TARGET]);
+  if (!doc[PARAM_HTTP_POST2_HEADER1].isNull())
+    setHeader1HttpPost2(doc[PARAM_HTTP_POST2_HEADER1]);
+  if (!doc[PARAM_HTTP_POST2_HEADER2].isNull())
+    setHeader2HttpPost2(doc[PARAM_HTTP_POST2_HEADER2]);
+
+  if (!doc[PARAM_HTTP_GET_TARGET].isNull())
+    setTargetHttpGet(doc[PARAM_HTTP_GET_TARGET]);
+  if (!doc[PARAM_HTTP_GET_HEADER1].isNull())
+    setHeader1HttpGet(doc[PARAM_HTTP_GET_HEADER1]);
+  if (!doc[PARAM_HTTP_GET_HEADER2].isNull())
+    setHeader2HttpGet(doc[PARAM_HTTP_GET_HEADER2]);
+
+  if (!doc[PARAM_INFLUXDB2_TARGET].isNull())
+    setTargetInfluxDB2(doc[PARAM_INFLUXDB2_TARGET]);
+  if (!doc[PARAM_INFLUXDB2_ORG].isNull())
+    setOrgInfluxDB2(doc[PARAM_INFLUXDB2_ORG]);
+  if (!doc[PARAM_INFLUXDB2_BUCKET].isNull())
+    setBucketInfluxDB2(doc[PARAM_INFLUXDB2_BUCKET]);
+  if (!doc[PARAM_INFLUXDB2_TOKEN].isNull())
+    setTokenInfluxDB2(doc[PARAM_INFLUXDB2_TOKEN]);
+
+  if (!doc[PARAM_MQTT_TARGET].isNull()) setTargetMqtt(doc[PARAM_MQTT_TARGET]);
+  if (!doc[PARAM_MQTT_PORT].isNull())
+    setPortMqtt(doc[PARAM_MQTT_PORT].as<int>());
+  if (!doc[PARAM_MQTT_USER].isNull()) setUserMqtt(doc[PARAM_MQTT_USER]);
+  if (!doc[PARAM_MQTT_PASS].isNull()) setPassMqtt(doc[PARAM_MQTT_PASS]);
+
   if (!doc[PARAM_PUSH_TIMEOUT].isNull())
     setPushTimeout(doc[PARAM_PUSH_TIMEOUT].as<int>());
+
   if (!doc[PARAM_DARK_MODE].isNull())
     setDarkMode(doc[PARAM_DARK_MODE].as<bool>());
+
   _saveNeeded = true;
 }
 
@@ -284,6 +300,31 @@ void BaseConfig::checkFileSystem() {
     Log.error(F("CFG : Unable to mount/format file system..." CR));
   }
 #endif
+}
+
+bool BaseConfig::saveFileWifiOnly() {
+  File configFile = LittleFS.open(_fileName, "w");
+
+  if (!configFile) {
+    writeErrorLog("CFG : Failed to save configuration.");
+    return false;
+  }
+
+  DynamicJsonDocument doc(JSON_BUFFER_SIZE_S);
+  JsonObject obj = doc.createNestedObject();
+
+  obj[PARAM_SSID] = getWifiSSID(0);
+  obj[PARAM_PASS] = getWifiPass(0);
+  obj[PARAM_SSID2] = getWifiSSID(1);
+  obj[PARAM_PASS2] = getWifiPass(1);
+
+  serializeJson(obj, configFile);
+  configFile.flush();
+  configFile.close();
+
+  _saveNeeded = false;
+  Log.notice(F("CFG : WIFI configuration saved to %s." CR), _fileName.c_str());
+  return true;
 }
 
 // EOF

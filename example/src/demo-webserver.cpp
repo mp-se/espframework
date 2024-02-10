@@ -28,6 +28,16 @@ SOFTWARE.
 #include <espframework.hpp>
 #include <log.hpp>
 
+#if defined(ESP8266)
+#define INCBIN_OUTPUT_SECTION ".irom.text"
+#include <incbin.h>
+// These are used in the webhandler class and needs to be defined when using ESP8266. For esp32 the files are defined in the platformio.ini file
+INCBIN(IndexHtml, "html/index.html");
+INCBIN(AppJs, "html/app.js.gz");
+INCBIN(AppCss, "html/app.css.gz");
+#endif
+
+// These are parameters that the example ui app uses. Part of the status response.
 constexpr auto PARAM_PLATFORM = "platform";
 constexpr auto PARAM_TOTAL_HEAP = "total_heap";
 constexpr auto PARAM_FREE_HEAP = "free_heap";

@@ -48,6 +48,18 @@ SOFTWARE.
 #include <espframework.hpp>
 #include <interface.hpp>
 
+constexpr auto PARAM_SUCCESS = "success";
+constexpr auto PARAM_STATUS = "status";
+constexpr auto PARAM_MESSAGE = "message";
+constexpr auto PARAM_TOKEN = "token";
+constexpr auto PARAM_COMMAND = "command";
+constexpr auto PARAM_FILE = "file";
+constexpr auto PARAM_FILES = "files";
+constexpr auto PARAM_NETWORKS = "networks";
+constexpr auto PARAM_RSSI = "rssi";
+constexpr auto PARAM_CHANNEL = "channel";
+constexpr auto PARAM_ENCRYPTION = "encryption";
+
 // TODO: Add validation of auth header in api calls
 // TODO: Change all apis to use JSON
 

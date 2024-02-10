@@ -35,35 +35,27 @@ constexpr auto PARAM_SSID2 = "wifi_ssid2";
 constexpr auto PARAM_PASS2 = "wifi_pass2";
 constexpr auto PARAM_OTA_URL = "ota_url";
 constexpr auto PARAM_TEMP_FORMAT = "temp_format";
-constexpr auto PARAM_TARGET_HTTP_POST = "http_post_target";
-constexpr auto PARAM_HEADER1_HTTP_POST = "http_post_header1";
-constexpr auto PARAM_HEADER2_HTTP_POST = "http_post_header2";
-constexpr auto PARAM_TARGET_HTTP_GET = "http_get_target";
-constexpr auto PARAM_HEADER1_HTTP_GET = "http_get_header1";
-constexpr auto PARAM_HEADER2_HTTP_GET = "http_get_header2";
-constexpr auto PARAM_TARGET_INFLUXDB2 = "influxdb2_target";
-constexpr auto PARAM_ORG_INFLUXDB2 = "influxdb2_org";
-constexpr auto PARAM_BUCKET_INFLUXDB2 = "influxdb2_bucket";
-constexpr auto PARAM_TOKEN_INFLUXDB2 = "influxdb2_token";
-constexpr auto PARAM_TARGET_MQTT = "mqtt_target";
-constexpr auto PARAM_PORT_MQTT = "mqtt_port";
-constexpr auto PARAM_USER_MQTT = "mqtt_user";
-constexpr auto PARAM_PASS_MQTT = "mqtt_pass";
+constexpr auto PARAM_HTTP_POST_TARGET = "http_post_target";
+constexpr auto PARAM_HTTP_POST_HEADER1 = "http_post_header1";
+constexpr auto PARAM_HTTP_POST_HEADER2 = "http_post_header2";
+constexpr auto PARAM_HTTP_POST2_TARGET = "http_post2_target";
+constexpr auto PARAM_HTTP_POST2_HEADER1 = "http_post2_header1";
+constexpr auto PARAM_HTTP_POST2_HEADER2 = "http_post2_header2";
+constexpr auto PARAM_HTTP_GET_TARGET = "http_get_target";
+constexpr auto PARAM_HTTP_GET_HEADER1 = "http_get_header1";
+constexpr auto PARAM_HTTP_GET_HEADER2 = "http_get_header2";
+constexpr auto PARAM_INFLUXDB2_TARGET = "influxdb2_target";
+constexpr auto PARAM_INFLUXDB2_ORG = "influxdb2_org";
+constexpr auto PARAM_INFLUXDB2_BUCKET = "influxdb2_bucket";
+constexpr auto PARAM_INFLUXDB2_TOKEN = "influxdb2_token";
+constexpr auto PARAM_MQTT_TARGET = "mqtt_target";
+constexpr auto PARAM_MQTT_PORT = "mqtt_port";
+constexpr auto PARAM_MQTT_USER = "mqtt_user";
+constexpr auto PARAM_MQTT_PASS = "mqtt_pass";
 constexpr auto PARAM_WIFI_PORTAL_TIMEOUT = "wifi_portal_timeout";
 constexpr auto PARAM_WIFI_CONNECT_TIMEOUT = "wifi_connect_timeout";
 constexpr auto PARAM_PUSH_TIMEOUT = "push_timeout";
 constexpr auto PARAM_DARK_MODE = "dark_mode";
-constexpr auto PARAM_SUCCESS = "success";
-constexpr auto PARAM_STATUS = "status";
-constexpr auto PARAM_MESSAGE = "message";
-constexpr auto PARAM_TOKEN = "token";
-constexpr auto PARAM_COMMAND = "command";
-constexpr auto PARAM_FILE = "file";
-constexpr auto PARAM_FILES = "files";
-constexpr auto PARAM_NETWORKS = "networks";
-constexpr auto PARAM_RSSI = "rssi";
-constexpr auto PARAM_CHANNEL = "channel";
-constexpr auto PARAM_ENCRYPTION = "encryption";
 
 class BaseConfig : public WifiConfig,
                    public OtaConfig,
@@ -84,6 +76,9 @@ class BaseConfig : public WifiConfig,
   String _targetHttpPost;
   String _header1HttpPost = "Content-Type: application/json";
   String _header2HttpPost;
+  String _targetHttpPost2;
+  String _header1HttpPost2 = "Content-Type: application/json";
+  String _header2HttpPost2;
   String _targetHttpGet;
   String _header1HttpGet;
   String _header2HttpGet;
@@ -139,6 +134,21 @@ class BaseConfig : public WifiConfig,
     _wifiPASS[idx] = s;
     _saveNeeded = true;
   }
+  bool dualWifiConfigured() {
+    return _wifiSSID[0].length() > 0 && _wifiSSID[1].length() > 0 ? true
+                                                                  : false;
+  }
+  void swapPrimaryWifi() {
+    String s = _wifiSSID[0];
+    _wifiSSID[0] = _wifiSSID[1];
+    _wifiSSID[1] = s;
+
+    String p = _wifiPASS[0];
+    _wifiPASS[0] = _wifiPASS[1];
+    _wifiPASS[1] = p;
+
+    _saveNeeded = true;
+  }
   int getWifiConnectionTimeout() { return _wifiConnectionTimeout; }
   void setWifiConnectionTimeout(int t) {
     _wifiConnectionTimeout = t;
@@ -164,9 +174,16 @@ class BaseConfig : public WifiConfig,
 
   // PushConfig
   bool hasTargetHttpPost() { return _targetHttpPost.length() ? true : false; }
+  bool hasTargetHttpPost2() { return _targetHttpPost2.length() ? true : false; }
   bool hasTargetHttpGet() { return _targetHttpGet.length() ? true : false; }
   bool hasTargetInfluxDb2() { return _targetInfluxDb2.length() ? true : false; }
   bool hasTargetMqtt() { return _targetMqtt.length() ? true : false; }
+
+  bool isHttpPostSSL() { return _targetHttpPost.startsWith("https://"); }
+  bool isHttpPost2SSL() { return _targetHttpPost2.startsWith("https://"); }
+  bool isHttpGetSSL() { return _targetHttpGet.startsWith("https://"); }
+  bool isHttpInfluxDb2SSL() { return _targetInfluxDb2.startsWith("https://"); }
+  bool isMqttSSL() { return _portMqtt > 8000 ? true : false; }
 
   const char* getTargetHttpPost() { return _targetHttpPost.c_str(); }
   void setTargetHttpPost(String target) {
@@ -181,6 +198,22 @@ class BaseConfig : public WifiConfig,
   const char* getHeader2HttpPost() { return _header2HttpPost.c_str(); }
   void setHeader2HttpPost(String header) {
     _header2HttpPost = header;
+    _saveNeeded = true;
+  }
+
+  const char* getTargetHttpPost2() { return _targetHttpPost2.c_str(); }
+  void setTargetHttpPost2(String target) {
+    _targetHttpPost2 = target;
+    _saveNeeded = true;
+  }
+  const char* getHeader1HttpPost2() { return _header1HttpPost2.c_str(); }
+  void setHeader1HttpPost2(String header) {
+    _header1HttpPost2 = header;
+    _saveNeeded = true;
+  }
+  const char* getHeader2HttpPost2() { return _header2HttpPost2.c_str(); }
+  void setHeader2HttpPost2(String header) {
+    _header2HttpPost2 = header;
     _saveNeeded = true;
   }
 
@@ -267,8 +300,10 @@ class BaseConfig : public WifiConfig,
 
   bool saveFile();
   bool loadFile();
+  bool saveFileWifiOnly();
   void checkFileSystem();
   bool isSaveNeeded() { return _saveNeeded; }
+  void setSaveNeeded() { _saveNeeded = true; }
 };
 
 #endif  // SRC_BASECONFIG_HPP_
