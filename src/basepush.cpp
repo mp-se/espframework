@@ -322,6 +322,12 @@ bool BasePush::sendHttpPost(String& payload) {
   return _lastSuccess;
 }
 
+bool BasePush::sendHttpPost2(String& payload) {
+  sendHttpPost(payload, _config->getTargetHttpPost2(),
+               _config->getHeader1HttpPost2(), _config->getHeader2HttpPost2());
+  return _lastSuccess;
+}
+
 bool BasePush::sendHttpGet(String& payload) {
   sendHttpGet(payload, _config->getTargetHttpGet(),
               _config->getHeader1HttpGet(), _config->getHeader2HttpGet());

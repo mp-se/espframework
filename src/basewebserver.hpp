@@ -37,9 +37,7 @@ SOFTWARE.
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include <ESPmDNS.h>
-#include <FS.h>
 #include <WiFi.h>
-#define ESP8266WebServer WebServer
 #endif
 
 #include <ArduinoJson.h>
@@ -47,21 +45,6 @@ SOFTWARE.
 
 #include <espframework.hpp>
 #include <interface.hpp>
-
-constexpr auto PARAM_SUCCESS = "success";
-constexpr auto PARAM_STATUS = "status";
-constexpr auto PARAM_MESSAGE = "message";
-constexpr auto PARAM_TOKEN = "token";
-constexpr auto PARAM_COMMAND = "command";
-constexpr auto PARAM_FILE = "file";
-constexpr auto PARAM_FILES = "files";
-constexpr auto PARAM_NETWORKS = "networks";
-constexpr auto PARAM_RSSI = "rssi";
-constexpr auto PARAM_CHANNEL = "channel";
-constexpr auto PARAM_ENCRYPTION = "encryption";
-
-// TODO: Add validation of auth header in api calls
-// TODO: Change all apis to use JSON
 
 #if defined(ESP8266)
 #include <incbin.h>
@@ -117,20 +100,24 @@ class BaseWebServer {
                         reinterpret_cast<uint32_t>(&indexHtmlStart[0]));
   }
   void webReturnAppJs(AsyncWebServerRequest *request) {
-    request->send_P(200, "text/html", (const uint8_t *)appJsStart,
-                    reinterpret_cast<uint32_t>(&appJsEnd[0]) -
-                        reinterpret_cast<uint32_t>(&appJsStart[0]));
+    AsyncWebServerResponse *response = request->beginResponse_P(
+        200, "application/javascript", (const uint8_t *)appJsStart,
+        reinterpret_cast<uint32_t>(&appJsEnd[0]) -
+            reinterpret_cast<uint32_t>(&appJsStart[0]));
+    response->addHeader("Content-Encoding", "gzip");
+    request->send(response);
   }
   void webReturnAppCss(AsyncWebServerRequest *request) {
-    request->send_P(200, "text/html", (const uint8_t *)appCssStart,
-                    reinterpret_cast<uint32_t>(&appCssEnd[0]) -
-                        reinterpret_cast<uint32_t>(&appCssStart[0]));
+    AsyncWebServerResponse *response = request->beginResponse_P(
+        200, "text/css", (const uint8_t *)appCssStart,
+        reinterpret_cast<uint32_t>(&appCssEnd[0]) -
+            reinterpret_cast<uint32_t>(&appCssStart[0]));
+    response->addHeader("Content-Encoding", "gzip");
+    request->send(response);
   }
 #endif
 
   void webHandleAuth(AsyncWebServerRequest *request);
-  void webHandleConfigRead(AsyncWebServerRequest *request);
-  void webHandleConfigWrite(AsyncWebServerRequest *request, JsonVariant &json);
   void webHandleWifiScan(AsyncWebServerRequest *request);
   void webHandleWifiScanStatus(AsyncWebServerRequest *request);
   void webHandleWifiClear(AsyncWebServerRequest *request);

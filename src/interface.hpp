@@ -65,6 +65,7 @@ class WifiConfig {
 
 class PushConfig {
  public:
+  virtual const char* getID();
   virtual const char* getMDNS();
 
   virtual int getPushTimeout();
@@ -77,6 +78,14 @@ class PushConfig {
   virtual const char* getHeader2HttpPost();
   virtual void setHeader2HttpPost(String header);
   virtual bool hasTargetHttpPost();
+
+  virtual const char* getTargetHttpPost2() = 0;
+  virtual void setTargetHttpPost2(String target);
+  virtual const char* getHeader1HttpPost2();
+  virtual void setHeader1HttpPost2(String header);
+  virtual const char* getHeader2HttpPost2();
+  virtual void setHeader2HttpPost2(String header);
+  virtual bool hasTargetHttpPost2();
 
   virtual const char* getTargetHttpGet();
   virtual void setTargetHttpGet(String target);

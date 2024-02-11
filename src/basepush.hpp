@@ -54,6 +54,8 @@ class BasePush {
 
   String sendHttpPost(String& payload, const char* target, const char* header1,
                       const char* header2);
+  String sendHttpPost2(String& payload, const char* target, const char* header1,
+                       const char* header2);
   String sendHttpGet(String& payload, const char* target, const char* header1,
                      const char* header2);
   void sendInfluxDb2(String& payload, const char* target, const char* org,
@@ -62,6 +64,7 @@ class BasePush {
                 const char* pass);
 
   bool sendHttpPost(String& payload);
+  bool sendHttpPost2(String& payload);
   bool sendHttpGet(String& payload);
   bool sendInfluxDb2(String& payload);
   bool sendMqtt(String& payload);

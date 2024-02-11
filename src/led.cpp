@@ -34,20 +34,20 @@ void ledOn(LedColor l) {
   r = (l & 0xff0000) >> 16;
   g = (l & 0x00ff00) >> 8;
   b = (l & 0x0000ff);
-  pin = PIN_LED;
+  pin = LED_BUILTIN;
 
-  Log.info(F("HELP: Setting led %d to RGB %d-%d-%d" CR), pin, r, g, b);
+  Log.info(F("LED : Setting led %d to RGB %d-%d-%d" CR), pin, r, g, b);
   neopixelWrite(pin, r, g, b);
 }
 #else
 bool ledInit = false;
 Ticker ledTicker;
 
-void ledToggle() { digitalWrite(PIN_LED, !digitalRead(PIN_LED)); }
+void ledToggle() { digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN)); }
 
 void ledOn(LedColor l) {
   if (!ledInit) {
-    pinMode(PIN_LED, OUTPUT);
+    pinMode(LED_BUILTIN, OUTPUT);
     ledInit = true;
   }
 
@@ -57,7 +57,7 @@ void ledOn(LedColor l) {
     ledTicker.attach(0.2, ledToggle);
   } else {
     ledTicker.detach();
-    digitalWrite(PIN_LED, l);
+    digitalWrite(LED_BUILTIN, l);
   }
 }
 #endif

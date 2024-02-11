@@ -27,13 +27,20 @@ SOFTWARE.
 #include <log.hpp>
 
 #if defined(ESP8266)
-#include <LittleFS.h>
 #define MAX_SKETCH_SPACE 1044464
 #else
-#include <FS.h>
 #include <HTTPUpdate.h>
-#include <LittleFS.h>
 #define MAX_SKETCH_SPACE 1835008
+#endif
+
+#if defined(ESP8266)
+#define INCBIN_OUTPUT_SECTION ".irom.text"
+#include <incbin.h>
+// These are used in the webhandler class and needs to be defined when using
+// ESP8266. For esp32 the files are defined in the platformio.ini file
+INCBIN(IndexHtml, "html/index.html");
+INCBIN(AppJs, "html/app.js.gz");
+INCBIN(AppCss, "html/app.css.gz");
 #endif
 
 BaseWebServer::BaseWebServer(WebConfig *config, int dynamicJsonSize) {
@@ -49,7 +56,6 @@ bool BaseWebServer::isAuthenticated(AsyncWebServerRequest *request) {
     token += _webConfig->getID();
 
     if (request->getHeader("Authorization")->value() == token) {
-      // Log.info(F("WEB : Auth token is valid." CR));
       return true;
     }
   }
@@ -115,44 +121,6 @@ void BaseWebServer::loop() {
   }
 }
 
-void BaseWebServer::webHandleConfigRead(AsyncWebServerRequest *request) {
-  if (!isAuthenticated(request)) {
-    return;
-  }
-
-  Log.notice(F("WEB : webServer callback for /api/config(read)." CR));
-  AsyncJsonResponse *response =
-      new AsyncJsonResponse(false, JSON_BUFFER_SIZE_L);
-  JsonObject obj = response->getRoot().as<JsonObject>();
-  _webConfig->createJson(obj);
-  response->setLength();
-  request->send(response);
-}
-
-void BaseWebServer::webHandleConfigWrite(AsyncWebServerRequest *request,
-                                         JsonVariant &json) {
-  if (!isAuthenticated(request)) {
-    return;
-  }
-
-  String id = request->arg(PARAM_ID);
-  Log.notice(F("WEB : BaseWebHandler callback for /api/config(write)." CR));
-
-  Log.notice(F("WEB : webServer callback for /api/config(write)." CR));
-  JsonObject obj = json.as<JsonObject>();
-  _webConfig->parseJson(obj);
-  obj.clear();
-  _webConfig->saveFile();
-
-  AsyncJsonResponse *response =
-      new AsyncJsonResponse(false, JSON_BUFFER_SIZE_S);
-  obj = response->getRoot().as<JsonObject>();
-  obj[PARAM_SUCCESS] = true;
-  obj[PARAM_MESSAGE] = "Configuration updated";
-  response->setLength();
-  request->send(response);
-}
-
 void BaseWebServer::webHandleUploadFile(AsyncWebServerRequest *request,
                                         String filename, size_t index,
                                         uint8_t *data, size_t len, bool final) {
@@ -168,7 +136,7 @@ void BaseWebServer::webHandleUploadFile(AsyncWebServerRequest *request,
 #if defined(ESP8266)
     Update.runAsync(true);
 #endif
-    if (!Update.begin(request->contentLength(), U_FLASH, PIN_LED)) {
+    if (!Update.begin(request->contentLength(), U_FLASH, LED_BUILTIN)) {
       _uploadReturn = 500;
       Log.error(F("WEB : Not enough space to store for this firmware." CR));
     } else {
@@ -414,13 +382,10 @@ void BaseWebServer::setupWebHandlers() {
   _server->on(
       "/api/auth", HTTP_GET,
       std::bind(&BaseWebServer::webHandleAuth, this, std::placeholders::_1));
-  _server->on("/api/config", HTTP_GET,
-              std::bind(&BaseWebServer::webHandleConfigRead, this,
-                        std::placeholders::_1));
-  _server->on("/api/wifi/scan/status", HTTP_GET,
+  _server->on("/api/wifi/status", HTTP_GET,
               std::bind(&BaseWebServer::webHandleWifiScanStatus, this,
                         std::placeholders::_1));
-  _server->on("/api/wifi/scan", HTTP_GET,
+  _server->on("/api/wifi", HTTP_GET,
               std::bind(&BaseWebServer::webHandleWifiScan, this,
                         std::placeholders::_1));
   _server->on(
@@ -439,12 +404,6 @@ void BaseWebServer::setupWebHandlers() {
                 std::placeholders::_1, std::placeholders::_2,
                 std::placeholders::_3, std::placeholders::_4,
                 std::placeholders::_5, std::placeholders::_6));
-  handler = new AsyncCallbackJsonWebHandler(
-      "/api/config",
-      std::bind(&BaseWebServer::webHandleConfigWrite, this,
-                std::placeholders::_1, std::placeholders::_2),
-      _dynamicJsonSize);
-  _server->addHandler(handler);
   _server->onNotFound(std::bind(&BaseWebServer::webHandlePageNotFound, this,
                                 std::placeholders::_1));
 }
