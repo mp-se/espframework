@@ -27,7 +27,7 @@ SOFTWARE.
 #include <espframework.hpp>
 
 DemoConfig::DemoConfig(String baseMDNS, String fileName)
-    : BaseConfig(baseMDNS, fileName) {}
+    : BaseConfig(baseMDNS, fileName, JSON_BUFFER_SIZE_L) {}
 
 void DemoConfig::createJson(JsonObject& doc) {
   // Call base class functions
