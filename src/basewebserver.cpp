@@ -121,7 +121,7 @@ void BaseWebServer::loop() {
   }
 }
 
-void BaseWebServer::webHandleUploadFile(AsyncWebServerRequest *request,
+void BaseWebServer::webHandleUploadFirmware(AsyncWebServerRequest *request,
                                         String filename, size_t index,
                                         uint8_t *data, size_t len, bool final) {
   if (!isAuthenticated(request)) {
@@ -129,7 +129,7 @@ void BaseWebServer::webHandleUploadFile(AsyncWebServerRequest *request,
   }
 
   uint32_t maxSketchSpace = MAX_SKETCH_SPACE;
-  Log.verbose(F("WEB : BaseWebHandler callback for /api/upload(post)." CR));
+  Log.verbose(F("WEB : BaseWebHandler callback for /api/firmware." CR));
 
   if (!index) {
     _uploadedSize = 0;
@@ -176,6 +176,34 @@ void BaseWebServer::webHandleUploadFile(AsyncWebServerRequest *request,
                 Update.getError());
       _uploadReturn = 500;
     }
+  }
+}
+
+void BaseWebServer::webHandleUploadFile(AsyncWebServerRequest *request,
+                                        String filename, size_t index,
+                                        uint8_t *data, size_t len, bool final) {
+  if (!isAuthenticated(request)) {
+    return;
+  }
+
+  uint32_t maxFileSize = LittleFS.totalBytes() - LittleFS.usedBytes() - 4096;
+  Log.verbose(F("WEB : BaseWebHandler callback for /api/filesystem/upload." CR));
+
+  if (!index) {
+    Log.notice(F("WEB : Start file upload, free space %d kb, size %d." CR), maxFileSize / 1024, request->contentLength());
+    request->_tempFile = LittleFS.open("/" + filename, "w");
+    _uploadReturn = 200;
+  }
+
+  if (len) {
+    request->_tempFile.write(data, len);
+    EspSerial.print(".");
+  }
+
+  if (final) {
+    Log.notice(F("WEB : Finished file upload." CR));
+    request->_tempFile.close();
+    request->send(200);
   }
 }
 
@@ -391,6 +419,13 @@ void BaseWebServer::setupWebHandlers() {
   _server->on(
       "/api/restart", HTTP_GET,
       std::bind(&BaseWebServer::webHandleRestart, this, std::placeholders::_1));
+  _server->on(
+      "/api/filesystem/upload", HTTP_POST,
+      std::bind(&BaseWebServer::webReturnOK, this, std::placeholders::_1),
+      std::bind(&BaseWebServer::webHandleUploadFile, this,
+                std::placeholders::_1, std::placeholders::_2,
+                std::placeholders::_3, std::placeholders::_4,
+                std::placeholders::_5, std::placeholders::_6));
   handler = new AsyncCallbackJsonWebHandler(
       "/api/filesystem",
       std::bind(&BaseWebServer::webHandleFileSystem, this,
@@ -398,9 +433,9 @@ void BaseWebServer::setupWebHandlers() {
       JSON_BUFFER_SIZE_S);
   _server->addHandler(handler);
   _server->on(
-      "/api/upload", HTTP_POST,
+      "/api/firmware", HTTP_POST,
       std::bind(&BaseWebServer::webReturnOK, this, std::placeholders::_1),
-      std::bind(&BaseWebServer::webHandleUploadFile, this,
+      std::bind(&BaseWebServer::webHandleUploadFirmware, this,
                 std::placeholders::_1, std::placeholders::_2,
                 std::placeholders::_3, std::placeholders::_4,
                 std::placeholders::_5, std::placeholders::_6));
