@@ -186,6 +186,8 @@ void BaseWebServer::webHandleUploadFile(AsyncWebServerRequest *request,
     return;
   }
 
+  // TODO: Check if the file will fit in the filesystem
+
   uint32_t maxFileSize = LittleFS.totalBytes() - LittleFS.usedBytes() - 4096;
   Log.verbose(F("WEB : BaseWebHandler callback for /api/filesystem/upload." CR));
 
@@ -269,6 +271,8 @@ void BaseWebServer::webHandleFileSystem(AsyncWebServerRequest *request,
 
   Log.notice(F("WEB : webServer callback for /api/filesystem." CR));
   JsonObject obj = json.as<JsonObject>();
+
+  // TODO: Add total and free space on file system
 
   if (!obj[PARAM_COMMAND].isNull()) {
     if (obj[PARAM_COMMAND] == String("dir")) {
