@@ -21,11 +21,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-#include <Ticker.h>
-
 #include <espframework.hpp>
 #include <led.hpp>
 #include <log.hpp>
+
+#if defined(ESP8266)
+#include <Ticker.h>
+#endif
 
 #if defined(ESP32C3) || defined(ESP32S3)
 void ledOn(LedColor l) {
