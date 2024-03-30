@@ -25,10 +25,6 @@ SOFTWARE.
 #include <led.hpp>
 #include <log.hpp>
 
-#if defined(ESP8266)
-#include <Ticker.h>
-#endif
-
 #if defined(ESP32C3) || defined(ESP32S3)
 void ledOn(LedColor l) {
   uint8_t r, g, b, pin;
@@ -42,6 +38,8 @@ void ledOn(LedColor l) {
   neopixelWrite(pin, r, g, b);
 }
 #else
+#include <Ticker.h>
+
 bool ledInit = false;
 Ticker ledTicker;
 
