@@ -286,8 +286,6 @@ void BaseWebServer::webHandleFileSystem(AsyncWebServerRequest *request,
   Log.notice(F("WEB : webServer callback for /api/filesystem." CR));
   JsonObject obj = json.as<JsonObject>();
 
-  // TODO: Add total and free space on file system
-
   if (!obj[PARAM_COMMAND].isNull()) {
     if (obj[PARAM_COMMAND] == String("dir")) {
       Log.notice(F("WEB : File system listing requested." CR));
@@ -306,7 +304,9 @@ void BaseWebServer::webHandleFileSystem(AsyncWebServerRequest *request,
       Dir dir = LittleFS.openDir("/");
       JsonArray arr = obj.createNestedArray(PARAM_FILES);
       while (dir.next()) {
-        arr.add("/" + dir.fileName());
+        JsonObject file = arr.createNestedObject();
+        file[PARAM_FILE] = "/" + String(dir.fileName());
+        file[PARAM_SIZE] = static_cast<int>(dir.fileSize());
       }
 #else  // ESP32
       obj[PARAM_TOTAL] = LittleFS.totalBytes();
@@ -411,12 +411,12 @@ void BaseWebServer::webHandleRestart(AsyncWebServerRequest *request) {
       new AsyncJsonResponse(false, JSON_BUFFER_SIZE_S);
   JsonObject obj = response->getRoot().as<JsonObject>();
   obj[PARAM_STATUS] = true;
+  obj[PARAM_SUCCESS] = true;
   obj[PARAM_MESSAGE] = "Restarting...";
   response->setLength();
   request->send(response);
-
-  delay(1000);
-  ESP_RESET();
+  _rebootTimer = millis();
+  _rebootTask = true;
 }
 
 void BaseWebServer::setupWebHandlers() {
