@@ -12,3 +12,4 @@ test/*
 /wokwi.toml
 /partitions.csv
 /output.map
+.DS_Store
