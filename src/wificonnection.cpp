@@ -120,15 +120,23 @@ void WifiConnection::startWifiAP() {
   IPAddress local(192, 168, 4, 1);
   IPAddress subnet(255, 255, 255, 0);
 
+  WiFi.mode(WIFI_AP);
+  
   if (!WiFi.softAPConfig(local, local, subnet)) {
     Log.notice(F("WIFI: Failed to configure access point." CR));
     return;
   }
 
-  if (!WiFi.softAP(_apSSID, _apPWD)) {
+  Log.notice(F("WIFI: Creating AP with %s,%s." CR), _apSSID.c_str(), _apPWD.c_str());
+  if (!WiFi.softAP(_apSSID.c_str(), _apPWD.c_str())) {
     Log.notice(F("WIFI: Failed to create access point." CR));
     return;
   }
+
+#if defined(ESP32C3)
+  Log.notice(F("WIFI: Reducing wifi power for c3 chip." CR));
+  WiFi.setTxPower(WIFI_POWER_8_5dBm);  // Required for ESP32C3 Mini
+#endif
 
   Log.notice(F("WIFI: Starting dns server." CR));
   _dnsServer = new DNSServer();
@@ -230,8 +238,8 @@ bool WifiConnection::disconnect() {
   return WiFi.disconnect(true);  // Erase WIFI credentials
 }
 
-void WifiConnection::timeSync() {
-  configTime(0 * 3600, 0, "pool.ntp.org", "time.nist.gov");
+void WifiConnection::timeSync(String timeZone) {
+  configTime(0, 0, "pool.ntp.org", "time.nist.gov");
 
   Log.notice(F("WIFI: Waiting for NTP sync."));
   time_t now = time(nullptr);
@@ -245,7 +253,15 @@ void WifiConnection::timeSync() {
   EspSerial.print(CR);
 
   struct tm timeinfo;
-  gmtime_r(&now, &timeinfo);
+  getLocalTime(&timeinfo);
+
+  // List of timezone configuration can be found here; https://github.com/nayarsystems/posix_tz_db/blob/master/zones.csv
+  if(timeZone.length()) {
+    setenv("TZ", timeZone.c_str(), 1);
+    tzset();
+  }
+
+  getLocalTime(&timeinfo);
   Log.notice(F("WIFI: Current time: %s."), asctime(&timeinfo));
 }
 

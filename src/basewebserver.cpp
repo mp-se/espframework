@@ -24,7 +24,6 @@ SOFTWARE.
 #include <baseconfig.hpp>
 #include <basewebserver.hpp>
 #include <espframework.hpp>
-#include <log.hpp>
 
 #if defined(ESP8266)
 #define MAX_SKETCH_SPACE 1044464
@@ -286,8 +285,6 @@ void BaseWebServer::webHandleFileSystem(AsyncWebServerRequest *request,
   Log.notice(F("WEB : webServer callback for /api/filesystem." CR));
   JsonObject obj = json.as<JsonObject>();
 
-  // TODO: Add total and free space on file system
-
   if (!obj[PARAM_COMMAND].isNull()) {
     if (obj[PARAM_COMMAND] == String("dir")) {
       Log.notice(F("WEB : File system listing requested." CR));
@@ -413,12 +410,22 @@ void BaseWebServer::webHandleRestart(AsyncWebServerRequest *request) {
       new AsyncJsonResponse(false, JSON_BUFFER_SIZE_S);
   JsonObject obj = response->getRoot().as<JsonObject>();
   obj[PARAM_STATUS] = true;
+  obj[PARAM_SUCCESS] = true;
   obj[PARAM_MESSAGE] = "Restarting...";
   response->setLength();
   request->send(response);
+  _rebootTimer = millis();
+  _rebootTask = true;
+}
 
-  delay(1000);
-  ESP_RESET();
+void BaseWebServer::webHandlePing(AsyncWebServerRequest *request) {
+  Log.notice(F("WEB : webServer callback for /api/ping." CR));
+  AsyncJsonResponse *response =
+      new AsyncJsonResponse(false, JSON_BUFFER_SIZE_S);
+  JsonObject obj = response->getRoot().as<JsonObject>();
+  obj[PARAM_STATUS] = true;
+  response->setLength();
+  request->send(response);
 }
 
 void BaseWebServer::setupWebHandlers() {
@@ -450,6 +457,9 @@ void BaseWebServer::setupWebHandlers() {
   _server->on(
       "/api/restart", HTTP_GET,
       std::bind(&BaseWebServer::webHandleRestart, this, std::placeholders::_1));
+  _server->on(
+      "/api/ping", HTTP_GET,
+      std::bind(&BaseWebServer::webHandlePing, this, std::placeholders::_1));
   _server->on(
       "/api/filesystem/upload", HTTP_POST,
       std::bind(&BaseWebServer::webReturnOK, this, std::placeholders::_1),
