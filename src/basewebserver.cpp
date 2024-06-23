@@ -306,9 +306,6 @@ void BaseWebServer::webHandleFileSystem(AsyncWebServerRequest *request,
         JsonObject file = arr.createNestedObject();
         file[PARAM_FILE] = "/" + String(dir.fileName());
         file[PARAM_SIZE] = static_cast<int>(dir.fileSize());
-        JsonObject file = arr.createNestedObject();
-        file[PARAM_FILE] = "/" + String(dir.fileName());
-        file[PARAM_SIZE] = static_cast<int>(dir.fileSize());
       }
 #else  // ESP32
       obj[PARAM_TOTAL] = LittleFS.totalBytes();
@@ -413,7 +410,6 @@ void BaseWebServer::webHandleRestart(AsyncWebServerRequest *request) {
       new AsyncJsonResponse(false, JSON_BUFFER_SIZE_S);
   JsonObject obj = response->getRoot().as<JsonObject>();
   obj[PARAM_STATUS] = true;
-  obj[PARAM_SUCCESS] = true;
   obj[PARAM_SUCCESS] = true;
   obj[PARAM_MESSAGE] = "Restarting...";
   response->setLength();
