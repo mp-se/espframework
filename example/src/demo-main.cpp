@@ -33,8 +33,9 @@ SOFTWARE.
 
 SerialDebug mySerial(115200L);
 DemoConfig myConfig("mdnsbase", "/esplib.cfg");
-WifiConnection myWifi(&myConfig, "espSSID", "password", "esplib", "", "");
-OtaUpdate myOta(&myConfig, "0.0.0");
+WifiConnection myWifi(&myConfig, "espSSID", "password", "esplib", "",
+                      "");
+OtaUpdate myOta(&myConfig, "1.0.0");
 DemoPush myPush(&myConfig);
 
 #include <demo-webserver.hpp>
@@ -84,7 +85,7 @@ void loop() {
   myWifi.loop();
   myDemoWebServer.loop();
   mySerialWebSocket.loop();
-  Log.notice(F("Loop:" CR));
+  // Log.notice(F("Loop:" CR));
   delay(2000);
 }
 

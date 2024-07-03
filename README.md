@@ -28,8 +28,16 @@ The v1.x is different from the previous releases on the following:
 * Moved UI to VueJS instead of html and jQuery since JQuery is no longer being developed
 * API's now require authentication header
 * API's now use JSON for request/response (move away from form-data)
-* Only supports async webserver
+* Now only supports async webserver
 * Changed name of webserver class to BaseWebServer
+
+## Migration to 1.0
+
+* Now support VueJS build instead of plain html files. Do a build of the UI project and place the following files in the html directory (index.html, app.css.gz, app.js.gz). All the configuration is already done in the framework for using these files.
+* Secure that all tags in json documents use the '_' chararacter and not '-', this will make the JavaScript development much simpler. 
+* WebServer now only support AsyncWebServer so replace (baseasyncwebhandler.hpp) with (basewebserver.hpp) and use the new base class BaseWebServer and all post requests uses the built in JSON handler
+* BaseConfig functions for creating json has new signature using JsonObject& as parameter
+* Starting wifi portal is done via .startWifiAP() and replace .startPortal()
 
 ## Supported targets
 
@@ -39,59 +47,73 @@ The v1.x is different from the previous releases on the following:
 - ESP32C3
 - ESP32S3
 
+## Compiler defines
+
+These are the defines used to configure the espframework
+
+- ENABLE_REMOTE_UI_DEVELOPMENT This will allow anyone to access the API's from other adresses (bypass CORS checks)
+
+The following defines configures the framework for the target platform
+
+- ESP8266 
+- ESP32
+- ESP32C3
+- ESP32S2
+- ESP32S4
+
 ## Features
 
 1. **WIFI Connection**
   
-    WIFI connection handler including a wifi configuration manager. You can configure up to two WIFI networks and the device will switch between them if there are connection errors. This also include a 
+  WIFI connection handler including a wifi configuration manager. You can configure up to two WIFI networks and the device will switch between them if there are connection errors. This also include a 
   double reset detector  for entering the WIFI setup mode.
 
 2. **OTA functionallity**
 
-    Checks for a newer software version on the provided URL. If found it will perform an update during the boot sequence.
+  Checks for a newer software version on the provided URL. If found it will perform an update during the boot sequence.
 
 3. **Web Server (Sync and Async)**
 
-    Basic web server functionallity (support both async and sync versions). Async is faster but requires long running tasks to be run in the loop or the watchdog will trigger.
+  Basic web server functionallity (support both async and sync versions). Async is faster but requires long running tasks to be run in the loop or the watchdog will trigger.
 
-    [How to work with AsynWebServer](https://github.com/me-no-dev/ESPAsyncWebServer)
+  [How to work with AsynWebServer](https://github.com/me-no-dev/ESPAsyncWebServer)
     
-    All web pages will be embedded into the binary so they will not consume any space on the file system and it also ensure that the right files are included.
+  All web pages will be embedded into the binary so they will not consume any space on the file system and it also ensure that the right files are included.
 
-    This version is targeted at using VueJS as the UI base and is predefined to deliver the following files:
-    * index.html
-    * app.js.gz
-    * app.css.gz
+  This version is targeted at using VueJS as the UI base and is predefined to deliver the following files:
+  * index.html
+  * app.js.gz
+  * app.css.gz
 
-    See the example project https://mp-se/espframework-ui.
+  See the example project https://mp-se/espframework-ui.
 
 3. **Configuration**
 
-    Extensible configuration class that persists data on the file system on the device. 
+  Extensible configuration class that persists data on the file system on the device. 
     
-    [How to work with JsonDocuments](https://github.com/bblanchon/ArduinoJson)
+  [How to work with JsonDocuments](https://github.com/bblanchon/ArduinoJson)
 
 4. **Logging**
 
-    Logging APIs that can be used to log data to serial port, tx/rx pins and websocket (web page). Support multiple logging levels. 
+  Logging APIs that can be used to log data to serial port, tx/rx pins and websocket (web page). Support multiple logging levels. 
     
-    [How to do logging](https://github.com/thijse/Arduino-Log)
+  [How to do logging](https://github.com/thijse/Arduino-Log)
 
 5. **Templating**
    
-    Use a template string and transform that using data labels. Perfect for creating payloads for pushing data to external services.
+  Use a template string and transform that using data labels. Perfect for creating payloads for pushing data to external services.
 
 6. **Push**
 
-    Pushing data to external endpoints using either; HTTP GET, HTTP POST, INFLUXDB v2 or MQTT. Supports SSL.
+  Pushing data to external endpoints using either; HTTP GET, HTTP POST, INFLUXDB v2 or MQTT. Supports SSL.
 
 7. **Performance profiling**
 
-    Profile code segments and push result to an influx database for later analysis.
+  Profile code segments and push result to an influx database for later analysis.
 
 8. **Utils**
 
-    Conversion functions between volumes, weight and temperature.
+  Conversion functions between volumes, weight and temperature.
 
 # Code samples
 There is an example application with all included files for platformio. So this section will highlight the main parts for using the framework. It consists of 3 parts:

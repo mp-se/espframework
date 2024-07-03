@@ -22,9 +22,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
 #include <espframework.hpp>
+#include <led.hpp>
 #include <log.hpp>
 #include <utils.hpp>
-#include <led.hpp>
 
 #if !defined(ESP8266)
 #include <esp_int_wdt.h>

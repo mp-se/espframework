@@ -33,6 +33,8 @@ class DemoWebServer : public BaseWebServer {
 
   void setupWebHandlers();
   void webHandleStatus(AsyncWebServerRequest *request);
+  void webHandleConfigRead(AsyncWebServerRequest *request);
+  void webHandleConfigWrite(AsyncWebServerRequest *request, JsonVariant &json);
 
  public:
   explicit DemoWebServer(WebConfig *config, DemoPush *push);

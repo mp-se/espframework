@@ -27,6 +27,7 @@ SOFTWARE.
 #include <demo-webserver.hpp>
 #include <espframework.hpp>
 #include <log.hpp>
+#include <demo-config.hpp>
 
 // These are parameters that the example ui app uses. Part of the status
 // response.
@@ -35,6 +36,8 @@ constexpr auto PARAM_TOTAL_HEAP = "total_heap";
 constexpr auto PARAM_FREE_HEAP = "free_heap";
 constexpr auto PARAM_IP = "ip";
 constexpr auto PARAM_WIFI_SETUP = "wifi_setup";
+constexpr auto PARAM_APP_VER = "app_ver";
+constexpr auto PARAM_APP_BUILD = "app_build";
 
 DemoWebServer::DemoWebServer(WebConfig *config, DemoPush *push)
     : BaseWebServer(config) {
@@ -48,6 +51,52 @@ void DemoWebServer::setupWebHandlers() {
   _server->on(
       "/api/status", HTTP_GET,
       std::bind(&DemoWebServer::webHandleStatus, this, std::placeholders::_1));
+
+  AsyncCallbackJsonWebHandler *handler;
+  _server->on("/api/config", HTTP_GET,
+              std::bind(&DemoWebServer::webHandleConfigRead, this,
+                        std::placeholders::_1));
+  handler = new AsyncCallbackJsonWebHandler(
+      "/api/config",
+      std::bind(&DemoWebServer::webHandleConfigWrite, this,
+                std::placeholders::_1, std::placeholders::_2),
+      JSON_BUFFER_SIZE_L);
+  _server->addHandler(handler);
+}
+
+void DemoWebServer::webHandleConfigRead(AsyncWebServerRequest *request) {
+  if (!isAuthenticated(request)) {
+    return;
+  }
+
+  Log.notice(F("WEB : webServer callback for /api/config(read)." CR));
+  AsyncJsonResponse *response =
+      new AsyncJsonResponse(false, JSON_BUFFER_SIZE_L);
+  JsonObject obj = response->getRoot().as<JsonObject>();
+  _webConfig->createJson(obj);
+  response->setLength();
+  request->send(response);
+}
+
+void DemoWebServer::webHandleConfigWrite(AsyncWebServerRequest *request,
+                                            JsonVariant &json) {
+  if (!isAuthenticated(request)) {
+    return;
+  }
+
+  Log.notice(F("WEB : webServer callback for /api/config(write)." CR));
+  JsonObject obj = json.as<JsonObject>();
+  _webConfig->parseJson(obj);
+  obj.clear();
+  _webConfig->saveFile();
+
+  AsyncJsonResponse *response =
+      new AsyncJsonResponse(false, JSON_BUFFER_SIZE_M);
+  obj = response->getRoot().as<JsonObject>();
+  obj[PARAM_SUCCESS] = true;
+  obj[PARAM_MESSAGE] = "Configuration updated";
+  response->setLength();
+  request->send(response);
 }
 
 void DemoWebServer::webHandleStatus(AsyncWebServerRequest *request) {
@@ -73,6 +122,8 @@ void DemoWebServer::webHandleStatus(AsyncWebServerRequest *request) {
 #endif
   obj[PARAM_RSSI] = WiFi.RSSI();
   obj[PARAM_SSID] = WiFi.SSID();
+  obj[PARAM_APP_VER] = CFG_APPVER;
+  obj[PARAM_APP_BUILD] = CFG_GITREV;
 #if defined(ESP8266)
   obj[PARAM_TOTAL_HEAP] = 81920;
   obj[PARAM_FREE_HEAP] = ESP.getFreeHeap();
