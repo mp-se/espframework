@@ -35,6 +35,10 @@ SOFTWARE.
 
 #include <interface.hpp>
 
+#if defined(ESP8266)
+#define wifi_mode_t WiFiMode_t
+#endif
+
 class WifiConnection {
  private:
   String _apSSID;
@@ -51,7 +55,7 @@ class WifiConnection {
   uint8_t _resetCounter = 0;
   const uint8_t _minResetCount = 2;
 
-  void connectAsync(int wifiIndex);
+  void connectAsync(int wifiIndex, wifi_mode_t _mode);
   bool waitForConnection(int maxTime);
   void readReset();
   void writeReset();
@@ -62,12 +66,16 @@ class WifiConnection {
   void init();
   void timeSync(String timeZone = "");
 
-  bool connect();
+  bool connect(wifi_mode_t _mode = WIFI_STA);
   bool disconnect();
   bool isConnected();
   bool isDoubleResetDetected();
   void stopDoubleReset();
-  void startWifiAP();
+  void setAP(String apSSID, String apPWD) {
+    _apSSID = apSSID;
+    _apPWD = apPWD;
+  }
+  void startAP(wifi_mode_t _mode = WIFI_AP);
   bool hasConfig();
   String getIPAddress();
 

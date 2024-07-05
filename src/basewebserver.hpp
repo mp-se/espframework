@@ -61,9 +61,8 @@ extern const uint8_t appCssStart[] asm("_binary_html_app_css_gz_start");
 extern const uint8_t appCssEnd[] asm("_binary_html_app_css_gz_end");
 #endif
 
-class BaseWebServer
-{
-protected:
+class BaseWebServer {
+ protected:
   AsyncWebServer *_server = 0;
   File _uploadFile;
   WebConfig *_webConfig;
@@ -80,34 +79,32 @@ protected:
   void resetWifiPortalTimer() { _wifiPortalTimer = millis(); }
   bool isAuthenticated(AsyncWebServerRequest *request);
 
-  void webReturnOK(AsyncWebServerRequest *request)
-  {
+  void webReturnOK(AsyncWebServerRequest *request) {
     request->send(_uploadReturn);
   }
 #if defined(ESP8266)
-  void webReturnIndexHtml(AsyncWebServerRequest *request)
-  {
+  void webReturnIndexHtml(AsyncWebServerRequest *request) {
     Log.notice(F("WEB : webServer callback for /index.html (Memory)." CR));
     request->send_P(200, "text/html", (const uint8_t *)gIndexHtmlData,
                     gIndexHtmlSize);
   }
-  void webReturnAppJs(AsyncWebServerRequest *request)
-  {
+  void webReturnAppJs(AsyncWebServerRequest *request) {
     if (LittleFS.exists("/app.js.gz")) {
       Log.notice(F("WEB : webServer callback for /app.js (FileSystem)." CR));
-      AsyncWebServerResponse *response = request->beginResponse(LittleFS, "/app.js.gz", "application/javascript");
+      AsyncWebServerResponse *response = request->beginResponse(
+          LittleFS, "/app.js.gz", "application/javascript");
       response->addHeader("Content-Encoding", "gzip");
       request->send(response);
     } else {
       Log.notice(F("WEB : webServer callback for /app.js (Memory)." CR));
-      AsyncWebServerResponse *response = request->beginResponse_P(
-        200, "application/javascript", (const uint8_t *)gAppJsData, gAppJsSize);
+      AsyncWebServerResponse *response =
+          request->beginResponse_P(200, "application/javascript",
+                                   (const uint8_t *)gAppJsData, gAppJsSize);
       response->addHeader("Content-Encoding", "gzip");
       request->send(response);
     }
   }
-  void webReturnAppCss(AsyncWebServerRequest *request)
-  {
+  void webReturnAppCss(AsyncWebServerRequest *request) {
     Log.notice(F("WEB : webServer callback for /app.css (Memory)." CR));
     AsyncWebServerResponse *response = request->beginResponse_P(
         200, "text/css", (const uint8_t *)gAppCssData, gAppCssSize);
@@ -115,18 +112,17 @@ protected:
     request->send(response);
   }
 #else
-  void webReturnIndexHtml(AsyncWebServerRequest *request)
-  {
+  void webReturnIndexHtml(AsyncWebServerRequest *request) {
     Log.notice(F("WEB : webServer callback for /index.html (Memory)." CR));
     request->send_P(200, "text/html", (const uint8_t *)indexHtmlStart,
                     reinterpret_cast<uint32_t>(&indexHtmlEnd[0]) -
                         reinterpret_cast<uint32_t>(&indexHtmlStart[0]));
   }
-  void webReturnAppJs(AsyncWebServerRequest *request)
-  {
+  void webReturnAppJs(AsyncWebServerRequest *request) {
     if (LittleFS.exists("/app.js.gz")) {
       Log.notice(F("WEB : webServer callback for /app.js (FileSystem)." CR));
-      AsyncWebServerResponse *response = request->beginResponse(LittleFS, "/app.js.gz", "application/javascript");
+      AsyncWebServerResponse *response = request->beginResponse(
+          LittleFS, "/app.js.gz", "application/javascript");
       response->addHeader("Content-Encoding", "gzip");
       request->send(response);
     } else {
@@ -139,8 +135,7 @@ protected:
       request->send(response);
     }
   }
-  void webReturnAppCss(AsyncWebServerRequest *request)
-  {
+  void webReturnAppCss(AsyncWebServerRequest *request) {
     Log.notice(F("WEB : webServer callback for /app.css (Memory)." CR));
     AsyncWebServerResponse *response = request->beginResponse_P(
         200, "text/css", (const uint8_t *)appCssStart,
@@ -167,7 +162,7 @@ protected:
 
   virtual void setupWebHandlers();
 
-public:
+ public:
   explicit BaseWebServer(WebConfig *config,
                          int dynamicJsonSize = JSON_BUFFER_SIZE_L);
 
@@ -177,6 +172,6 @@ public:
   virtual void loop();
 };
 
-#endif // SRC_BASEWEBSERVER_HPP_
+#endif  // SRC_BASEWEBSERVER_HPP_
 
 // EOF

@@ -116,18 +116,19 @@ void WifiConnection::stopDoubleReset() {
   writeReset();
 }
 
-void WifiConnection::startWifiAP() {
+void WifiConnection::startAP(wifi_mode_t _mode) {
   IPAddress local(192, 168, 4, 1);
   IPAddress subnet(255, 255, 255, 0);
 
-  WiFi.mode(WIFI_AP);
-  
+  WiFi.mode(_mode);
+
   if (!WiFi.softAPConfig(local, local, subnet)) {
     Log.notice(F("WIFI: Failed to configure access point." CR));
     return;
   }
 
-  Log.notice(F("WIFI: Creating AP with %s,%s." CR), _apSSID.c_str(), _apPWD.c_str());
+  Log.notice(F("WIFI: Creating AP with %s,%s." CR), _apSSID.c_str(),
+             _apPWD.c_str());
   if (!WiFi.softAP(_apSSID.c_str(), _apPWD.c_str())) {
     Log.notice(F("WIFI: Failed to create access point." CR));
     return;
@@ -165,9 +166,9 @@ void WifiConnection::loop() {
   }
 }
 
-void WifiConnection::connectAsync(int wifiIndex) {
+void WifiConnection::connectAsync(int wifiIndex, wifi_mode_t _mode) {
   WiFi.persistent(true);
-  WiFi.mode(WIFI_STA);
+  WiFi.mode(_mode);
 #if defined(ESP32C3)
   Log.notice(F("WIFI: Reducing wifi power for c3 chip." CR));
   WiFi.setTxPower(WIFI_POWER_8_5dBm);  // Required for ESP32C3 Mini
@@ -208,16 +209,16 @@ bool WifiConnection::waitForConnection(int maxTime) {
   return true;
 }
 
-bool WifiConnection::connect() {
+bool WifiConnection::connect(wifi_mode_t _mode) {
   int timeout = _wifiConfig->getWifiConnectionTimeout();
 
-  connectAsync(0);
+  connectAsync(0, _mode);
   if (!waitForConnection(timeout)) {
     Log.warning(F("WIFI: Failed to connect to first SSID %s." CR),
                 _wifiConfig->getWifiSSID(0));
 
     if (strlen(_wifiConfig->getWifiSSID(1))) {
-      connectAsync(1);
+      connectAsync(1, _mode);
 
       if (waitForConnection(timeout)) {
         Log.notice(F("WIFI: Connected to second SSID %s." CR),
@@ -255,8 +256,9 @@ void WifiConnection::timeSync(String timeZone) {
   struct tm timeinfo;
   getLocalTime(&timeinfo);
 
-  // List of timezone configuration can be found here; https://github.com/nayarsystems/posix_tz_db/blob/master/zones.csv
-  if(timeZone.length()) {
+  // List of timezone configuration can be found here;
+  // https://github.com/nayarsystems/posix_tz_db/blob/master/zones.csv
+  if (timeZone.length()) {
     setenv("TZ", timeZone.c_str(), 1);
     tzset();
   }
