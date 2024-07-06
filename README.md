@@ -250,7 +250,7 @@ void setup() {
   myWifi.init();
   if (!myWifi.hasConfig() || myWifi.isDoubleResetDetected()) {
     myDemoWebServer.setWifiSetup(true); // Force the webserver to run in wifi mgmt mode
-    myWifi.startWifiAP(); // Start the wifi manager
+    myWifi.startAP(); // Start the wifi manager
   }
 
   myWifi.connect(); // Perform the connection
@@ -426,8 +426,8 @@ This library is based on the following projects, without the work of these autho
 - [https://github.com/mp-se/Arduino-Log](https://github.com/mp-se/Arduino-Log)
 - [https://github.com/mp-se/ArduinoJson](https://github.com/mp-se/ArduinoJson)
 - [https://github.com/mp-se/arduino-mqtt](https://github.com/mp-se/arduino-mqtt)
-- [https://github.com/mp-se/incbin](https://github.com/mp-se/incbin)
+- [https://github.com/mp-se/incbin](https://github.com/mp-se/incbin, esp8266 only)
 - [https://github.com/mp-se/ESPAsyncWebServer](https://github.com/mp-se/ESPAsyncWebServer)
 - [https://github.com/mp-se/ESPAsyncTCP](https://github.com/mp-se/ESPAsyncTCP)
-- [https://github.com/esp8266/Arduino](https://github.com/esp8266/Arduino)
-- [https://github.com/espressif/arduino-esp32](https://github.com/espressif/arduino-esp32)
+- [https://github.com/esp8266/Arduino](https://github.com/esp8266/Arduino, esp8266 only)
+- [https://github.com/espressif/arduino-esp32](https://github.com/espressif/arduino-esp32, esp32 only)

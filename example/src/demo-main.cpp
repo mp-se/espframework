@@ -59,10 +59,12 @@ void setup() {
         F("Main: Missing wifi config or double reset detected, entering wifi "
           "setup." CR));
     myDemoWebServer.setWifiSetup(true);
-    myWifi.startWifiAP();
+    myWifi.startAP();
   } else {
     PERF_BEGIN("wifi-connect");
-    myWifi.connect();
+    myWifi.connect(WIFI_AP_STA);
+    myWifi.setAP("extra", "password"); // Will create an AP as well as connecting to the defined wifi
+    myWifi.startAP(WIFI_AP_STA);
     PERF_END("wifi-connect");
     PERF_PUSH();
     myWifi.timeSync();
