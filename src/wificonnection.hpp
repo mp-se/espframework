@@ -51,7 +51,7 @@ class WifiConnection {
   uint8_t _resetCounter = 0;
   const uint8_t _minResetCount = 2;
 
-  void connectAsync(int wifiIndex);
+  void connectAsync(String ssid, String pass);
   bool waitForConnection(int maxTime);
   void readReset();
   void writeReset();
@@ -62,7 +62,7 @@ class WifiConnection {
   void init();
   void timeSync(String timeZone = "");
 
-  bool connect();
+  bool connect(bool wifiDirect = false);
   bool disconnect();
   bool isConnected();
   bool isDoubleResetDetected();

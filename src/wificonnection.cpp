@@ -165,7 +165,7 @@ void WifiConnection::loop() {
   }
 }
 
-void WifiConnection::connectAsync(int wifiIndex) {
+void WifiConnection::connectAsync(String ssid, String pass) {
   WiFi.persistent(true);
   WiFi.mode(WIFI_STA);
 #if defined(ESP32C3)
@@ -177,10 +177,9 @@ void WifiConnection::connectAsync(int wifiIndex) {
                _userSSID.c_str());
     WiFi.begin(_userSSID.c_str(), _userPWD.c_str());
   } else {
-    Log.notice(F("WIFI: Connecting to wifi (%d) using stored settings %s." CR),
-               wifiIndex, _wifiConfig->getWifiSSID(wifiIndex));
-    WiFi.begin(_wifiConfig->getWifiSSID(wifiIndex),
-               _wifiConfig->getWifiPass(wifiIndex));
+    Log.notice(F("WIFI: Connecting to wifi using stored settings %s." CR),
+               ssid);
+    WiFi.begin(ssid, pass);
   }
 }
 
@@ -208,26 +207,30 @@ bool WifiConnection::waitForConnection(int maxTime) {
   return true;
 }
 
-bool WifiConnection::connect() {
+bool WifiConnection::connect(bool wifiDirect) {
   int timeout = _wifiConfig->getWifiConnectionTimeout();
 
-  connectAsync(0);
-  if (!waitForConnection(timeout)) {
-    Log.warning(F("WIFI: Failed to connect to first SSID %s." CR),
-                _wifiConfig->getWifiSSID(0));
+  if(wifiDirect) {
+    connectAsync(_wifiConfig->getWifiDirectSSID(), _wifiConfig->getWifiDirectPass());    
+  } else {
+    connectAsync(_wifiConfig->getWifiSSID(0), _wifiConfig->getWifiPass(0));
+    if (!waitForConnection(timeout)) {
+      Log.warning(F("WIFI: Failed to connect to first SSID %s." CR),
+                  _wifiConfig->getWifiSSID(0));
 
-    if (strlen(_wifiConfig->getWifiSSID(1))) {
-      connectAsync(1);
+      if (strlen(_wifiConfig->getWifiSSID(1))) {
+        connectAsync(_wifiConfig->getWifiSSID(1), _wifiConfig->getWifiPass(1));
 
-      if (waitForConnection(timeout)) {
-        Log.notice(F("WIFI: Connected to second SSID %s." CR),
-                   _wifiConfig->getWifiSSID(1));
-        return true;
+        if (waitForConnection(timeout)) {
+          Log.notice(F("WIFI: Connected to second SSID %s." CR),
+                    _wifiConfig->getWifiSSID(1));
+          return true;
+        }
       }
-    }
 
-    Log.warning(F("WIFI: Failed to connect to any SSID." CR));
-    return false;
+      Log.warning(F("WIFI: Failed to connect to any SSID." CR));
+      return false;
+    }
   }
 
   return true;

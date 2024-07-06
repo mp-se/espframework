@@ -58,6 +58,8 @@ void BaseConfig::createJsonWifi(JsonObject& doc) {
   doc[PARAM_SSID2] = getWifiSSID(1);
   doc[PARAM_PASS] = getWifiPass(0);
   doc[PARAM_PASS2] = getWifiPass(1);
+  doc[PARAM_DIRECT_SSID] = getWifiDirectSSID();
+  doc[PARAM_DIRECT_PASS] = getWifiDirectPass();
   doc[PARAM_WIFI_PORTAL_TIMEOUT] = getWifiPortalTimeout();
   doc[PARAM_WIFI_CONNECT_TIMEOUT] = getWifiConnectionTimeout();
 }
@@ -71,6 +73,8 @@ void BaseConfig::parseJsonWifi(JsonObject& doc) {
   if (!doc[PARAM_PASS].isNull()) setWifiPass(doc[PARAM_PASS], 0);
   if (!doc[PARAM_SSID2].isNull()) setWifiSSID(doc[PARAM_SSID2], 1);
   if (!doc[PARAM_PASS2].isNull()) setWifiPass(doc[PARAM_PASS2], 1);
+  if (!doc[PARAM_DIRECT_SSID].isNull()) setWifiDirectSSID(doc[PARAM_DIRECT_SSID]);
+  if (!doc[PARAM_DIRECT_PASS].isNull()) setWifiDirectPass(doc[PARAM_DIRECT_PASS]);
   if (!doc[PARAM_WIFI_PORTAL_TIMEOUT].isNull())
     this->setWifiPortalTimeout(doc[PARAM_WIFI_PORTAL_TIMEOUT].as<int>());
   if (!doc[PARAM_WIFI_CONNECT_TIMEOUT].isNull())

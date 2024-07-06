@@ -60,6 +60,11 @@ class WifiConfig {
   virtual const char* getWifiPass(int idx);
   virtual void setWifiPass(String s, int idx);
 
+  virtual const char* getWifiDirectSSID();
+  virtual void setWifiDirectSSID(String s);
+  virtual const char* getWifiDirectPass();
+  virtual void setWifiDirectPass(String s);
+
   virtual bool saveFile();
 };
 

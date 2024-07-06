@@ -36,6 +36,8 @@ class BaseConfig : public WifiConfig,
   String _mDNS;
   String _wifiSSID[2] = {"", ""};
   String _wifiPASS[2] = {"", ""};
+  String _wifiDirectSSID = "";
+  String _wifiDirectPASS = "";
   int _wifiConnectionTimeout = 30;
   int _wifiPortalTimeout = 120;
 
@@ -102,6 +104,16 @@ class BaseConfig : public WifiConfig,
   const char* getWifiPass(int idx) { return _wifiPASS[idx].c_str(); }
   void setWifiPass(String s, int idx) {
     _wifiPASS[idx] = s;
+    _saveNeeded = true;
+  }
+  const char* getWifiDirectSSID() { return _wifiDirectSSID.c_str(); }
+  void setWifiDirectSSID(String s) {
+    _wifiDirectSSID = s;
+    _saveNeeded = true;
+  }
+  const char* getWifiDirectPass() { return _wifiDirectPASS.c_str(); }
+  void setWifiDirectPass(String s) {
+    _wifiDirectPASS = s;
     _saveNeeded = true;
   }
   bool dualWifiConfigured() {
