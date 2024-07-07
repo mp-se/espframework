@@ -66,7 +66,8 @@ class WifiConnection {
   void init();
   void timeSync(String timeZone = "");
 
-  bool connect(bool wifiDirect = false, wifi_mode_t mode = WIFI_STA);
+  bool connect(bool wifiDirect, wifi_mode_t mode = WIFI_STA);
+  bool connect(wifi_mode_t mode = WIFI_STA) { connect(false, mode); }
   bool disconnect();
   bool isConnected();
   bool isDoubleResetDetected();

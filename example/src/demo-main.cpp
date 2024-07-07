@@ -62,9 +62,9 @@ void setup() {
     myWifi.startAP();
   } else {
     PERF_BEGIN("wifi-connect");
-    myWifi.connect(WIFI_AP_STA);
-    myWifi.setAP("extra", "password"); // Will create an AP as well as connecting to the defined wifi
-    myWifi.startAP(WIFI_AP_STA);
+    myWifi.connect(false, WIFI_AP_STA); // Connect to stored wifi in mixed mode
+    myWifi.setAP("test-ap", "password");
+    myWifi.startAP(WIFI_AP_STA); // Start the AP
     PERF_END("wifi-connect");
     PERF_PUSH();
     myWifi.timeSync();
