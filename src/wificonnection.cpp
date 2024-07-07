@@ -211,21 +211,27 @@ bool WifiConnection::waitForConnection(int maxTime) {
 bool WifiConnection::connect(bool wifiDirect, wifi_mode_t mode) {
   int timeout = _wifiConfig->getWifiConnectionTimeout();
 
-  if(wifiDirect) {
-    connectAsync(_wifiConfig->getWifiDirectSSID(), _wifiConfig->getWifiDirectPass(), mode);    
+  if (wifiDirect) {
+    connectAsync(_wifiConfig->getWifiDirectSSID(),
+                 _wifiConfig->getWifiDirectPass(), mode);
+    if (waitForConnection(timeout)) {
+      Log.notice(F("WIFI: Connected to direct SSID." CR));
+      return true;
+    }
   } else {
-    connectAsync(_wifiConfig->getWifiSSID(0), _wifiConfig->getWifiPass(0), mode);
+    connectAsync(_wifiConfig->getWifiSSID(0), _wifiConfig->getWifiPass(0),
+                 mode);
     if (!waitForConnection(timeout)) {
       Log.warning(F("WIFI: Failed to connect to first SSID %s." CR),
                   _wifiConfig->getWifiSSID(0));
 
       if (strlen(_wifiConfig->getWifiSSID(1))) {
-        connectAsync(_wifiConfig->getWifiSSID(1), _wifiConfig->getWifiPass(1), mode);
-
+        connectAsync(_wifiConfig->getWifiSSID(1), _wifiConfig->getWifiPass(1),
+                     mode);
         if (waitForConnection(timeout)) {
           Log.notice(F("WIFI: Connected to second SSID %s." CR),
-                    _wifiConfig->getWifiSSID(1));
-          return true;
+                     _wifiConfig->getWifiSSID(1));
+         return true;
         }
       }
 

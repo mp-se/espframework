@@ -33,8 +33,7 @@ SOFTWARE.
 
 SerialDebug mySerial(115200L);
 DemoConfig myConfig("mdnsbase", "/esplib.cfg");
-WifiConnection myWifi(&myConfig, "espSSID", "password", "esplib", "",
-                      "");
+WifiConnection myWifi(&myConfig, "espSSID", "password", "esplib", "", "");
 OtaUpdate myOta(&myConfig, "1.0.0");
 DemoPush myPush(&myConfig);
 
@@ -62,13 +61,20 @@ void setup() {
     myWifi.startAP();
   } else {
     PERF_BEGIN("wifi-connect");
-    myWifi.connect(false, WIFI_AP_STA); // Connect to stored wifi in mixed mode
-    myWifi.setAP("test-ap", "password");
-    myWifi.startAP(WIFI_AP_STA); // Start the AP
-    PERF_END("wifi-connect");
-    PERF_PUSH();
+
+    // Example on how to do direct connect
+    /*myConfig.setWifiDirectSSID("gw-fa413c");
+    myConfig.setWifiDirectPass("gravitymongw");
+    myWifi.connect(true);*/
+
+    // Standard method of connecting
+    myWifi.connect(false, WIFI_AP_STA); // Connect to stored wifi in mixed mode 
+    myWifi.setAP("test-ap", "password"); myWifi.startAP(WIFI_AP_STA); // Start the AP
     myWifi.timeSync();
 
+    PERF_END("wifi-connect");
+    PERF_PUSH();
+    
     if (!myWifi.isConnected() || myOta.checkFirmwareVersion()) {
       Log.notice(F("Main: New firmware available via OTA, doing update." CR));
       myOta.updateFirmware();
