@@ -30,6 +30,7 @@ SOFTWARE.
 #include <perf.hpp>
 #include <serialws.hpp>
 #include <wificonnection.hpp>
+#include <uptime.hpp>
 
 SerialDebug mySerial(115200L);
 DemoConfig myConfig("mdnsbase", "/esplib.cfg");
@@ -61,20 +62,14 @@ void setup() {
     myWifi.startAP();
   } else {
     PERF_BEGIN("wifi-connect");
-
-    // Example on how to do direct connect
-    /*myConfig.setWifiDirectSSID("gw-fa413c");
-    myConfig.setWifiDirectPass("gravitymongw");
-    myWifi.connect(true);*/
-
-    // Standard method of connecting
-    myWifi.connect(false, WIFI_AP_STA); // Connect to stored wifi in mixed mode 
-    myWifi.setAP("test-ap", "password"); myWifi.startAP(WIFI_AP_STA); // Start the AP
-    myWifi.timeSync();
-
+    myWifi.connect(WIFI_AP_STA);
+    myWifi.setAP("extra", "password");  // Will create an AP as well as
+                                        // connecting to the defined wifi
+    myWifi.startAP(WIFI_AP_STA);
     PERF_END("wifi-connect");
     PERF_PUSH();
-    
+    myWifi.timeSync();
+
     if (!myWifi.isConnected() || myOta.checkFirmwareVersion()) {
       Log.notice(F("Main: New firmware available via OTA, doing update." CR));
       myOta.updateFirmware();
@@ -95,6 +90,9 @@ void loop() {
   mySerialWebSocket.loop();
   // Log.notice(F("Loop:" CR));
   delay(2000);
+
+  myUptime.calculate();
+  Log.notice(F("Loop: Uptime %d days, %d hours, %d minutes, %d seconds." CR), myUptime.getDays(), myUptime.getHours(), myUptime.getMinutes(), myUptime.getSeconds());
 }
 
 // EOF
