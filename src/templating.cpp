@@ -26,14 +26,14 @@ SOFTWARE.
 // the useDefaultTemplate param is there to support unit tests.
 const char* TemplatingEngine::create(const char* base) {
 #if LOG_LEVEL == 6
-  Log.verbose(F("TPL : Base '%s'." CR), base.c_str());
+  Log.verbose(F("TPL : Base '%s'." CR), base);
 #endif
 
   // Insert data into template.
   transform(base);
 
 #if LOG_LEVEL == 6
-  Log.verbose(F("TPL : Transformed '%s'." CR), _output.c_str());
+  Log.verbose(F("TPL : Transformed '%s'." CR), _output == NULL ? "" : _output);
 #endif
 
   if (_output) return _output;
