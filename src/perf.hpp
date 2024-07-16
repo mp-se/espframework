@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2021-22 Magnus
+Copyright (c) 2021-2024 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,7 @@ SOFTWARE.
 
 class PerfLogging {
  private:
-  BaseConfig* _config = 0;
+  PushConfig* _config = 0;
 
   struct PerfEntry {
     uint32_t start;   // millis()
@@ -96,7 +96,7 @@ class PerfLogging {
     return _instance;
   }
 
-  void setBaseConfig(BaseConfig* config) { _config = config; }
+  void setBaseConfig(PushConfig* config) { _config = config; }
 
   void clear();
   void start(const char* key);

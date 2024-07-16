@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2021-22 Magnus
+Copyright (c) 2021-2024 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -31,8 +31,8 @@ class DemoConfig : public BaseConfig {
  public:
   DemoConfig(String baseMDNS, String fileName);
 
-  void createJson(DynamicJsonDocument& doc, bool skipSecrets = true);
-  void parseJson(DynamicJsonDocument& doc);
+  void createJson(JsonObject& doc);
+  void parseJson(JsonObject& doc);
 };
 
 #endif  // SRC_DEMO_CONFIG_HPP_

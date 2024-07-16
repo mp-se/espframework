@@ -14,12 +14,30 @@ This is a framework that I use in my own ESP projects as a base. It contains a l
   - [class SerialWebSocket](#class-serialwebsocket)
   - [class WifiConnection](#class-wificonnection)
   - [class OtaUpdate](#class-otaupdate)
-  - [class BaseAsyncWebHandler and BaseWebHandler](#class-baseasyncwebhandler-and-basewebhandler)
+  - [class BaseWebServer](#class-BaseWebServer)
   - [class TemplatingEngine](#class-templatingengine)
   - [class BasePush](#class-basepush)
   - [class PerfLogging](#class-perflogging)
   - [Misc helper methods](#misc-helper-methods)
 - [Credits](#credits)
+
+## Changes from 0.x to 1.x
+
+The v1.x is different from the previous releases on the following:
+
+* Moved UI to VueJS instead of html and jQuery since JQuery is no longer being developed
+* API's now require authentication header
+* API's now use JSON for request/response (move away from form-data)
+* Now only supports async webserver
+* Changed name of webserver class to BaseWebServer
+
+## Migration to 1.0
+
+* Now support VueJS build instead of plain html files. Do a build of the UI project and place the following files in the html directory (index.html, app.css.gz, app.js.gz). All the configuration is already done in the framework for using these files.
+* Secure that all tags in json documents use the '_' chararacter and not '-', this will make the JavaScript development much simpler. 
+* WebServer now only support AsyncWebServer so replace (baseasyncwebhandler.hpp) with (basewebserver.hpp) and use the new base class BaseWebServer and all post requests uses the built in JSON handler
+* BaseConfig functions for creating json has new signature using JsonObject& as parameter
+* Starting wifi portal is done via .startWifiAP() and replace .startPortal()
 
 ## Supported targets
 
@@ -29,67 +47,77 @@ This is a framework that I use in my own ESP projects as a base. It contains a l
 - ESP32C3
 - ESP32S3
 
+## Compiler defines
+
+These are the defines used to configure the espframework
+
+- ENABLE_REMOTE_UI_DEVELOPMENT This will allow anyone to access the API's from other adresses (bypass CORS checks)
+
+The following defines configures the framework for the target platform
+
+- ESP8266 
+- ESP32
+- ESP32C3
+- ESP32S2
+- ESP32S4
+
 ## Features
 
 1. **WIFI Connection**
   
-    WIFI connection handler including a wifi configuration manager. You can configure up to two WIFI networks and the device will switch between them if there are connection errors. This also include a 
+  WIFI connection handler including a wifi configuration manager. You can configure up to two WIFI networks and the device will switch between them if there are connection errors. This also include a 
   double reset detector  for entering the WIFI setup mode.
 
 2. **OTA functionallity**
 
-    Checks for a newer software version on the provided URL. If found it will perform an update during the boot sequence.
+  Checks for a newer software version on the provided URL. If found it will perform an update during the boot sequence.
 
 3. **Web Server (Sync and Async)**
 
-    Basic web server functionallity (support both async and sync versions). Async is faster but requires long running tasks to be run in the loop or the watchdog will trigger.
+  Basic web server functionallity (support both async and sync versions). Async is faster but requires long running tasks to be run in the loop or the watchdog will trigger.
 
-    [How to work with AsynWebServer](https://github.com/me-no-dev/ESPAsyncWebServer)
+  [How to work with AsynWebServer](https://github.com/me-no-dev/ESPAsyncWebServer)
     
-    All web pages will be embedded into the binary so they will not consume any space on the file system and it also ensure that the right html files are included.
+  All web pages will be embedded into the binary so they will not consume any space on the file system and it also ensure that the right files are included.
 
-    There are a number of html pages included by default and you can add as many pages as you want (or whats fit into memory).
-    * Index.htm (Main page)
-    * Config.htm (For configuration/settings)
-    * Upload.htm (For manually uploading new firmware)
-    * About.htm  (About page)
-    * Serial console
+  This version is targeted at using VueJS as the UI base and is predefined to deliver the following files:
+  * index.html
+  * app.js.gz
+  * app.css.gz
 
-    The example files uses jquery and bootstrap but you can choose to customize these in any way that you want.
+  See the example project https://mp-se/espframework-ui.
 
 3. **Configuration**
 
-    Extensible configuration class that persists data on the file system on the device. 
+  Extensible configuration class that persists data on the file system on the device. 
     
-    [How to work with JsonDocuments](https://github.com/bblanchon/ArduinoJson)
+  [How to work with JsonDocuments](https://github.com/bblanchon/ArduinoJson)
 
 4. **Logging**
 
-    Logging APIs that can be used to log data to serial port, tx/rx pins and websocket (web page). Support multiple logging levels. 
+  Logging APIs that can be used to log data to serial port, tx/rx pins and websocket (web page). Support multiple logging levels. 
     
-    [How to do logging](https://github.com/thijse/Arduino-Log)
+  [How to do logging](https://github.com/thijse/Arduino-Log)
 
 5. **Templating**
    
-    Use a template string and transform that using data labels. Perfect for creating payloads for pushing data to external services.
+  Use a template string and transform that using data labels. Perfect for creating payloads for pushing data to external services.
 
 6. **Push**
 
-    Pushing data to external endpoints using either; HTTP GET, HTTP POST, INFLUXDB v2 or MQTT. Supports SSL.
+  Pushing data to external endpoints using either; HTTP GET, HTTP POST, INFLUXDB v2 or MQTT. Supports SSL.
 
 7. **Performance profiling**
 
-    Profile code segments and push result to an influx database for later analysis.
+  Profile code segments and push result to an influx database for later analysis.
 
 8. **Utils**
 
-    Conversion functions between volumes, weight and temperature.
+  Conversion functions between volumes, weight and temperature.
 
 # Code samples
 There is an example application with all included files for platformio. So this section will highlight the main parts for using the framework. It consists of 3 parts:
 * src - Source and Header files for the classes
-* html - HTML files that needs to be Minified (made smaller). See VSCODE Minify plugin.
-* test - Example json files that can be used to test html parts. 
 * platformio.ini - Build file for platformio in VSCODE
 
 ## class BaseConfig
@@ -108,8 +136,8 @@ class DemoConfig : public BaseConfig {
  public:
   DemoConfig(String baseMDNS, String fileName);
 
-  void createJson(DynamicJsonDocument& doc, bool skipSecrets = true);
-  void parseJson(DynamicJsonDocument& doc);
+  void createJson(JsonObject& doc);
+  void parseJson(JsonObject& doc);
 
   // Add your get set methods
   void setParam(String& p);
@@ -122,17 +150,17 @@ This is an basic implementation, you need to call the relevant methods in the ba
 DemoConfig::DemoConfig(String baseMDNS, String fileName)
     : BaseConfig(baseMDNS, fileName) {}
 
-void DemoConfig::createJson(DynamicJsonDocument& doc, bool skipSecrets) {
+void DemoConfig::createJson(JsonObject& doc) {
   // Call base class functions
-  createJsonBase(doc, skipSecrets);
-  createJsonWifi(doc, skipSecrets);
-  createJsonOta(doc, skipSecrets);
-  createJsonPush(doc, skipSecrets);
+  createJsonBase(doc);
+  createJsonWifi(doc);
+  createJsonOta(doc);
+  createJsonPush(doc);
 
   // Handle project specific config
 }
 
-void DemoConfig::parseJson(DynamicJsonDocument& doc) {
+void DemoConfig::parseJson(JsonObject& doc) {
   // Call base class functions
   parseJsonBase(doc);
   parseJsonWifi(doc);
@@ -221,7 +249,8 @@ The following code will initialize the wifi setup but also check the double rese
 void setup() {
   myWifi.init();
   if (!myWifi.hasConfig() || myWifi.isDoubleResetDetected()) {
-    myWifi.startPortal(); // Start the wifi manager
+    myDemoWebServer.setWifiSetup(true); // Force the webserver to run in wifi mgmt mode
+    myWifi.startAP(); // Start the wifi manager
   }
 
   myWifi.connect(); // Perform the connection
@@ -250,17 +279,11 @@ void setup() {
 }
 ```
 
-## class BaseAsyncWebHandler and BaseWebHandler
-To create a webserver you need to create your own class that inherits from the base class. This example shows
-the async server but the structure is simular for the standard web handler.
-
-If you want to use the AsyncWebServer you need to add this define to the platformio.ini file.
-```cpp
--D USE_ASYNC_WEB
-```
+## class BaseWebServer
+To create a webserver you need to create your own class that inherits from the base class. 
 
 ```cpp
-class DemoAsyncWebHandler : public BaseAsyncWebHandler {
+class DemoWebServer : public BaseWebServer {
  private:
   DemoPush *_push;
 
@@ -270,48 +293,46 @@ class DemoAsyncWebHandler : public BaseAsyncWebHandler {
                     strlen(reinterpret_cast<const char *>(&testHtmStart[0])));
   }
 
-  void setupAsyncWebHandlers();
+  void setupWebHandlers();
 
   // Method to handle incoming request for a defined endpoint
   void webHandleStatus(AsyncWebServerRequest *request);
 
  public:
-  explicit DemoAsyncWebHandler(WebConfig *config, DemoPush *push);
+  explicit DemoBaseWebServer(WebConfig *config, DemoPush *push);
 };
 ```
 
 ```cpp
-DemoAsyncWebHandler::DemoAsyncWebHandler(WebConfig *config, DemoPush *push)
-    : BaseAsyncWebHandler(config) {
+DemoBaseWebServer::DemoBaseWebServer(WebConfig *config, DemoPush *push)
+    : BaseWebServer(config) {
   _push = push;
 }
 
-void DemoAsyncWebHandler::setupAsyncWebHandlers() {
-  BaseAsyncWebHandler::setupAsyncWebHandlers();
+void DemoBaseWebServer::setupWebHandlers() {
+  BaseWebServer::setupWebHandlers();
 
   // Add bindings for various endpoints
-  _server->on("/test.htm", std::bind(&DemoAsyncWebHandler::webReturnTestHtm, 
-      this, std::placeholders::_1));
-  _server->on("/api/status", HTTP_GET, std::bind(&DemoAsyncWebHandler::webHandleStatus, 
+  _server->on("/api/status", HTTP_GET, std::bind(&DemoBaseWebServer::webHandleStatus, 
       this, std::placeholders::_1));
 }
 ```
 
 Create a global instance of your class
 ```cpp
-DemoWebHandler myWebHandler(&myConfig, &myPush);
+DemoBaseWebServer myWebServer(&myConfig, &myPush);
 ```
 
 Initialize and run the webserver.
 ```cpp
 void setup() {
   if (myWifi.isConnected()) {
-    myAsyncWebHandler.setupAsyncWebServer();
+    myBaseWebServer.setuWebServer();
   }
 }
 
 void loop() {
-  myAsyncWebHandler.loop();
+  myBaseWebServer.loop();
 }
 ```
 
@@ -405,8 +426,8 @@ This library is based on the following projects, without the work of these autho
 - [https://github.com/mp-se/Arduino-Log](https://github.com/mp-se/Arduino-Log)
 - [https://github.com/mp-se/ArduinoJson](https://github.com/mp-se/ArduinoJson)
 - [https://github.com/mp-se/arduino-mqtt](https://github.com/mp-se/arduino-mqtt)
-- [https://github.com/mp-se/incbin](https://github.com/mp-se/incbin)
+- [https://github.com/mp-se/incbin](https://github.com/mp-se/incbin, esp8266 only)
 - [https://github.com/mp-se/ESPAsyncWebServer](https://github.com/mp-se/ESPAsyncWebServer)
 - [https://github.com/mp-se/ESPAsyncTCP](https://github.com/mp-se/ESPAsyncTCP)
-- [https://github.com/esp8266/Arduino](https://github.com/esp8266/Arduino)
-- [https://github.com/espressif/arduino-esp32](https://github.com/espressif/arduino-esp32)
+- [https://github.com/esp8266/Arduino](https://github.com/esp8266/Arduino, esp8266 only)
+- [https://github.com/espressif/arduino-esp32](https://github.com/espressif/arduino-esp32, esp32 only)

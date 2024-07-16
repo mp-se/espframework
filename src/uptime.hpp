@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2021-22 Magnus
+Copyright (c) 2024 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -21,47 +21,32 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-#ifndef SRC_DEMO_WEBHANDLER_HPP_
-#define SRC_DEMO_WEBHANDLER_HPP_
+#ifndef SRC_UPTIME_HPP_
+#define SRC_UPTIME_HPP_
 
-#include <basewebhandler.hpp>
-#include <demo-push.hpp>
+#include <Arduino.h>
 
-#if defined(ESP8266)
-#include <incbin.h>
-INCBIN_EXTERN(TestHtm);
-#else
-extern const uint8_t testHtmStart[] asm("_binary_html_test_min_htm_start");
-extern const uint8_t testHtmEnd[] asm("_binary_html_test_min_htm_end");
-#endif
-
-class DemoWebHandler : public BaseWebHandler {
+class Uptime {
  private:
-  DemoPush* _push;
-
-#if defined(ESP8266)
-  void webReturnTestHtm() {
-    _server->send_P(200, "text/html", (const char*)gTestHtmData, gTestHtmSize);
-  }
-#else
-  void webReturnTestHtm() {
-    _server->send_P(200, "text/html", (const char*)testHtmStart,
-                    strlen(reinterpret_cast<const char*>(&testHtmStart[0])));
-  }
-#endif
-
-  void setupWebHandlers();
-
-  void webHandleStatus();
-  void webHandlePushHttpPost();
-  void webHandlePushHttpGet();
-  void webHandlePushHttpMqtt();
-  void webHandlePushHttpInfluxDb2();
+  uint64_t _startTime = 0;
+  int _seconds;
+  int _minutes;
+  int _hours;
+  int _days;
 
  public:
-  explicit DemoWebHandler(WebConfig* config, DemoPush* push);
+  Uptime() { _startTime = millis(); }
+
+  void calculate();
+
+  int getSeconds() { return _seconds; }
+  int getMinutes() { return _minutes; }
+  int getHours() { return _hours; }
+  int getDays() { return _days; }
 };
 
-#endif  // SRC_DEMO_WEBHANDLER_HPP_
+extern Uptime myUptime;
+
+#endif  // SRC_UPTIME_HPP_
 
 // EOF

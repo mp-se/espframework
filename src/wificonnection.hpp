@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2021-23 Magnus
+Copyright (c) 2021-2024 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,14 +25,21 @@ SOFTWARE.
 #define SRC_WIFICONNECTION_HPP_
 
 #if defined(ESP8266)
+#include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #else
+#include <WiFi.h>
 #include <HTTPClient.h>
 #endif
+#include <DNSServer.h>
 #include <LittleFS.h>
 #include <WiFiUdp.h>
 
 #include <interface.hpp>
+
+#if defined(ESP8266)
+#define wifi_mode_t WiFiMode_t
+#endif
 
 class WifiConnection {
  private:
@@ -42,6 +49,7 @@ class WifiConnection {
   String _userSSID;
   String _userPWD;
   WifiConfig* _wifiConfig;
+  DNSServer* _dnsServer = NULL;
 
   // Double reset
   uint32_t _timer = 0;
@@ -49,7 +57,7 @@ class WifiConnection {
   uint8_t _resetCounter = 0;
   const uint8_t _minResetCount = 2;
 
-  void connectAsync(int wifiIndex);
+  void connectAsync(String ssid, String pass, wifi_mode_t mode);
   bool waitForConnection(int maxTime);
   void readReset();
   void writeReset();
@@ -58,16 +66,21 @@ class WifiConnection {
   WifiConnection(WifiConfig* cfg, String apSSID, String apPWD, String apMDNS,
                  String userSSID = "", String userPWD = "");
   void init();
-  void timeSync();
+  void timeSync(String timeZone = "");
 
-  bool connect();
+  bool connect(bool wifiDirect, wifi_mode_t mode = WIFI_STA);
+  bool connect(wifi_mode_t mode = WIFI_STA) { return connect(false, mode); }
   bool disconnect();
   bool isConnected();
   bool isDoubleResetDetected();
   void stopDoubleReset();
+  void setAP(String apSSID, String apPWD) {
+    _apSSID = apSSID;
+    _apPWD = apPWD;
+  }
+  void startAP(wifi_mode_t mode = WIFI_AP);
   bool hasConfig();
   String getIPAddress();
-  void startPortal();
 
   void loop();
 };

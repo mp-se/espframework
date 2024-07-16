@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2021-23 Magnus
+Copyright (c) 2021-2024 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,33 +24,8 @@ SOFTWARE.
 #ifndef SRC_BASECONFIG_HPP_
 #define SRC_BASECONFIG_HPP_
 
+#include <espframework.hpp>
 #include <interface.hpp>
-
-constexpr auto PARAM_ID = "id";
-constexpr auto PARAM_MDNS = "mdns";
-constexpr auto PARAM_SSID = "wifi-ssid";
-constexpr auto PARAM_PASS = "wifi-pass";
-constexpr auto PARAM_SSID2 = "wifi-ssid2";
-constexpr auto PARAM_PASS2 = "wifi-pass2";
-constexpr auto PARAM_OTA_URL = "ota-url";
-constexpr auto PARAM_TEMP_FORMAT = "temp-format";
-constexpr auto PARAM_TARGET_HTTP_POST = "http-post-target";
-constexpr auto PARAM_HEADER1_HTTP_POST = "http-post-header1";
-constexpr auto PARAM_HEADER2_HTTP_POST = "http-post-header2";
-constexpr auto PARAM_TARGET_HTTP_GET = "http-get-target";
-constexpr auto PARAM_HEADER1_HTTP_GET = "http-get-header1";
-constexpr auto PARAM_HEADER2_HTTP_GET = "http-get-header2";
-constexpr auto PARAM_TARGET_INFLUXDB2 = "influxdb2-target";
-constexpr auto PARAM_ORG_INFLUXDB2 = "influxdb2-org";
-constexpr auto PARAM_BUCKET_INFLUXDB2 = "influxdb2-bucket";
-constexpr auto PARAM_TOKEN_INFLUXDB2 = "influxdb2-token";
-constexpr auto PARAM_TARGET_MQTT = "mqtt-target";
-constexpr auto PARAM_PORT_MQTT = "mqtt-port";
-constexpr auto PARAM_USER_MQTT = "mqtt-user";
-constexpr auto PARAM_PASS_MQTT = "mqtt-pass";
-constexpr auto PARAM_WIFI_PORTAL_TIMEOUT = "wifi-portal-timeout";
-constexpr auto PARAM_WIFI_CONNECT_TIMEOUT = "wifi-connect-timeout";
-constexpr auto PARAM_PUSH_TIMEOUT = "push-timeout";
 
 class BaseConfig : public WifiConfig,
                    public OtaConfig,
@@ -61,6 +36,8 @@ class BaseConfig : public WifiConfig,
   String _mDNS;
   String _wifiSSID[2] = {"", ""};
   String _wifiPASS[2] = {"", ""};
+  String _wifiDirectSSID = "";
+  String _wifiDirectPASS = "";
   int _wifiConnectionTimeout = 30;
   int _wifiPortalTimeout = 120;
 
@@ -71,6 +48,9 @@ class BaseConfig : public WifiConfig,
   String _targetHttpPost;
   String _header1HttpPost = "Content-Type: application/json";
   String _header2HttpPost;
+  String _targetHttpPost2;
+  String _header1HttpPost2 = "Content-Type: application/json";
+  String _header2HttpPost2;
   String _targetHttpGet;
   String _header1HttpGet;
   String _header2HttpGet;
@@ -88,7 +68,8 @@ class BaseConfig : public WifiConfig,
   String _id;
   char _tempFormat = 'C';
   String _fileName;
-  int _dynamicJsonSize = 2000;
+  int _dynamicJsonSize;
+  bool _darkMode = false;
 
   void formatFileSystem();
 
@@ -96,18 +77,18 @@ class BaseConfig : public WifiConfig,
  protected:
   bool _saveNeeded;
 
-  void createJsonBase(DynamicJsonDocument& doc, bool skipSecrets);
-  void createJsonOta(DynamicJsonDocument& doc, bool skipSecrets);
-  void createJsonWifi(DynamicJsonDocument& doc, bool skipSecrets);
-  void createJsonPush(DynamicJsonDocument& doc, bool skipSecrets);
+  void createJsonBase(JsonObject& doc);
+  void createJsonOta(JsonObject& doc);
+  void createJsonWifi(JsonObject& doc);
+  void createJsonPush(JsonObject& doc);
 
-  void parseJsonBase(DynamicJsonDocument& doc);
-  void parseJsonOta(DynamicJsonDocument& doc);
-  void parseJsonWifi(DynamicJsonDocument& doc);
-  void parseJsonPush(DynamicJsonDocument& doc);
+  void parseJsonBase(JsonObject& doc);
+  void parseJsonOta(JsonObject& doc);
+  void parseJsonWifi(JsonObject& doc);
+  void parseJsonPush(JsonObject& doc);
 
  public:
-  BaseConfig(String baseMDNS, String fileName, int dynamicJsonSize = 2000);
+  BaseConfig(String baseMDNS, String fileName, int dynamicJsonSize);
 
   // WifiConfig
   const char* getMDNS() { return _mDNS.c_str(); }
@@ -123,6 +104,31 @@ class BaseConfig : public WifiConfig,
   const char* getWifiPass(int idx) { return _wifiPASS[idx].c_str(); }
   void setWifiPass(String s, int idx) {
     _wifiPASS[idx] = s;
+    _saveNeeded = true;
+  }
+  const char* getWifiDirectSSID() { return _wifiDirectSSID.c_str(); }
+  void setWifiDirectSSID(String s) {
+    _wifiDirectSSID = s;
+    _saveNeeded = true;
+  }
+  const char* getWifiDirectPass() { return _wifiDirectPASS.c_str(); }
+  void setWifiDirectPass(String s) {
+    _wifiDirectPASS = s;
+    _saveNeeded = true;
+  }
+  bool dualWifiConfigured() {
+    return _wifiSSID[0].length() > 0 && _wifiSSID[1].length() > 0 ? true
+                                                                  : false;
+  }
+  void swapPrimaryWifi() {
+    String s = _wifiSSID[0];
+    _wifiSSID[0] = _wifiSSID[1];
+    _wifiSSID[1] = s;
+
+    String p = _wifiPASS[0];
+    _wifiPASS[0] = _wifiPASS[1];
+    _wifiPASS[1] = p;
+
     _saveNeeded = true;
   }
   int getWifiConnectionTimeout() { return _wifiConnectionTimeout; }
@@ -150,9 +156,16 @@ class BaseConfig : public WifiConfig,
 
   // PushConfig
   bool hasTargetHttpPost() { return _targetHttpPost.length() ? true : false; }
+  bool hasTargetHttpPost2() { return _targetHttpPost2.length() ? true : false; }
   bool hasTargetHttpGet() { return _targetHttpGet.length() ? true : false; }
   bool hasTargetInfluxDb2() { return _targetInfluxDb2.length() ? true : false; }
   bool hasTargetMqtt() { return _targetMqtt.length() ? true : false; }
+
+  bool isHttpPostSSL() { return _targetHttpPost.startsWith("https://"); }
+  bool isHttpPost2SSL() { return _targetHttpPost2.startsWith("https://"); }
+  bool isHttpGetSSL() { return _targetHttpGet.startsWith("https://"); }
+  bool isHttpInfluxDb2SSL() { return _targetInfluxDb2.startsWith("https://"); }
+  bool isMqttSSL() { return _portMqtt > 8000 ? true : false; }
 
   const char* getTargetHttpPost() { return _targetHttpPost.c_str(); }
   void setTargetHttpPost(String target) {
@@ -167,6 +180,22 @@ class BaseConfig : public WifiConfig,
   const char* getHeader2HttpPost() { return _header2HttpPost.c_str(); }
   void setHeader2HttpPost(String header) {
     _header2HttpPost = header;
+    _saveNeeded = true;
+  }
+
+  const char* getTargetHttpPost2() { return _targetHttpPost2.c_str(); }
+  void setTargetHttpPost2(String target) {
+    _targetHttpPost2 = target;
+    _saveNeeded = true;
+  }
+  const char* getHeader1HttpPost2() { return _header1HttpPost2.c_str(); }
+  void setHeader1HttpPost2(String header) {
+    _header1HttpPost2 = header;
+    _saveNeeded = true;
+  }
+  const char* getHeader2HttpPost2() { return _header2HttpPost2.c_str(); }
+  void setHeader2HttpPost2(String header) {
+    _header2HttpPost2 = header;
     _saveNeeded = true;
   }
 
@@ -241,14 +270,22 @@ class BaseConfig : public WifiConfig,
   bool isTempFormatC() { return _tempFormat == 'C' ? true : false; }
   bool isTempFormatF() { return _tempFormat == 'F' ? true : false; }
 
+  bool getDarkMode() { return _darkMode; }
+  void setDarkMode(bool b) {
+    _darkMode = b;
+    _saveNeeded = true;
+  }
+
   // Functions
-  virtual void createJson(DynamicJsonDocument& doc, bool skipSecrets = true) {}
-  virtual void parseJson(DynamicJsonDocument& doc) {}
+  virtual void createJson(JsonObject& doc) {}
+  virtual void parseJson(JsonObject& doc) {}
 
   bool saveFile();
   bool loadFile();
+  bool saveFileWifiOnly();
   void checkFileSystem();
   bool isSaveNeeded() { return _saveNeeded; }
+  void setSaveNeeded() { _saveNeeded = true; }
 };
 
 #endif  // SRC_BASECONFIG_HPP_

@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2023 Magnus
+Copyright (c) 2023-2024 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,10 +24,9 @@ SOFTWARE.
 #ifndef SRC_SERIALWS_HPP_
 #define SRC_SERIALWS_HPP_
 
-#if defined(USE_ASYNC_WEB)
-
-#include <Arduino.h>
 #include <Print.h>
+
+#include <espframework.hpp>
 
 #if defined(ESP32)
 #include <freertos/FreeRTOS.h>
@@ -41,13 +40,6 @@ SOFTWARE.
 #include <ESPAsyncWebServer.h>
 #endif
 
-#if defined(ESP8266)
-#include <incbin.h>
-INCBIN_EXTERN(WebSocketHtm);
-#else
-extern const uint8_t webSocketHtmStart[] asm("_binary_html_ws_min_htm_start");
-#endif
-
 class SerialWebSocket : public Print {
  protected:
   AsyncWebServer *_server = 0;
@@ -55,19 +47,6 @@ class SerialWebSocket : public Print {
   Print *_secondayLog = 0;
   uint8_t _buf[40] = {0};
   uint32_t _bufSize = 0;
-
-#if defined(ESP8266)
-  void webReturnWebSocketHtm(AsyncWebServerRequest *request) {
-    request->send_P(200, "text/html", (const uint8_t *)gWebSocketHtmData,
-                    gWebSocketHtmSize);
-  }
-#else
-  void webReturnWebSocketHtm(AsyncWebServerRequest *request) {
-    request->send_P(
-        200, "text/html", (const uint8_t *)webSocketHtmStart,
-        strlen(reinterpret_cast<const char *>(&webSocketHtmStart[0])));
-  }
-#endif
 
  public:
   SerialWebSocket() {}
@@ -80,8 +59,6 @@ class SerialWebSocket : public Print {
     if (_webSocket) _webSocket->cleanupClients();
   }
 };
-
-#endif  // USE_ASYNC_WEB
 
 #endif  // SRC_SERIALWS_HPP_
 

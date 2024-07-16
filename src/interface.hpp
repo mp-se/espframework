@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2021-23 Magnus
+Copyright (c) 2021-2024 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -36,14 +36,14 @@ class OtaConfig {
 
 class WebConfig {
  public:
-  virtual void createJson(DynamicJsonDocument& doc,
-                          bool skipSecrets = true) = 0;
-  virtual void parseJson(DynamicJsonDocument& doc);
+  virtual void createJson(JsonObject& doc);
+  virtual void parseJson(JsonObject& doc);
 
   virtual bool saveFile();
 
   virtual const char* getID();
   virtual const char* getMDNS();
+  virtual int getWifiPortalTimeout();
 };
 
 class WifiConfig {
@@ -60,11 +60,17 @@ class WifiConfig {
   virtual const char* getWifiPass(int idx);
   virtual void setWifiPass(String s, int idx);
 
+  virtual const char* getWifiDirectSSID();
+  virtual void setWifiDirectSSID(String s);
+  virtual const char* getWifiDirectPass();
+  virtual void setWifiDirectPass(String s);
+
   virtual bool saveFile();
 };
 
 class PushConfig {
  public:
+  virtual const char* getID();
   virtual const char* getMDNS();
 
   virtual int getPushTimeout();
@@ -77,6 +83,14 @@ class PushConfig {
   virtual const char* getHeader2HttpPost();
   virtual void setHeader2HttpPost(String header);
   virtual bool hasTargetHttpPost();
+
+  virtual const char* getTargetHttpPost2() = 0;
+  virtual void setTargetHttpPost2(String target);
+  virtual const char* getHeader1HttpPost2();
+  virtual void setHeader1HttpPost2(String header);
+  virtual const char* getHeader2HttpPost2();
+  virtual void setHeader2HttpPost2(String header);
+  virtual bool hasTargetHttpPost2();
 
   virtual const char* getTargetHttpGet();
   virtual void setTargetHttpGet(String target);

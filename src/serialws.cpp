@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2023 Magnus
+Copyright (c) 2023-2024 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -21,24 +21,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-#if defined(USE_ASYNC_WEB)
 #include <log.hpp>
 #include <serialws.hpp>
 
-#if defined(ESP8266)
-#include <incbin.h>
-INCBIN(WebSocketHtm, "html/ws.min.htm");
-#endif
-
 void SerialWebSocket::begin(AsyncWebServer *server, Print *secondary) {
   Log.notice(F("WS  : Starting serial websocket" CR));
-
   _server = server;
   _secondayLog = secondary;
-  _server->on("/serial", HTTP_GET,
-              std::bind(&SerialWebSocket::webReturnWebSocketHtm, this,
-                        std::placeholders::_1));
-
   _webSocket = new AsyncWebSocket("/serialws");
   _server->addHandler(_webSocket);
 }
@@ -64,7 +53,5 @@ void SerialWebSocket::flush() {
   memset(_buf, 0, sizeof(_buf));
   _bufSize = 0;
 }
-
-#endif  // USE_ASYNC_WEB
 
 // EOF

@@ -1,9 +1,9 @@
 # Prerequisites
 .pio/*
 .vscode/*
-example/test/__pycache__
+__pycache__
 # These files are under examples and should not be checked in.
-script/*
+script/
 src/demo*.*
 platformio.ini
 html/*
@@ -12,3 +12,4 @@ test/*
 /wokwi.toml
 /partitions.csv
 /output.map
+.DS_Store

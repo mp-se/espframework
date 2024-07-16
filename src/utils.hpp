@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2021-23 Magnus
+Copyright (c) 2021-2024 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,8 +24,6 @@ SOFTWARE.
 #ifndef SRC_UTILS_HPP_
 #define SRC_UTILS_HPP_
 
-#include <Arduino.h>
-
 float convertCtoF(float c);
 float convertFtoC(float f);
 float convertKGtoLBS(float kg);
@@ -34,6 +32,8 @@ float convertCLtoUSOZ(float cl);
 float convertCLtoUKOZ(float cl);
 float convertUSOZtoCL(float usoz);
 float convertUKOZtoCL(float ukoz);
+double convertToPlato(double sg);
+double convertToSG(double plato);
 
 float reduceFloatPrecision(float f, int dec);
 char* convertFloatToString(float f, char* buf, int dec = 2);
@@ -42,6 +42,13 @@ void tcp_cleanup();
 void deepSleep(int t);
 
 void printHeap(String prefix);
+
+void forcedReset();
+
+void checkResetReason();
+
+String urldecode(String str);
+String urlencode(String str);
 
 #endif  // SRC_UTILS_HPP_
 

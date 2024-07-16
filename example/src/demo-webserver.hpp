@@ -21,24 +21,25 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-#include <templating.hpp>
+#ifndef SRC_DEMO_WEBSERVER_HPP_
+#define SRC_DEMO_WEBSERVER_HPP_
 
-// the useDefaultTemplate param is there to support unit tests.
-const char* TemplatingEngine::create(const char* base) {
-#if LOG_LEVEL == 6
-  Log.verbose(F("TPL : Base '%s'." CR), base);
-#endif
+#include <basewebserver.hpp>
+#include <demo-push.hpp>
 
-  // Insert data into template.
-  transform(base);
+class DemoWebServer : public BaseWebServer {
+ private:
+  DemoPush *_push;
 
-#if LOG_LEVEL == 6
-  Log.verbose(F("TPL : Transformed '%s'." CR), _output == NULL ? "" : _output);
-#endif
+  void setupWebHandlers();
+  void webHandleStatus(AsyncWebServerRequest *request);
+  void webHandleConfigRead(AsyncWebServerRequest *request);
+  void webHandleConfigWrite(AsyncWebServerRequest *request, JsonVariant &json);
 
-  if (_output) return _output;
+ public:
+  explicit DemoWebServer(WebConfig *config, DemoPush *push);
+};
 
-  return "";
-}
+#endif  // SRC_DEMO_WEBSERVER_HPP_
 
 // EOF

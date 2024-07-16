@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2021-22 Magnus
+Copyright (c) 2024 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -21,18 +21,22 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-#if defined(ESP8266)
-#define INCBIN_OUTPUT_SECTION ".irom.text"
-#include <incbin.h>
+#include <uptime.hpp>
 
-// These are used in the webhandler class and needs to be defined.
-INCBIN(IndexHtm, "html/index.min.htm");
-INCBIN(ConfigHtm, "html/config.min.htm");
-INCBIN(AboutHtm, "html/about.min.htm");
-INCBIN(UploadHtm, "html/upload.min.htm");
+constexpr auto SECONDS = 1000;
+constexpr auto MINUTES = 60 * 1000;
+constexpr auto HOURS = 60 * 60 * 1000;
+constexpr auto DAYS = 24 * 60 * 60 * 1000;
 
-// Extensions for the demo web handler
-INCBIN(TestHtm, "html/test.min.htm");
-#endif
+Uptime myUptime;
+
+void Uptime::calculate() {
+  uint64_t t = millis() - _startTime;
+
+  _seconds = static_cast<int>(floor((t % MINUTES) / SECONDS));
+  _minutes = static_cast<int>(floor((t % HOURS) / MINUTES));
+  _hours = static_cast<int>(floor((t % DAYS) / HOURS));
+  _days = static_cast<int>(floor(t / DAYS));
+}
 
 // EOF

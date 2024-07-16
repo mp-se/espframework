@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2023 Magnus
+Copyright (c) 2023-2024 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,8 +23,6 @@ SOFTWARE.
  */
 #ifndef SRC_LED_HPP_
 #define SRC_LED_HPP_
-
-#include <Arduino.h>
 
 enum LedColor {
 #if defined(ESP32C3) || defined(ESP32S3)
