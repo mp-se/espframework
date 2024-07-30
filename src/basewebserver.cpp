@@ -40,7 +40,7 @@ SOFTWARE.
 INCBIN(IndexHtml, "html/index.html");
 INCBIN(AppJs, "html/app.js.gz");
 INCBIN(AppCss, "html/app.css.gz");
-INCBIN(Favicon, "html/favicon.ico");
+INCBIN(FaviconIco, "html/favicon.ico.gz");
 #endif
 
 BaseWebServer::BaseWebServer(WebConfig *config, int dynamicJsonSize) {
