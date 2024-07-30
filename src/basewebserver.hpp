@@ -52,6 +52,7 @@ SOFTWARE.
 INCBIN_EXTERN(IndexHtml);
 INCBIN_EXTERN(AppJs);
 INCBIN_EXTERN(AppCss);
+INCBIN_EXTERN(Favicon);
 #else
 extern const uint8_t indexHtmlStart[] asm("_binary_html_index_html_start");
 extern const uint8_t indexHtmlEnd[] asm("_binary_html_index_html_end");
@@ -59,6 +60,8 @@ extern const uint8_t appJsStart[] asm("_binary_html_app_js_gz_start");
 extern const uint8_t appJsEnd[] asm("_binary_html_app_js_gz_end");
 extern const uint8_t appCssStart[] asm("_binary_html_app_css_gz_start");
 extern const uint8_t appCssEnd[] asm("_binary_html_app_css_gz_end");
+extern const uint8_t faviconStart[] asm("_binary_html_favicon_ico_start");
+extern const uint8_t faviconEnd[] asm("_binary_html_favicon_ico_end");
 #endif
 
 class BaseWebServer {
@@ -111,6 +114,12 @@ class BaseWebServer {
     response->addHeader("Content-Encoding", "gzip");
     request->send(response);
   }
+  void webReturnFavicon(AsyncWebServerRequest *request) {
+    Log.notice(F("WEB : webServer callback for /favicon.ico (Memory)." CR));
+    AsyncWebServerResponse *response = request->beginResponse_P(
+        200, "image/x-icon", (const uint8_t *)gFaviconData, gFaviconSize);
+    request->send(response);
+  }
 #else
   void webReturnIndexHtml(AsyncWebServerRequest *request) {
     Log.notice(F("WEB : webServer callback for /index.html (Memory)." CR));
@@ -142,6 +151,14 @@ class BaseWebServer {
         reinterpret_cast<uint32_t>(&appCssEnd[0]) -
             reinterpret_cast<uint32_t>(&appCssStart[0]));
     response->addHeader("Content-Encoding", "gzip");
+    request->send(response);
+  }
+  void webReturnFavicon(AsyncWebServerRequest *request) {
+    Log.notice(F("WEB : webServer callback for /favicon.ico (Memory)." CR));
+    AsyncWebServerResponse *response = request->beginResponse_P(
+        200, "image/x-icon", (const uint8_t *)faviconStart,
+        reinterpret_cast<uint32_t>(&faviconEnd[0]) -
+            reinterpret_cast<uint32_t>(&faviconStart[0]));
     request->send(response);
   }
 #endif

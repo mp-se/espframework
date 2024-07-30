@@ -40,6 +40,7 @@ SOFTWARE.
 INCBIN(IndexHtml, "html/index.html");
 INCBIN(AppJs, "html/app.js.gz");
 INCBIN(AppCss, "html/app.css.gz");
+INCBIN(Favicon, "html/favicon.ico");
 #endif
 
 BaseWebServer::BaseWebServer(WebConfig *config, int dynamicJsonSize) {
@@ -138,12 +139,12 @@ void BaseWebServer::webHandleUploadFirmware(AsyncWebServerRequest *request,
 #endif
     if (!Update.begin(request->contentLength(), U_FLASH, LED_BUILTIN)) {
       _uploadReturn = 500;
-      Log.error(F("WEB : Not enough space to store for this firmware." CR));
+      Log.error(F("WEB : Not enough space to store for this firmware (%d)." CR), request->contentLength());
     } else {
       _uploadReturn = 200;
       Log.notice(
-          F("WEB : Start firmware upload, max sketch size %d kb, size %d." CR),
-          maxSketchSpace / 1024, request->contentLength());
+          F("WEB : Start firmware upload, max sketch size %d kb, size %d kb." CR),
+          maxSketchSpace / 1024, request->contentLength() / 1024);
     }
   }
 
@@ -441,6 +442,8 @@ void BaseWebServer::setupWebHandlers() {
   _server->on("/js/app.js", std::bind(&BaseWebServer::webReturnAppJs, this,
                                       std::placeholders::_1));
   _server->on("/css/app.css", std::bind(&BaseWebServer::webReturnAppCss, this,
+                                        std::placeholders::_1));
+  _server->on("/favicon.ico", std::bind(&BaseWebServer::webReturnFavicon, this,
                                         std::placeholders::_1));
 
   AsyncCallbackJsonWebHandler *handler;
