@@ -84,6 +84,7 @@ The following defines configures the framework for the target platform
   * index.html
   * app.js.gz
   * app.css.gz
+  * favicon.ico.gz
 
   See the example project https://mp-se/espframework-ui.
 
