@@ -27,6 +27,8 @@ SOFTWARE.
 #else
 #include <HTTPUpdate.h>
 #include <WiFi.h>
+#include <WiFiClient.h>
+#include <WiFiClientSecure.h>
 #define ESPhttpUpdate httpUpdate
 #endif
 

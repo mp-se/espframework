@@ -27,8 +27,8 @@ SOFTWARE.
 #include <utils.hpp>
 
 #if !defined(ESP8266)
-#include <esp_int_wdt.h>
 #include <esp_task_wdt.h>
+#include <esp_chip_info.h>
 #else
 #include <user_interface.h>
 #endif
@@ -94,10 +94,12 @@ void printHeap(String prefix) {
 
 void forcedReset() {
 #if !defined(ESP8266)
+  esp_task_wdt_config_t task = { 1000, 0, false };
+  
   ledOff();
   LittleFS.end();
   delay(100);
-  esp_task_wdt_init(1, true);
+  esp_task_wdt_init(&task);
   esp_task_wdt_add(NULL);
   while (true) {
     // wait for watchdog timer to be triggered
