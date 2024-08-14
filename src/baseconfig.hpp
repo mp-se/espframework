@@ -66,7 +66,7 @@ class BaseConfig : public WifiConfig,
 
   // BaseConfig
   String _id;
-  char _tempFormat = 'C';
+  char _tempUnit = 'C';
   String _fileName;
   int _dynamicJsonSize;
   bool _darkMode = false;
@@ -260,15 +260,28 @@ class BaseConfig : public WifiConfig,
   // Base
   const char* getID() { return _id.c_str(); }
 
-  char getTempFormat() { return _tempFormat; }
+  char getTempFormat() {
+    return getTempUnit();
+  }  // @deprecated, use setTempUnit()
   void setTempFormat(char c) {
+    setTempUnit(c);
+  }  // @deprecated, use setTempUnit()
+  bool isTempFormatC() {
+    return isTempUnitC();
+  }  // @deprecated, use isTempUnitC()
+  bool isTempFormatF() {
+    return isTempUnitF();
+  }  // @deprecated, use isTempUnitF()
+
+  char getTempUnit() { return _tempUnit; }
+  void setTempUnit(char c) {
     if (c == 'C' || c == 'F') {
-      _tempFormat = c;
+      _tempUnit = c;
       _saveNeeded = true;
     }
   }
-  bool isTempFormatC() { return _tempFormat == 'C' ? true : false; }
-  bool isTempFormatF() { return _tempFormat == 'F' ? true : false; }
+  bool isTempUnitC() { return _tempUnit == 'C' ? true : false; }
+  bool isTempUnitF() { return _tempUnit == 'F' ? true : false; }
 
   bool getDarkMode() { return _darkMode; }
   void setDarkMode(bool b) {

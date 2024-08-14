@@ -125,7 +125,6 @@ void BaseConfig::createJsonPush(JsonObject& doc) {
   doc[PARAM_MQTT_USER] = getUserMqtt();
   doc[PARAM_MQTT_PASS] = getPassMqtt();
   doc[PARAM_PUSH_TIMEOUT] = getPushTimeout();
-  doc[PARAM_DARK_MODE] = getDarkMode();
 }
 
 void BaseConfig::parseJsonPush(JsonObject& doc) {
@@ -171,9 +170,6 @@ void BaseConfig::parseJsonPush(JsonObject& doc) {
   if (!doc[PARAM_PUSH_TIMEOUT].isNull())
     setPushTimeout(doc[PARAM_PUSH_TIMEOUT].as<int>());
 
-  if (!doc[PARAM_DARK_MODE].isNull())
-    setDarkMode(doc[PARAM_DARK_MODE].as<bool>());
-
   _saveNeeded = true;
 }
 
@@ -183,6 +179,8 @@ void BaseConfig::createJsonBase(JsonObject& doc) {
 #endif
   doc[PARAM_ID] = getID();
   doc[PARAM_TEMP_FORMAT] = String(getTempFormat());
+  doc[PARAM_TEMP_UNIT] = String(getTempFormat());
+  doc[PARAM_DARK_MODE] = getDarkMode();
 }
 
 void BaseConfig::parseJsonBase(JsonObject& doc) {
@@ -196,6 +194,13 @@ void BaseConfig::parseJsonBase(JsonObject& doc) {
     String s = doc[PARAM_TEMP_FORMAT];
     setTempFormat(s.charAt(0));
   }
+  if (!doc[PARAM_TEMP_UNIT].isNull()) {
+    String s = doc[PARAM_TEMP_UNIT];
+    setTempFormat(s.charAt(0));
+  }
+
+  if (!doc[PARAM_DARK_MODE].isNull())
+    setDarkMode(doc[PARAM_DARK_MODE].as<bool>());
 
   _saveNeeded = true;
 }
