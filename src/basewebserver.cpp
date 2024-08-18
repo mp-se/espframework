@@ -139,12 +139,13 @@ void BaseWebServer::webHandleUploadFirmware(AsyncWebServerRequest *request,
 #endif
     if (!Update.begin(request->contentLength(), U_FLASH, LED_BUILTIN)) {
       _uploadReturn = 500;
-      Log.error(F("WEB : Not enough space to store for this firmware (%d)." CR), request->contentLength());
+      Log.error(F("WEB : Not enough space to store for this firmware (%d)." CR),
+                request->contentLength());
     } else {
       _uploadReturn = 200;
-      Log.notice(
-          F("WEB : Start firmware upload, max sketch size %d kb, size %d kb." CR),
-          maxSketchSpace / 1024, request->contentLength() / 1024);
+      Log.notice(F("WEB : Start firmware upload, max sketch size %d kb, size "
+                   "%d kb." CR),
+                 maxSketchSpace / 1024, request->contentLength() / 1024);
     }
   }
 

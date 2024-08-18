@@ -166,9 +166,20 @@ void WifiConnection::loop() {
   }
 }
 
+const uint8_t *WifiConnection::findStrongestAP(String &ssid) {
+  int noNetwork = WiFi.scanNetworks(false, false);
+
+  for (int i = 0; i < noNetwork; i++) {
+    if (WiFi.SSID(i).equals(ssid)) return WiFi.BSSID(i);
+  }
+
+  return NULL;
+}
+
 void WifiConnection::connectAsync(String ssid, String pass, wifi_mode_t mode) {
   WiFi.persistent(true);
   WiFi.mode(mode);
+
 #if defined(ESP32C3)
   Log.notice(F("WIFI: Reducing wifi power for c3 chip." CR));
   WiFi.setTxPower(WIFI_POWER_8_5dBm);  // Required for ESP32C3 Mini
@@ -180,7 +191,13 @@ void WifiConnection::connectAsync(String ssid, String pass, wifi_mode_t mode) {
   } else {
     Log.notice(F("WIFI: Connecting to wifi using stored settings %s." CR),
                ssid);
-    WiFi.begin(ssid, pass);
+
+    if (_enableStrongestAP) {
+      const uint8_t *bssid = findStrongestAP(ssid);
+      WiFi.begin(ssid, pass, 0, bssid);
+    } else {
+      WiFi.begin(ssid, pass);
+    }
   }
 }
 
@@ -231,7 +248,7 @@ bool WifiConnection::connect(bool wifiDirect, wifi_mode_t mode) {
         if (waitForConnection(timeout)) {
           Log.notice(F("WIFI: Connected to second SSID %s." CR),
                      _wifiConfig->getWifiSSID(1));
-         return true;
+          return true;
         }
       }
 
