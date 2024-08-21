@@ -209,7 +209,7 @@ void WifiConnection::connectAsync(String ssid, String pass, wifi_mode_t mode) {
     Log.notice(F("WIFI: Connecting to wifi using stored settings %s." CR),
                ssid);
 
-    if (_enableStrongestAP) {
+    if (_wifiConfig->getWifiScanAP()) {
       const uint8_t *bssid = findStrongestAP(ssid);
       WiFi.begin(ssid, pass, 0, bssid);
       // WiFi.begin(ssid, pass, findStrongestChannel(ssid));

@@ -50,7 +50,6 @@ class WifiConnection {
   String _userPWD;
   WifiConfig* _wifiConfig;
   DNSServer* _dnsServer = NULL;
-  bool _enableStrongestAP = false;
 
   // Double reset
   uint32_t _timer = 0;
@@ -70,7 +69,6 @@ class WifiConnection {
   void init();
   void timeSync(String timeZone = "");
 
-  void enableStrongestAP() { _enableStrongestAP = true; }
   bool connect(bool wifiDirect, wifi_mode_t mode = WIFI_STA);
   bool connect(wifi_mode_t mode = WIFI_STA) { return connect(false, mode); }
   bool disconnect();

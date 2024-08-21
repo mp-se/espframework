@@ -75,12 +75,14 @@ constexpr auto JSON_BUFFER_SIZE_XL = 5000;
 // Config
 constexpr auto PARAM_ID = "id";
 constexpr auto PARAM_MDNS = "mdns";
+constexpr auto PARAM_CORS_ALLOWED = "cors_allowed";
 constexpr auto PARAM_SSID = "wifi_ssid";
 constexpr auto PARAM_PASS = "wifi_pass";
 constexpr auto PARAM_SSID2 = "wifi_ssid2";
 constexpr auto PARAM_PASS2 = "wifi_pass2";
 constexpr auto PARAM_DIRECT_SSID = "wifi_direct_ssid";
 constexpr auto PARAM_DIRECT_PASS = "wifi_direct_pass";
+constexpr auto PARAM_SCAN_AP = "wifi_scan_ap";
 constexpr auto PARAM_OTA_URL = "ota_url";
 constexpr auto PARAM_TEMP_FORMAT = "temp_format";  // Alias is temp_unit
 constexpr auto PARAM_TEMP_UNIT = "temp_unit";

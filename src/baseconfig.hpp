@@ -40,6 +40,7 @@ class BaseConfig : public WifiConfig,
   String _wifiDirectPASS = "";
   int _wifiConnectionTimeout = 30;
   int _wifiPortalTimeout = 120;
+  bool _wifiScanAP = false;
 
   // OtaConfig
   String _otaURL;
@@ -71,6 +72,13 @@ class BaseConfig : public WifiConfig,
   int _dynamicJsonSize;
   bool _darkMode = false;
 
+  // WebServer
+#if defined(ENABLE_REMOTE_UI_DEVELOPMENT)
+  bool _corsAllowed = true;
+#else
+  bool _corsAllowed = false;
+#endif
+
   void formatFileSystem();
 
   // Internal
@@ -89,6 +97,14 @@ class BaseConfig : public WifiConfig,
 
  public:
   BaseConfig(String baseMDNS, String fileName, int dynamicJsonSize);
+
+  // WebServer
+  bool getCorsAllowed() { return _corsAllowed; }
+  void setCorsAllowed(bool b) {
+    _corsAllowed = b;
+    _saveNeeded = true;
+  }
+  bool isCorsAllowed() { return getCorsAllowed(); }
 
   // WifiConfig
   const char* getMDNS() { return _mDNS.c_str(); }
@@ -139,6 +155,11 @@ class BaseConfig : public WifiConfig,
   int getWifiPortalTimeout() { return _wifiPortalTimeout; }
   void setWifiPortalTimeout(int t) {
     _wifiPortalTimeout = t;
+    _saveNeeded = true;
+  }
+  bool getWifiScanAP() { return _wifiScanAP; }
+  void setWifiScanAP(bool t) {
+    _wifiScanAP = t;
     _saveNeeded = true;
   }
 

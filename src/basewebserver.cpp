@@ -265,7 +265,6 @@ void BaseWebServer::webHandlePageNotFound(AsyncWebServerRequest *request) {
                 request->url().c_str());
 
   request->redirect("/");
-  // request->send(404, "application/json", "{\"message\":\"URL not found\"}");
 }
 
 void BaseWebServer::webHandleAuth(AsyncWebServerRequest *request) {
@@ -527,9 +526,10 @@ bool BaseWebServer::setupWebServer() {
 #endif
 
   setupWebHandlers();
-#if defined(ENABLE_REMOTE_UI_DEVELOPMENT)
-  DefaultHeaders::Instance().addHeader("Access-Control-Allow-Origin", "*");
-#endif
+  if (_webConfig->isCorsAllowed()) {
+    DefaultHeaders::Instance().addHeader("Access-Control-Allow-Origin", "*");
+  }
+
   _server->begin();
   Log.notice(F("WEB : Web server started." CR));
   return true;
