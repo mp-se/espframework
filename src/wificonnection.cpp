@@ -167,10 +167,27 @@ void WifiConnection::loop() {
 }
 
 const uint8_t *WifiConnection::findStrongestAP(String &ssid) {
-  int noNetwork = WiFi.scanNetworks(false, false);
+#if defined(ESP8266)
+  uint8 *ptr = (unsigned char *)ssid.c_str();
+  int noNetwork = WiFi.scanNetworks(false, false, 0, ptr);
+#else
+  int noNetwork = WiFi.scanNetworks(false, false, false, 300, 0, ssid.c_str());
+#endif
 
   for (int i = 0; i < noNetwork; i++) {
-    if (WiFi.SSID(i).equals(ssid)) return WiFi.BSSID(i);
+    Log.notice(F("WIFI: Found the following networks ssid: %s bssid: %s, rssi: "
+                 "%d channel: %d." CR),
+               WiFi.SSID(i).c_str(), WiFi.BSSIDstr(i).c_str(), WiFi.RSSI(i),
+               WiFi.channel(i));
+  }
+
+  for (int i = 0; i < noNetwork; i++) {
+    if (WiFi.SSID(i).equals(ssid)) {
+      Log.notice(F("WIFI: Using ssid: %s bssid: %s, rssi: %d channel: %d." CR),
+                 WiFi.SSID(i).c_str(), WiFi.BSSIDstr(i).c_str(), WiFi.RSSI(i),
+                 WiFi.channel(i));
+      return WiFi.BSSID(i);
+    }
   }
 
   return NULL;
@@ -195,6 +212,7 @@ void WifiConnection::connectAsync(String ssid, String pass, wifi_mode_t mode) {
     if (_enableStrongestAP) {
       const uint8_t *bssid = findStrongestAP(ssid);
       WiFi.begin(ssid, pass, 0, bssid);
+      // WiFi.begin(ssid, pass, findStrongestChannel(ssid));
     } else {
       WiFi.begin(ssid, pass);
     }
