@@ -49,10 +49,6 @@ The v1.x is different from the previous releases on the following:
 
 ## Compiler defines
 
-These are the defines used to configure the espframework
-
-- ENABLE_REMOTE_UI_DEVELOPMENT This will allow anyone to access the API's from other adresses (bypass CORS checks)
-
 The following defines configures the framework for the target platform
 
 - ESP8266 

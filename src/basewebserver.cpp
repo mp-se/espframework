@@ -233,19 +233,19 @@ void BaseWebServer::webHandlePageNotFound(AsyncWebServerRequest *request) {
   if (request->method() == HTTP_OPTIONS) {
     Log.notice(F("WEB : Got OPTIONS request for %s." CR),
                request->url().c_str());
-#if defined(ENABLE_REMOTE_UI_DEVELOPMENT)
-    AsyncWebServerResponse *resp = request->beginResponse(200);
-    resp->addHeader("Access-Control-Allow-Credentials", "true");
-    resp->addHeader("Access-Control-Allow-Methods",
-                    "GET,HEAD,OPTIONS,POST,PUT");
-    resp->addHeader(
-        "Access-Control-Allow-Headers",
-        "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, "
-        "Content-Type, Access-Control-Request-Method, "
-        "Access-Control-Request-Headers, Authorization");
-    request->send(resp);
-    return;
-#endif
+    if (_webConfig->isCorsAllowed()) {
+      AsyncWebServerResponse *resp = request->beginResponse(200);
+      resp->addHeader("Access-Control-Allow-Credentials", "true");
+      resp->addHeader("Access-Control-Allow-Methods",
+                      "GET,HEAD,OPTIONS,POST,PUT");
+      resp->addHeader(
+          "Access-Control-Allow-Headers",
+          "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, "
+          "Content-Type, Access-Control-Request-Method, "
+          "Access-Control-Request-Headers, Authorization");
+      request->send(resp);
+      return;
+    }
   }
 
   if (request->method() == HTTP_GET)
