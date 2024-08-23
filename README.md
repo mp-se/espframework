@@ -4,7 +4,7 @@
 
 # ESP framework
 
-This is a framework that I use in my own ESP projects as a base. It contains a lot of basic features that are needed. It has been tested with the following targets: ESP8266, ESP32, ESP32S2, ESP32C3, ESP32S3
+This is a framework that I use in my own ESP projects as a base. It contains a lot of basic features that are needed. It has been tested with the following targets: ESP8266, ESP32, ESP32S2, ESP32C3, ESP32S3, ESP32 PRO, ESP32S3 PRO
 
 - [ESP framework](#esp-framework)
   - [Features](#features)
@@ -48,10 +48,6 @@ The v1.x is different from the previous releases on the following:
 - ESP32S3
 
 ## Compiler defines
-
-These are the defines used to configure the espframework
-
-- ENABLE_REMOTE_UI_DEVELOPMENT This will allow anyone to access the API's from other adresses (bypass CORS checks)
 
 The following defines configures the framework for the target platform
 

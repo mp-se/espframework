@@ -40,6 +40,7 @@ class BaseConfig : public WifiConfig,
   String _wifiDirectPASS = "";
   int _wifiConnectionTimeout = 30;
   int _wifiPortalTimeout = 120;
+  bool _wifiScanAP = false;
 
   // OtaConfig
   String _otaURL;
@@ -66,10 +67,17 @@ class BaseConfig : public WifiConfig,
 
   // BaseConfig
   String _id;
-  char _tempFormat = 'C';
+  char _tempUnit = 'C';
   String _fileName;
   int _dynamicJsonSize;
   bool _darkMode = false;
+
+  // WebServer
+#if defined(ENABLE_REMOTE_UI_DEVELOPMENT)
+  bool _corsAllowed = true;
+#else
+  bool _corsAllowed = false;
+#endif
 
   void formatFileSystem();
 
@@ -89,6 +97,14 @@ class BaseConfig : public WifiConfig,
 
  public:
   BaseConfig(String baseMDNS, String fileName, int dynamicJsonSize);
+
+  // WebServer
+  bool getCorsAllowed() { return _corsAllowed; }
+  void setCorsAllowed(bool b) {
+    _corsAllowed = b;
+    _saveNeeded = true;
+  }
+  bool isCorsAllowed() { return getCorsAllowed(); }
 
   // WifiConfig
   const char* getMDNS() { return _mDNS.c_str(); }
@@ -139,6 +155,11 @@ class BaseConfig : public WifiConfig,
   int getWifiPortalTimeout() { return _wifiPortalTimeout; }
   void setWifiPortalTimeout(int t) {
     _wifiPortalTimeout = t;
+    _saveNeeded = true;
+  }
+  bool getWifiScanAP() { return _wifiScanAP; }
+  void setWifiScanAP(bool t) {
+    _wifiScanAP = t;
     _saveNeeded = true;
   }
 
@@ -260,15 +281,28 @@ class BaseConfig : public WifiConfig,
   // Base
   const char* getID() { return _id.c_str(); }
 
-  char getTempFormat() { return _tempFormat; }
+  char getTempFormat() {
+    return getTempUnit();
+  }  // @deprecated, use setTempUnit()
   void setTempFormat(char c) {
+    setTempUnit(c);
+  }  // @deprecated, use setTempUnit()
+  bool isTempFormatC() {
+    return isTempUnitC();
+  }  // @deprecated, use isTempUnitC()
+  bool isTempFormatF() {
+    return isTempUnitF();
+  }  // @deprecated, use isTempUnitF()
+
+  char getTempUnit() { return _tempUnit; }
+  void setTempUnit(char c) {
     if (c == 'C' || c == 'F') {
-      _tempFormat = c;
+      _tempUnit = c;
       _saveNeeded = true;
     }
   }
-  bool isTempFormatC() { return _tempFormat == 'C' ? true : false; }
-  bool isTempFormatF() { return _tempFormat == 'F' ? true : false; }
+  bool isTempUnitC() { return _tempUnit == 'C' ? true : false; }
+  bool isTempUnitF() { return _tempUnit == 'F' ? true : false; }
 
   bool getDarkMode() { return _darkMode; }
   void setDarkMode(bool b) {

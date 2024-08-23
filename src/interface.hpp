@@ -44,6 +44,8 @@ class WebConfig {
   virtual const char* getID();
   virtual const char* getMDNS();
   virtual int getWifiPortalTimeout();
+
+  virtual bool isCorsAllowed();
 };
 
 class WifiConfig {
@@ -52,6 +54,9 @@ class WifiConfig {
   virtual void setWifiConnectionTimeout(int t);
   virtual int getWifiPortalTimeout();
   virtual void setWifiPortalTimeout(int t);
+
+  virtual bool getWifiScanAP();
+  virtual void setWifiScanAP(bool b);
 
   virtual const char* getMDNS();
   virtual void setMDNS(String s);

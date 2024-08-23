@@ -25,11 +25,11 @@ SOFTWARE.
 #define SRC_WIFICONNECTION_HPP_
 
 #if defined(ESP8266)
-#include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
+#include <ESP8266WiFi.h>
 #else
-#include <WiFi.h>
 #include <HTTPClient.h>
+#include <WiFi.h>
 #endif
 #include <DNSServer.h>
 #include <LittleFS.h>
@@ -61,6 +61,7 @@ class WifiConnection {
   bool waitForConnection(int maxTime);
   void readReset();
   void writeReset();
+  const uint8_t* findStrongestAP(String& ssid);
 
  public:
   WifiConnection(WifiConfig* cfg, String apSSID, String apPWD, String apMDNS,

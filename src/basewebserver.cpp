@@ -139,12 +139,13 @@ void BaseWebServer::webHandleUploadFirmware(AsyncWebServerRequest *request,
 #endif
     if (!Update.begin(request->contentLength(), U_FLASH, LED_BUILTIN)) {
       _uploadReturn = 500;
-      Log.error(F("WEB : Not enough space to store for this firmware (%d)." CR), request->contentLength());
+      Log.error(F("WEB : Not enough space to store for this firmware (%d)." CR),
+                request->contentLength());
     } else {
       _uploadReturn = 200;
-      Log.notice(
-          F("WEB : Start firmware upload, max sketch size %d kb, size %d kb." CR),
-          maxSketchSpace / 1024, request->contentLength() / 1024);
+      Log.notice(F("WEB : Start firmware upload, max sketch size %d kb, size "
+                   "%d kb." CR),
+                 maxSketchSpace / 1024, request->contentLength() / 1024);
     }
   }
 
@@ -232,19 +233,19 @@ void BaseWebServer::webHandlePageNotFound(AsyncWebServerRequest *request) {
   if (request->method() == HTTP_OPTIONS) {
     Log.notice(F("WEB : Got OPTIONS request for %s." CR),
                request->url().c_str());
-#if defined(ENABLE_REMOTE_UI_DEVELOPMENT)
-    AsyncWebServerResponse *resp = request->beginResponse(200);
-    resp->addHeader("Access-Control-Allow-Credentials", "true");
-    resp->addHeader("Access-Control-Allow-Methods",
-                    "GET,HEAD,OPTIONS,POST,PUT");
-    resp->addHeader(
-        "Access-Control-Allow-Headers",
-        "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, "
-        "Content-Type, Access-Control-Request-Method, "
-        "Access-Control-Request-Headers, Authorization");
-    request->send(resp);
-    return;
-#endif
+    if (_webConfig->isCorsAllowed()) {
+      AsyncWebServerResponse *resp = request->beginResponse(200);
+      resp->addHeader("Access-Control-Allow-Credentials", "true");
+      resp->addHeader("Access-Control-Allow-Methods",
+                      "GET,HEAD,OPTIONS,POST,PUT");
+      resp->addHeader(
+          "Access-Control-Allow-Headers",
+          "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, "
+          "Content-Type, Access-Control-Request-Method, "
+          "Access-Control-Request-Headers, Authorization");
+      request->send(resp);
+      return;
+    }
   }
 
   if (request->method() == HTTP_GET)
@@ -264,7 +265,6 @@ void BaseWebServer::webHandlePageNotFound(AsyncWebServerRequest *request) {
                 request->url().c_str());
 
   request->redirect("/");
-  // request->send(404, "application/json", "{\"message\":\"URL not found\"}");
 }
 
 void BaseWebServer::webHandleAuth(AsyncWebServerRequest *request) {
@@ -526,9 +526,10 @@ bool BaseWebServer::setupWebServer() {
 #endif
 
   setupWebHandlers();
-#if defined(ENABLE_REMOTE_UI_DEVELOPMENT)
-  DefaultHeaders::Instance().addHeader("Access-Control-Allow-Origin", "*");
-#endif
+  if (_webConfig->isCorsAllowed()) {
+    DefaultHeaders::Instance().addHeader("Access-Control-Allow-Origin", "*");
+  }
+
   _server->begin();
   Log.notice(F("WEB : Web server started." CR));
   return true;
