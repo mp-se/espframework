@@ -52,7 +52,7 @@ void dumpErrorLog(const char *fname) {
     String s;
     do {
       s = f.readString();
-      Serial.print(s.c_str());
+      EspSerial.print(s.c_str());
     } while (s.length());
     f.close();
   }
@@ -65,34 +65,33 @@ void dumpErrorLog2() { dumpErrorLog(ERR_FILENAME2); }
 
 SerialDebug::SerialDebug(const uint32_t serialSpeed) {
 #if defined(USE_SERIAL_PINS) && defined(ESP8266)
-  // EspSerial.begin(serialSpeed, SERIAL_8N1, 3, 1);
   EspSerial.begin(serialSpeed);
 #warning "SerialPins is not implemented on ESP8266"
 #elif defined(ESP8266)
   EspSerial.begin(serialSpeed);
 #elif defined(USE_SERIAL_PINS) && defined(ESP32C3)
-  // EspSerial.begin(115200L, SERIAL_8N1, 20, 21);
-  EspSerial.begin(115200L);
+  // EspSerial.begin(serialSpeed, SERIAL_8N1, 20, 21);
+  EspSerial.begin(serialSpeed);
 #elif defined(ESP32C3)
-  EspSerial.begin(115200L);
+  EspSerial.begin(serialSpeed);
 #elif defined(USE_SERIAL_PINS) && defined(ESP32S2)
-  EspSerial.begin(115200L, SERIAL_8N1, 37, 39);
+  EspSerial.begin(serialSpeed, SERIAL_8N1, 37, 39);
 #elif defined(ESP32S2)
-  EspSerial.begin(115200L);
+  EspSerial.begin(serialSpeed);
 #elif defined(USE_SERIAL_PINS) && defined(ESP32S3)
-  EspSerial.begin(115200L, SERIAL_8N1, 44, 43);
+  EspSerial.begin(serialSpeed, SERIAL_8N1, 44, 43);
 #elif defined(ESP32S3)
-  EspSerial.begin(115200L);
+  EspSerial.begin(serialSpeed);
 #elif defined(USE_SERIAL_PINS) && defined(ESP32)
   EspSerial.begin(serialSpeed, SERIAL_8N1, 3, 1);
 #elif defined(ESP32)
-  EspSerial.begin(115200L);
+  EspSerial.begin(serialSpeed);
 #endif
   EspSerial.println("Serial console activated.");
 
   begin(&EspSerial);
   getLog()->setPrefix(printTimestamp);
-  getLog()->notice(F("SDBG: Serial logging started at %l." CR), serialSpeed);
+  getLog()->notice(F("SDBG: Serial logging started at %d." CR), serialSpeed);
 }
 
 void printTimestamp(Print *_logOutput, int _logLevel) {

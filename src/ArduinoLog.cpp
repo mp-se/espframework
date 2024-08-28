@@ -214,3 +214,5 @@ void Logging::printFormat(const char format, va_list *args) {
 }
 
 Logging Log = Logging();
+
+// EOF

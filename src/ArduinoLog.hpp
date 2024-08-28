@@ -85,18 +85,6 @@ typedef void (*printfunction)(Print *, int);
 class Logging {
  public:
   /**
-   * default Constructor
-   */
-  Logging()
-#ifndef ESPFWK_DISABLE_LOGGING
-      : _level(ESPFWK_LEVEL_SILENT),
-        _showLevel(true),
-        _logOutput(NULL)
-#endif
-  {
-  }
-
-  /**
    * Initializing, must be called as first. Note that if you use
    * this variant of Init, you need to initialize the baud rate
    * yourself, if printer happens to be a serial port.
@@ -343,6 +331,10 @@ class Logging {
   template <class T>
   void printLevel(int level, bool cr, T msg, ...) {
 #ifndef ESPFWK_DISABLE_LOGGING
+    if (_logOutput == NULL) {
+      return;
+    }
+
     if (level > _level) {
       return;
     }
@@ -375,10 +367,9 @@ class Logging {
   }
 
 #ifndef ESPFWK_DISABLE_LOGGING
-  int _level;
-  bool _showLevel;
-  Print *_logOutput;
-
+  int _level = ESPFWK_LEVEL_SILENT;
+  bool _showLevel = true;
+  Print *_logOutput = NULL;
   printfunction _prefix = NULL;
   printfunction _suffix = NULL;
 #endif

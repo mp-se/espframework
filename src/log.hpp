@@ -45,16 +45,7 @@ void writeErrorLog(const char* format, ...);
 void dumpErrorLog1();
 void dumpErrorLog2();
 
-#if defined(USE_SERIAL_PINS) && defined(ESP32) && \
-    !defined(ARDUINO_USB_CDC_ON_BOOT)
-#define EspSerial Serial0
-#else
 #define EspSerial Serial
-#if defined(USE_SERIAL_PINS)
-#undef USE_SERIAL_PINS
-#warning "Cannot use serial pins with ARDUINO_USB_CDC_ON_BOOT"
-#endif
-#endif
 
 #endif  // SRC_LOG_HPP_
 
