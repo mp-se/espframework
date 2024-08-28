@@ -57,6 +57,10 @@ The following defines configures the framework for the target platform
 - ESP32S2
 - ESP32S4
 
+On ESP32 the following can be used to set the max size for firmware updates.
+
+- MAX_SKETCH_SPACE default value is 0x1c0000 (1.8Mb)
+
 ## Features
 
 1. **WIFI Connection**

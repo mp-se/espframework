@@ -24,8 +24,7 @@ SOFTWARE.
 #ifndef SRC_LOG_HPP_
 #define SRC_LOG_HPP_
 
-#include <ArduinoLog.h>
-
+#include <ArduinoLog.hpp>
 #include <espframework.hpp>
 
 #define ERR_FILENAME "/error.log"

@@ -26,10 +26,14 @@ SOFTWARE.
 #include <espframework.hpp>
 
 #if defined(ESP8266)
+#undef MAX_SKETCH_SPACE
 #define MAX_SKETCH_SPACE 1044464
 #else
 #include <HTTPUpdate.h>
-#define MAX_SKETCH_SPACE 1835008
+#if !defined(MAX_SKETCH_SPACE)
+#define MAX_SKETCH_SPACE 0x1c0000
+#warning "MAX_SKETCH_SPACE is not defined, using default value of 0x1c0000"
+#endif
 #endif
 
 #if defined(ESP8266)
