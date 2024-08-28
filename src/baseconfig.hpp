@@ -80,6 +80,7 @@ class BaseConfig : public WifiConfig,
 #endif
 
   void formatFileSystem();
+  void getWifiPreference();
 
   // Internal
  protected:
@@ -309,6 +310,12 @@ class BaseConfig : public WifiConfig,
     _darkMode = b;
     _saveNeeded = true;
   }
+
+  // EEPROM function (Only ESP32)
+#if !defined(ESP8266)
+  void setPreference(const char* key, const char* value, const char* nameSpace);
+  String getPreference(const char* key, const char* nameSpace);
+#endif
 
   // Functions
   virtual void createJson(JsonObject& doc) {}

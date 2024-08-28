@@ -25,6 +25,10 @@ SOFTWARE.
 #include <espframework.hpp>
 #include <log.hpp>
 
+#if !defined(ESP8266)
+#include <Preferences.h>
+#endif
+
 BaseConfig::BaseConfig(String baseMDNS, String fileName, int dynamicJsonSize) {
   _dynamicJsonSize = dynamicJsonSize;
 
@@ -240,6 +244,15 @@ bool BaseConfig::saveFile() {
   configFile.close();
   _saveNeeded = false;
   Log.notice(F("CFG : Configuration saved." CR));
+
+#if !defined(ESP8266)
+  if (strlen(getWifiSSID(0)) > 0 && strlen(getWifiPass(0)) > 0) {
+    setPreference("ssid", getWifiSSID(0), "espfwk");
+    setPreference("pass", getWifiPass(0), "espfwk");
+    Log.notice(F("CFG : Stored wifi settings in EEPROM as backup." CR));
+  }
+#endif
+
   return true;
 }
 
@@ -251,6 +264,7 @@ bool BaseConfig::loadFile() {
   if (!LittleFS.exists(_fileName.c_str())) {
     Log.error(F("CFG : Configuration file %s does not exist." CR),
               _fileName.c_str());
+    getWifiPreference();
     return false;
   }
 
@@ -258,6 +272,7 @@ bool BaseConfig::loadFile() {
 
   if (!configFile) {
     Log.error(F("CFG : Failed to open %s." CR), _fileName.c_str());
+    getWifiPreference();
     return false;
   }
 
@@ -272,13 +287,29 @@ bool BaseConfig::loadFile() {
   if (err) {
     Log.error(F("CFG : Failed to parse file, Err: %s, %d." CR), err.c_str(),
               doc.capacity());
+    getWifiPreference();
     return false;
   }
 
   JsonObject obj = doc.as<JsonObject>();
   parseJson(obj);
   Log.notice(F("CFG : Configuration file loaded." CR));
+
+  if (strlen(getWifiSSID(0)) > 0 && strlen(getWifiPass(0)) > 0) {
+    getWifiPreference();
+  }
+
   return true;
+}
+
+void BaseConfig::getWifiPreference() {
+#if !defined(ESP8266)
+  String ssid = getPreference("ssid", "espfwk");
+  String pass = getPreference("pass", "espfwk");
+  setWifiSSID(ssid, 0);
+  setWifiPass(pass, 0);
+  Log.notice(F("CFG : Using wifi settings from EEPROM." CR));
+#endif
 }
 
 void BaseConfig::formatFileSystem() {
@@ -337,5 +368,23 @@ bool BaseConfig::saveFileWifiOnly() {
   Log.notice(F("CFG : WIFI configuration saved to %s." CR), _fileName.c_str());
   return true;
 }
+
+#if !defined(ESP8266)
+void BaseConfig::setPreference(const char* key, const char* value,
+                               const char* nameSpace) {
+  Preferences p;
+  p.begin(nameSpace, false);
+  p.putString(key, String(value));
+  p.end();
+}
+
+String BaseConfig::getPreference(const char* key, const char* nameSpace) {
+  Preferences p;
+  p.begin(nameSpace, true);
+  String s = p.getString(key);
+  p.end();
+  return s;
+}
+#endif
 
 // EOF
