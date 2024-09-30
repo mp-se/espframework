@@ -157,8 +157,9 @@ class BaseWebServer {
     Log.notice(F("WEB : webServer callback for /favicon.ico (Memory)." CR));
     AsyncWebServerResponse *response = request->beginResponse(
         200, "image/x-icon", (const uint8_t *)faviconIcoStart,
-        reinterpret_cast<int32_t>(&faviconIcoEnd[0]) -
-            reinterpret_cast<int32_t>(&faviconIcoStart[0]));
+        reinterpret_cast<uint32_t>(&faviconIcoEnd[0]) -
+            reinterpret_cast<uint32_t>(&faviconIcoStart[0]));
+    response->addHeader("Content-Encoding", "gzip");
     request->send(response);
   }
 #endif
