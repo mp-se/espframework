@@ -231,13 +231,13 @@ bool BaseConfig::saveFile() {
   }
 
   JsonDocument doc;
-  JsonObject obj = doc.createNestedObject();
+  JsonObject obj = doc.as<JsonObject>(); 
   createJson(obj);
 #if LOG_LEVEL == 6
   serializeJson(doc, EspSerial);
   EspSerial.print(CR);
 #endif
-  serializeJson(obj, configFile);
+  serializeJson(doc, configFile);
   configFile.flush();
   configFile.close();
   _saveNeeded = false;

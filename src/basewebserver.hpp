@@ -138,8 +138,8 @@ class BaseWebServer {
       Log.notice(F("WEB : webServer callback for /app.js (Memory)." CR));
       AsyncWebServerResponse *response = request->beginResponse(
           200, "application/javascript", (const uint8_t *)appJsStart,
-          reinterpret_cast<uint32_t>(&appJsEnd[0]) -
-              reinterpret_cast<uint32_t>(&appJsStart[0]));
+          reinterpret_cast<int32_t>(&appJsEnd[0]) -
+              reinterpret_cast<int32_t>(&appJsStart[0]));
       response->addHeader("Content-Encoding", "gzip");
       request->send(response);
     }
@@ -148,8 +148,8 @@ class BaseWebServer {
     Log.notice(F("WEB : webServer callback for /app.css (Memory)." CR));
     AsyncWebServerResponse *response =
         request->beginResponse(200, "text/css", (const uint8_t *)appCssStart,
-                               reinterpret_cast<uint32_t>(&appCssEnd[0]) -
-                                   reinterpret_cast<uint32_t>(&appCssStart[0]));
+                               reinterpret_cast<int32_t>(&appCssEnd[0]) -
+                                   reinterpret_cast<int32_t>(&appCssStart[0]));
     response->addHeader("Content-Encoding", "gzip");
     request->send(response);
   }
@@ -157,9 +157,8 @@ class BaseWebServer {
     Log.notice(F("WEB : webServer callback for /favicon.ico (Memory)." CR));
     AsyncWebServerResponse *response = request->beginResponse(
         200, "image/x-icon", (const uint8_t *)faviconIcoStart,
-        reinterpret_cast<uint32_t>(&faviconIcoEnd[0]) -
-            reinterpret_cast<uint32_t>(&faviconIcoStart[0]));
-    request->send(response);
+        reinterpret_cast<int32_t>(&faviconIcoEnd[0]) -
+            reinterpret_cast<int32_t>(&faviconIcoStart[0]));
     request->send(response);
   }
 #endif

@@ -95,32 +95,29 @@ void BaseWebServer::loop() {
 
   if (_wifiScanTask) {
     JsonDocument doc;
-    JsonObject obj;
-    obj[PARAM_STATUS] = false;
-    obj[PARAM_SUCCESS] = true;
-    obj[PARAM_MESSAGE] = "";
-    doc.add(obj);
 
-    JsonArray networks = obj[PARAM_NETWORKS].to<JsonArray>();
+    doc[PARAM_STATUS] = false;
+    doc[PARAM_SUCCESS] = true;
+    doc[PARAM_MESSAGE] = "";
+
+    JsonArray networks = doc[PARAM_NETWORKS].to<JsonArray>();
 
     Log.notice(F("WEB : Scanning for wifi networks." CR));
     int noNetwork = WiFi.scanNetworks(false, false);
 
     for (int i = 0; i < noNetwork; i++) {
-      JsonObject n;
-      n[PARAM_SSID] = WiFi.SSID(i);
-      n[PARAM_RSSI] = WiFi.RSSI(i);
-      n[PARAM_CHANNEL] = WiFi.channel(i);
+      networks[i][PARAM_SSID] = WiFi.SSID(i);
+      networks[i][PARAM_RSSI] = WiFi.RSSI(i);
+      networks[i][PARAM_CHANNEL] = WiFi.channel(i);
 #if defined(ESP8266)
-      n[PARAM_ENCRYPTION] = WiFi.encryptionType(i);
+      networks[i][PARAM_ENCRYPTION] = WiFi.encryptionType(i);
 #else
-      n[PARAM_ENCRYPTION] = WiFi.encryptionType(i);
+      networks[i][PARAM_ENCRYPTION] = WiFi.encryptionType(i);
 #endif
-      networks.add(n);
     }
 
-    serializeJson(obj, _wifiScanData);
-    Log.notice(F("WEB : Scan complete %s." CR), _wifiScanData.c_str());
+    unsigned int ret = serializeJson(doc, _wifiScanData);
+    Log.notice(F("WEB : Scan complete %d, %s." CR), ret, _wifiScanData.c_str());
     _wifiScanTask = false;
   }
 }
@@ -304,12 +301,14 @@ void BaseWebServer::webHandleFileSystem(AsyncWebServerRequest *request,
       obj[PARAM_FREE] = info.totalBytes - info.usedBytes;
 
       Dir dir = LittleFS.openDir("/");
+      int i = 0;
       JsonArray arr = obj[PARAM_FILES].to<JsonArray>();
+      
       while (dir.next()) {
-        JsonObject file;
-        file[PARAM_FILE] = "/" + String(dir.fileName());
-        file[PARAM_SIZE] = static_cast<int>(dir.fileSize());
+        arr[i][PARAM_FILE] = "/" + String(dir.fileName());
+        arr[i][PARAM_SIZE] = static_cast<int>(dir.fileSize());
         arr.add(file);
+        i++;
       }
 #else  // ESP32
       obj[PARAM_TOTAL] = LittleFS.totalBytes();
@@ -318,13 +317,14 @@ void BaseWebServer::webHandleFileSystem(AsyncWebServerRequest *request,
 
       File root = LittleFS.open("/");
       File f = root.openNextFile();
+      int i = 0;
+
       JsonArray arr = obj[PARAM_FILES].to<JsonArray>();
       while (f) {
-        JsonObject file;
-        file[PARAM_FILE] = "/" + String(f.name());
-        file[PARAM_SIZE] = static_cast<int>(f.size());
-        arr.add(file);
+        arr[i][PARAM_FILE] = "/" + String(f.name());
+        arr[i][PARAM_SIZE] = static_cast<int>(f.size());
         f = root.openNextFile();
+        i++;
       }
       f.close();
       root.close();

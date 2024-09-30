@@ -70,7 +70,7 @@ void DemoWebServer::webHandleConfigRead(AsyncWebServerRequest *request) {
 
   Log.notice(F("WEB : webServer callback for /api/config(read)." CR));
   AsyncJsonResponse *response =
-      new AsyncJsonResponse(false, JSON_BUFFER_SIZE_L);
+      new AsyncJsonResponse(false);
   JsonObject obj = response->getRoot().as<JsonObject>();
   _webConfig->createJson(obj);
   response->setLength();
@@ -90,7 +90,7 @@ void DemoWebServer::webHandleConfigWrite(AsyncWebServerRequest *request,
   _webConfig->saveFile();
 
   AsyncJsonResponse *response =
-      new AsyncJsonResponse(false, JSON_BUFFER_SIZE_M);
+      new AsyncJsonResponse(false);
   obj = response->getRoot().as<JsonObject>();
   obj[PARAM_SUCCESS] = true;
   obj[PARAM_MESSAGE] = "Configuration updated";
@@ -101,7 +101,7 @@ void DemoWebServer::webHandleConfigWrite(AsyncWebServerRequest *request,
 void DemoWebServer::webHandleStatus(AsyncWebServerRequest *request) {
   Log.notice(F("WEB : webServer callback for /api/status." CR));
   AsyncJsonResponse *response =
-      new AsyncJsonResponse(false, JSON_BUFFER_SIZE_S);
+      new AsyncJsonResponse(false);
   JsonObject obj = response->getRoot().as<JsonObject>();
 
   obj[PARAM_ID] = _webConfig->getID();
