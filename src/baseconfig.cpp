@@ -350,14 +350,13 @@ bool BaseConfig::saveFileWifiOnly() {
   }
 
   JsonDocument doc;
-  JsonObject obj = doc.createNestedObject();
 
-  obj[PARAM_SSID] = getWifiSSID(0);
-  obj[PARAM_PASS] = getWifiPass(0);
-  obj[PARAM_SSID2] = getWifiSSID(1);
-  obj[PARAM_PASS2] = getWifiPass(1);
+  doc[PARAM_SSID] = getWifiSSID(0);
+  doc[PARAM_PASS] = getWifiPass(0);
+  doc[PARAM_SSID2] = getWifiSSID(1);
+  doc[PARAM_PASS2] = getWifiPass(1);
 
-  serializeJson(obj, configFile);
+  serializeJson(doc, configFile);
   configFile.flush();
   configFile.close();
 

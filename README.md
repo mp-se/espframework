@@ -73,8 +73,9 @@ On ESP32 the following can be used to set the max size for firmware updates.
   ESP8266
   - https://github.com/esphome/ESPAsyncTCP#v2.0.0
 
-  ESP32
-  - https://github.com/esphome/AsyncTCP#v2.1.4
+  ESP32 (One of these)
+  - https://github.com/esphome/AsyncTCP#v2.1.4 (For arduino 2.x)
+  - https://github.com/mathieucarbou/AsyncTCP#v3.2.5 (For arduino 3.x)
 
 
 ## Features
