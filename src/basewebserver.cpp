@@ -95,17 +95,19 @@ void BaseWebServer::loop() {
 
   if (_wifiScanTask) {
     JsonDocument doc;
-    JsonObject obj = doc.createNestedObject();
+    JsonObject obj;
     obj[PARAM_STATUS] = false;
     obj[PARAM_SUCCESS] = true;
     obj[PARAM_MESSAGE] = "";
-    JsonArray networks = obj.createNestedArray(PARAM_NETWORKS);
+    doc.add(obj);
+
+    JsonArray networks = obj[PARAM_NETWORKS].to<JsonArray>();
 
     Log.notice(F("WEB : Scanning for wifi networks." CR));
     int noNetwork = WiFi.scanNetworks(false, false);
 
     for (int i = 0; i < noNetwork; i++) {
-      JsonObject n = networks.createNestedObject();
+      JsonObject n;
       n[PARAM_SSID] = WiFi.SSID(i);
       n[PARAM_RSSI] = WiFi.RSSI(i);
       n[PARAM_CHANNEL] = WiFi.channel(i);
@@ -114,6 +116,7 @@ void BaseWebServer::loop() {
 #else
       n[PARAM_ENCRYPTION] = WiFi.encryptionType(i);
 #endif
+      networks.add(n);
     }
 
     serializeJson(obj, _wifiScanData);
@@ -314,11 +317,12 @@ void BaseWebServer::webHandleFileSystem(AsyncWebServerRequest *request,
 
       File root = LittleFS.open("/");
       File f = root.openNextFile();
-      JsonArray arr = obj.createNestedArray(PARAM_FILES);
+      JsonArray arr = obj[PARAM_FILES].to<JsonArray>();
       while (f) {
-        JsonObject file = arr.createNestedObject();
+        JsonObject file;
         file[PARAM_FILE] = "/" + String(f.name());
         file[PARAM_SIZE] = static_cast<int>(f.size());
+        arr.add(file);
         f = root.openNextFile();
       }
       f.close();
