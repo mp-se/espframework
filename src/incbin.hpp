@@ -114,13 +114,13 @@
  * @warning If you use this facility, you might have to deal with
  * platform-specific linker output section naming on your own.
  */
-#if !defined(INCBIN_OUTPUT_SECTION)
+/*#if !defined(INCBIN_OUTPUT_SECTION)
 #if defined(__APPLE__)
 #define INCBIN_OUTPUT_SECTION ".const_data"
 #else
 #define INCBIN_OUTPUT_SECTION ".rodata"
 #endif
-#endif
+#endif*/
 
 /**
  * @brief Optionally override the linker section into which data is emitted.
