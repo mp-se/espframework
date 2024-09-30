@@ -30,7 +30,6 @@ SOFTWARE.
 #endif
 
 BaseConfig::BaseConfig(String baseMDNS, String fileName) {
-
   char buf[30];
 #if defined(ESP8266)
   snprintf(buf, sizeof(buf), "%06x", (unsigned int)ESP.getChipId());

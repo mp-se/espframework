@@ -48,7 +48,7 @@ SOFTWARE.
 #include <log.hpp>
 
 #if defined(ESP8266)
-#include <incbin.h>
+#include <incbin.hpp>
 INCBIN_EXTERN(IndexHtml);
 INCBIN_EXTERN(AppJs);
 INCBIN_EXTERN(AppCss);
@@ -87,7 +87,7 @@ class BaseWebServer {
 #if defined(ESP8266)
   void webReturnIndexHtml(AsyncWebServerRequest *request) {
     Log.notice(F("WEB : webServer callback for /index.html (Memory)." CR));
-    request->send_P(200, "text/html", (const uint8_t *)gIndexHtmlData,
+    request->send(200, "text/html", (const uint8_t *)gIndexHtmlData,
                     gIndexHtmlSize);
   }
   void webReturnAppJs(AsyncWebServerRequest *request) {
@@ -123,7 +123,7 @@ class BaseWebServer {
 #else
   void webReturnIndexHtml(AsyncWebServerRequest *request) {
     Log.notice(F("WEB : webServer callback for /index.html (Memory)." CR));
-    request->send_P(200, "text/html", (const uint8_t *)indexHtmlStart,
+    request->send(200, "text/html", (const uint8_t *)indexHtmlStart,
                     reinterpret_cast<uint32_t>(&indexHtmlEnd[0]) -
                         reinterpret_cast<uint32_t>(&indexHtmlStart[0]));
   }

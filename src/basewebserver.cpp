@@ -38,7 +38,7 @@ SOFTWARE.
 
 #if defined(ESP8266)
 #define INCBIN_OUTPUT_SECTION ".irom.text"
-#include <incbin.h>
+#include <incbin.hpp>
 // These are used in the webhandler class and needs to be defined when using
 // ESP8266. For esp32 the files are defined in the platformio.ini file
 INCBIN(IndexHtml, "html/index.html");
@@ -47,9 +47,7 @@ INCBIN(AppCss, "html/app.css.gz");
 INCBIN(FaviconIco, "html/favicon.ico.gz");
 #endif
 
-BaseWebServer::BaseWebServer(WebConfig *config) {
-  _webConfig = config;
-}
+BaseWebServer::BaseWebServer(WebConfig *config) { _webConfig = config; }
 
 bool BaseWebServer::isAuthenticated(AsyncWebServerRequest *request) {
   resetWifiPortalTimer();
@@ -272,8 +270,7 @@ void BaseWebServer::webHandlePageNotFound(AsyncWebServerRequest *request) {
 
 void BaseWebServer::webHandleAuth(AsyncWebServerRequest *request) {
   Log.notice(F("WEB : webServer callback for /api/auth." CR));
-  AsyncJsonResponse *response =
-      new AsyncJsonResponse(false);
+  AsyncJsonResponse *response = new AsyncJsonResponse(false);
   JsonObject obj = response->getRoot().as<JsonObject>();
   obj[PARAM_TOKEN] = _webConfig->getID();
   response->setLength();
@@ -292,8 +289,7 @@ void BaseWebServer::webHandleFileSystem(AsyncWebServerRequest *request,
   if (!obj[PARAM_COMMAND].isNull()) {
     if (obj[PARAM_COMMAND] == String("dir")) {
       Log.notice(F("WEB : File system listing requested." CR));
-      AsyncJsonResponse *response =
-          new AsyncJsonResponse(false);
+      AsyncJsonResponse *response = new AsyncJsonResponse(false);
       JsonObject obj = response->getRoot().as<JsonObject>();
 
 #if defined(ESP8266)
@@ -373,8 +369,7 @@ void BaseWebServer::webHandleWifiScan(AsyncWebServerRequest *request) {
   Log.notice(F("WEB : webServer callback for /api/wifi/scan." CR));
   _wifiScanTask = true;
   _wifiScanData = "";
-  AsyncJsonResponse *response =
-      new AsyncJsonResponse(false);
+  AsyncJsonResponse *response = new AsyncJsonResponse(false);
   JsonObject obj = response->getRoot().as<JsonObject>();
   obj[PARAM_SUCCESS] = true;
   obj[PARAM_MESSAGE] = "Scheduled wifi scanning";
@@ -390,8 +385,7 @@ void BaseWebServer::webHandleWifiScanStatus(AsyncWebServerRequest *request) {
   Log.notice(F("WEB : webServer callback for /api/wifi/scan/status." CR));
 
   if (_wifiScanTask || !_wifiScanData.length()) {
-    AsyncJsonResponse *response =
-        new AsyncJsonResponse(false);
+    AsyncJsonResponse *response = new AsyncJsonResponse(false);
     JsonObject obj = response->getRoot().as<JsonObject>();
     obj[PARAM_STATUS] = static_cast<bool>(_wifiScanTask);
     obj[PARAM_SUCCESS] = false;
@@ -410,8 +404,7 @@ void BaseWebServer::webHandleRestart(AsyncWebServerRequest *request) {
   }
 
   Log.notice(F("WEB : webServer callback for /api/restart." CR));
-  AsyncJsonResponse *response =
-      new AsyncJsonResponse(false);
+  AsyncJsonResponse *response = new AsyncJsonResponse(false);
   JsonObject obj = response->getRoot().as<JsonObject>();
   obj[PARAM_STATUS] = true;
   obj[PARAM_SUCCESS] = true;
@@ -424,8 +417,7 @@ void BaseWebServer::webHandleRestart(AsyncWebServerRequest *request) {
 
 void BaseWebServer::webHandlePing(AsyncWebServerRequest *request) {
   Log.notice(F("WEB : webServer callback for /api/ping." CR));
-  AsyncJsonResponse *response =
-      new AsyncJsonResponse(false);
+  AsyncJsonResponse *response = new AsyncJsonResponse(false);
   JsonObject obj = response->getRoot().as<JsonObject>();
   obj[PARAM_STATUS] = true;
   response->setLength();
