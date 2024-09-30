@@ -27,7 +27,7 @@ SOFTWARE.
 #include <Arduino.h>
 #include <ArduinoJson.h>
 
-#define ESPFWK_VER "1.0.1"
+#define ESPFWK_VER "1.0"
 
 void forcedReset();
 void espReset();
@@ -66,11 +66,6 @@ void espReset();
 #include "esp32/rom/rtc.h"
 #define ESP_RESET forcedReset
 #endif
-
-constexpr auto JSON_BUFFER_SIZE_S = 500;
-constexpr auto JSON_BUFFER_SIZE_M = 1000;
-constexpr auto JSON_BUFFER_SIZE_L = 3000;
-constexpr auto JSON_BUFFER_SIZE_XL = 5000;
 
 // Config
 constexpr auto PARAM_ID = "id";

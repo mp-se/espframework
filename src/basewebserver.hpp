@@ -48,7 +48,7 @@ SOFTWARE.
 #include <log.hpp>
 
 #if defined(ESP8266)
-#include <incbin.h>
+#include <incbin.hpp>
 INCBIN_EXTERN(IndexHtml);
 INCBIN_EXTERN(AppJs);
 INCBIN_EXTERN(AppCss);
@@ -70,7 +70,6 @@ class BaseWebServer {
   File _uploadFile;
   WebConfig *_webConfig;
   int _uploadReturn = 200;
-  int _dynamicJsonSize = 2000;
   bool _wifiSetup = false;
   uint32_t _uploadedSize = 0;
   uint32_t _rebootTimer = 0;
@@ -88,7 +87,7 @@ class BaseWebServer {
 #if defined(ESP8266)
   void webReturnIndexHtml(AsyncWebServerRequest *request) {
     Log.notice(F("WEB : webServer callback for /index.html (Memory)." CR));
-    request->send_P(200, "text/html", (const uint8_t *)gIndexHtmlData,
+    request->send(200, "text/html", (const uint8_t *)gIndexHtmlData,
                     gIndexHtmlSize);
   }
   void webReturnAppJs(AsyncWebServerRequest *request) {
@@ -101,22 +100,22 @@ class BaseWebServer {
     } else {
       Log.notice(F("WEB : webServer callback for /app.js (Memory)." CR));
       AsyncWebServerResponse *response =
-          request->beginResponse_P(200, "application/javascript",
-                                   (const uint8_t *)gAppJsData, gAppJsSize);
+          request->beginResponse(200, "application/javascript",
+                                 (const uint8_t *)gAppJsData, gAppJsSize);
       response->addHeader("Content-Encoding", "gzip");
       request->send(response);
     }
   }
   void webReturnAppCss(AsyncWebServerRequest *request) {
     Log.notice(F("WEB : webServer callback for /app.css (Memory)." CR));
-    AsyncWebServerResponse *response = request->beginResponse_P(
+    AsyncWebServerResponse *response = request->beginResponse(
         200, "text/css", (const uint8_t *)gAppCssData, gAppCssSize);
     response->addHeader("Content-Encoding", "gzip");
     request->send(response);
   }
   void webReturnFavicon(AsyncWebServerRequest *request) {
     Log.notice(F("WEB : webServer callback for /favicon.ico (Memory)." CR));
-    AsyncWebServerResponse *response = request->beginResponse_P(
+    AsyncWebServerResponse *response = request->beginResponse(
         200, "image/x-icon", (const uint8_t *)gFaviconIcoData, gFaviconIcoSize);
     response->addHeader("Content-Encoding", "gzip");
     request->send(response);
@@ -124,7 +123,7 @@ class BaseWebServer {
 #else
   void webReturnIndexHtml(AsyncWebServerRequest *request) {
     Log.notice(F("WEB : webServer callback for /index.html (Memory)." CR));
-    request->send_P(200, "text/html", (const uint8_t *)indexHtmlStart,
+    request->send(200, "text/html", (const uint8_t *)indexHtmlStart,
                     reinterpret_cast<uint32_t>(&indexHtmlEnd[0]) -
                         reinterpret_cast<uint32_t>(&indexHtmlStart[0]));
   }
@@ -137,30 +136,30 @@ class BaseWebServer {
       request->send(response);
     } else {
       Log.notice(F("WEB : webServer callback for /app.js (Memory)." CR));
-      AsyncWebServerResponse *response = request->beginResponse_P(
+      AsyncWebServerResponse *response = request->beginResponse(
           200, "application/javascript", (const uint8_t *)appJsStart,
-          reinterpret_cast<uint32_t>(&appJsEnd[0]) -
-              reinterpret_cast<uint32_t>(&appJsStart[0]));
+          reinterpret_cast<int32_t>(&appJsEnd[0]) -
+              reinterpret_cast<int32_t>(&appJsStart[0]));
       response->addHeader("Content-Encoding", "gzip");
       request->send(response);
     }
   }
   void webReturnAppCss(AsyncWebServerRequest *request) {
     Log.notice(F("WEB : webServer callback for /app.css (Memory)." CR));
-    AsyncWebServerResponse *response = request->beginResponse_P(
-        200, "text/css", (const uint8_t *)appCssStart,
-        reinterpret_cast<uint32_t>(&appCssEnd[0]) -
-            reinterpret_cast<uint32_t>(&appCssStart[0]));
+    AsyncWebServerResponse *response =
+        request->beginResponse(200, "text/css", (const uint8_t *)appCssStart,
+                               reinterpret_cast<int32_t>(&appCssEnd[0]) -
+                                   reinterpret_cast<int32_t>(&appCssStart[0]));
     response->addHeader("Content-Encoding", "gzip");
     request->send(response);
   }
   void webReturnFavicon(AsyncWebServerRequest *request) {
     Log.notice(F("WEB : webServer callback for /favicon.ico (Memory)." CR));
-    AsyncWebServerResponse *response = request->beginResponse_P(
+    AsyncWebServerResponse *response = request->beginResponse(
         200, "image/x-icon", (const uint8_t *)faviconIcoStart,
         reinterpret_cast<uint32_t>(&faviconIcoEnd[0]) -
             reinterpret_cast<uint32_t>(&faviconIcoStart[0]));
-    request->send(response);
+    response->addHeader("Content-Encoding", "gzip");
     request->send(response);
   }
 #endif
@@ -182,8 +181,7 @@ class BaseWebServer {
   virtual void setupWebHandlers();
 
  public:
-  explicit BaseWebServer(WebConfig *config,
-                         int dynamicJsonSize = JSON_BUFFER_SIZE_L);
+  explicit BaseWebServer(WebConfig *config);
 
   virtual bool setupWebServer();
   virtual AsyncWebServer *getWebServer() { return _server; }

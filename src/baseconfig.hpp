@@ -69,7 +69,6 @@ class BaseConfig : public WifiConfig,
   String _id;
   char _tempUnit = 'C';
   String _fileName;
-  int _dynamicJsonSize;
   bool _darkMode = false;
 
   // WebServer
@@ -80,6 +79,7 @@ class BaseConfig : public WifiConfig,
 #endif
 
   void formatFileSystem();
+  void getWifiPreference();
 
   // Internal
  protected:
@@ -96,7 +96,7 @@ class BaseConfig : public WifiConfig,
   void parseJsonPush(JsonObject& doc);
 
  public:
-  BaseConfig(String baseMDNS, String fileName, int dynamicJsonSize);
+  BaseConfig(String baseMDNS, String fileName);
 
   // WebServer
   bool getCorsAllowed() { return _corsAllowed; }
@@ -309,6 +309,12 @@ class BaseConfig : public WifiConfig,
     _darkMode = b;
     _saveNeeded = true;
   }
+
+  // EEPROM function (Only ESP32)
+#if !defined(ESP8266)
+  void setPreference(const char* key, const char* value, const char* nameSpace);
+  String getPreference(const char* key, const char* nameSpace);
+#endif
 
   // Functions
   virtual void createJson(JsonObject& doc) {}

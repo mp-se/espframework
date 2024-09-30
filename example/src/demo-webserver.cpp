@@ -23,11 +23,11 @@ SOFTWARE.
  */
 #include <LittleFS.h>
 
+#include <demo-config.hpp>
 #include <demo-push.hpp>
 #include <demo-webserver.hpp>
 #include <espframework.hpp>
 #include <log.hpp>
-#include <demo-config.hpp>
 
 // These are parameters that the example ui app uses. Part of the status
 // response.
@@ -57,10 +57,8 @@ void DemoWebServer::setupWebHandlers() {
               std::bind(&DemoWebServer::webHandleConfigRead, this,
                         std::placeholders::_1));
   handler = new AsyncCallbackJsonWebHandler(
-      "/api/config",
-      std::bind(&DemoWebServer::webHandleConfigWrite, this,
-                std::placeholders::_1, std::placeholders::_2),
-      JSON_BUFFER_SIZE_L);
+      "/api/config", std::bind(&DemoWebServer::webHandleConfigWrite, this,
+                               std::placeholders::_1, std::placeholders::_2));
   _server->addHandler(handler);
 }
 
@@ -70,8 +68,7 @@ void DemoWebServer::webHandleConfigRead(AsyncWebServerRequest *request) {
   }
 
   Log.notice(F("WEB : webServer callback for /api/config(read)." CR));
-  AsyncJsonResponse *response =
-      new AsyncJsonResponse(false, JSON_BUFFER_SIZE_L);
+  AsyncJsonResponse *response = new AsyncJsonResponse(false);
   JsonObject obj = response->getRoot().as<JsonObject>();
   _webConfig->createJson(obj);
   response->setLength();
@@ -79,7 +76,7 @@ void DemoWebServer::webHandleConfigRead(AsyncWebServerRequest *request) {
 }
 
 void DemoWebServer::webHandleConfigWrite(AsyncWebServerRequest *request,
-                                            JsonVariant &json) {
+                                         JsonVariant &json) {
   if (!isAuthenticated(request)) {
     return;
   }
@@ -90,8 +87,7 @@ void DemoWebServer::webHandleConfigWrite(AsyncWebServerRequest *request,
   obj.clear();
   _webConfig->saveFile();
 
-  AsyncJsonResponse *response =
-      new AsyncJsonResponse(false, JSON_BUFFER_SIZE_M);
+  AsyncJsonResponse *response = new AsyncJsonResponse(false);
   obj = response->getRoot().as<JsonObject>();
   obj[PARAM_SUCCESS] = true;
   obj[PARAM_MESSAGE] = "Configuration updated";
@@ -101,8 +97,7 @@ void DemoWebServer::webHandleConfigWrite(AsyncWebServerRequest *request,
 
 void DemoWebServer::webHandleStatus(AsyncWebServerRequest *request) {
   Log.notice(F("WEB : webServer callback for /api/status." CR));
-  AsyncJsonResponse *response =
-      new AsyncJsonResponse(false, JSON_BUFFER_SIZE_S);
+  AsyncJsonResponse *response = new AsyncJsonResponse(false);
   JsonObject obj = response->getRoot().as<JsonObject>();
 
   obj[PARAM_ID] = _webConfig->getID();
