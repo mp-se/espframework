@@ -66,12 +66,11 @@ On ESP32 the following can be used to set the max size for firmware updates.
   The framework is dependant on other projects which are listed here. These needs to be included into your project for a successful compilation.
 
   ALL
-  - https://github.com/bblanchon/ArduinoJson#v6.21.3
+  - https://github.com/bblanchon/ArduinoJson##v7.2.0
   - https://github.com/256dpi/arduino-mqtt#v2.5.2
   - https://github.com/mathieucarbou/ESPAsyncWebServer#v3.3.4
 
   ESP8266
-  - https://github.com/mp-se/incbin#v1.0.0
   - https://github.com/mathieucarbou/esphome-ESPAsyncTCP#v2.0.0
 
   ESP32
@@ -305,7 +304,7 @@ class DemoWebServer : public BaseWebServer {
 
   // Method to return a html page stored in memory
   void webReturnTestHtm(AsyncWebServerRequest *request) {
-    request->send_P(200, "text/html", (const uint8_t *)testHtmStart,
+    request->send(200, "text/html", (const uint8_t *)testHtmStart,
                     strlen(reinterpret_cast<const char *>(&testHtmStart[0])));
   }
 
