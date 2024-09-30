@@ -160,7 +160,7 @@ class BaseWebServer {
         200, "image/x-icon", (const uint8_t *)faviconIcoStart,
         reinterpret_cast<uint32_t>(&faviconIcoEnd[0]) -
             reinterpret_cast<uint32_t>(&faviconIcoStart[0]));
-    request->send(response);
+    response->addHeader("Content-Encoding", "gzip");
     request->send(response);
   }
 #endif
