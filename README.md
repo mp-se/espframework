@@ -61,6 +61,23 @@ On ESP32 the following can be used to set the max size for firmware updates.
 
 - MAX_SKETCH_SPACE default value is 0x1c0000 (1.8Mb)
 
+## Dependant Libraries
+
+  The framework is dependant on other projects which are listed here. These needs to be included into your project for a successful compilation.
+
+  ALL
+  - https://github.com/bblanchon/ArduinoJson#v6.21.3
+  - https://github.com/256dpi/arduino-mqtt#v2.5.2
+  - https://github.com/mathieucarbou/ESPAsyncWebServer#v3.3.4
+
+  ESP8266
+  - https://github.com/mp-se/incbin#v1.0.0
+  - https://github.com/mathieucarbou/esphome-ESPAsyncTCP#v2.0.0
+
+  ESP32
+  - https://github.com/mathieucarbou/AsyncTCP#v3.2.5
+
+
 ## Features
 
 1. **WIFI Connection**
@@ -74,10 +91,8 @@ On ESP32 the following can be used to set the max size for firmware updates.
 
 3. **Web Server (Sync and Async)**
 
-  Basic web server functionallity (support both async and sync versions). Async is faster but requires long running tasks to be run in the loop or the watchdog will trigger.
+  Basic web server functionallity using async versions. This also limits how much time you can spend in an API. If you have longer running tasks these should be called from the loop() and not in the async server request code.
 
-  [How to work with AsynWebServer](https://github.com/me-no-dev/ESPAsyncWebServer)
-    
   All web pages will be embedded into the binary so they will not consume any space on the file system and it also ensure that the right files are included.
 
   This version is targeted at using VueJS as the UI base and is predefined to deliver the following files:
@@ -96,9 +111,9 @@ On ESP32 the following can be used to set the max size for firmware updates.
 
 4. **Logging**
 
-  Logging APIs that can be used to log data to serial port, tx/rx pins and websocket (web page). Support multiple logging levels. 
+  For logging I use this logging library which is not included in the source code since its no longer maintained by the author. 
     
-  [How to do logging](https://github.com/thijse/Arduino-Log)
+  [Used logging library](https://github.com/thijse/Arduino-Log)
 
 5. **Templating**
    

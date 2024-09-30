@@ -348,7 +348,7 @@ void BaseWebServer::webHandleFileSystem(AsyncWebServerRequest *request,
 
         if (LittleFS.exists(obj[PARAM_FILE].as<String>())) {
           AsyncWebServerResponse *response =
-              request->beginResponse(LittleFS, f);
+              request->beginResponse(LittleFS, f, "");
           request->send(response);
         } else {
           request->send(404);

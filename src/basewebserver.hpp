@@ -101,22 +101,22 @@ class BaseWebServer {
     } else {
       Log.notice(F("WEB : webServer callback for /app.js (Memory)." CR));
       AsyncWebServerResponse *response =
-          request->beginResponse_P(200, "application/javascript",
-                                   (const uint8_t *)gAppJsData, gAppJsSize);
+          request->beginResponse(200, "application/javascript",
+                                 (const uint8_t *)gAppJsData, gAppJsSize);
       response->addHeader("Content-Encoding", "gzip");
       request->send(response);
     }
   }
   void webReturnAppCss(AsyncWebServerRequest *request) {
     Log.notice(F("WEB : webServer callback for /app.css (Memory)." CR));
-    AsyncWebServerResponse *response = request->beginResponse_P(
+    AsyncWebServerResponse *response = request->beginResponse(
         200, "text/css", (const uint8_t *)gAppCssData, gAppCssSize);
     response->addHeader("Content-Encoding", "gzip");
     request->send(response);
   }
   void webReturnFavicon(AsyncWebServerRequest *request) {
     Log.notice(F("WEB : webServer callback for /favicon.ico (Memory)." CR));
-    AsyncWebServerResponse *response = request->beginResponse_P(
+    AsyncWebServerResponse *response = request->beginResponse(
         200, "image/x-icon", (const uint8_t *)gFaviconIcoData, gFaviconIcoSize);
     response->addHeader("Content-Encoding", "gzip");
     request->send(response);
@@ -137,7 +137,7 @@ class BaseWebServer {
       request->send(response);
     } else {
       Log.notice(F("WEB : webServer callback for /app.js (Memory)." CR));
-      AsyncWebServerResponse *response = request->beginResponse_P(
+      AsyncWebServerResponse *response = request->beginResponse(
           200, "application/javascript", (const uint8_t *)appJsStart,
           reinterpret_cast<uint32_t>(&appJsEnd[0]) -
               reinterpret_cast<uint32_t>(&appJsStart[0]));
@@ -147,10 +147,10 @@ class BaseWebServer {
   }
   void webReturnAppCss(AsyncWebServerRequest *request) {
     Log.notice(F("WEB : webServer callback for /app.css (Memory)." CR));
-    AsyncWebServerResponse *response = request->beginResponse_P(
-        200, "text/css", (const uint8_t *)appCssStart,
-        reinterpret_cast<uint32_t>(&appCssEnd[0]) -
-            reinterpret_cast<uint32_t>(&appCssStart[0]));
+    AsyncWebServerResponse *response =
+        request->beginResponse(200, "text/css", (const uint8_t *)appCssStart,
+                               reinterpret_cast<uint32_t>(&appCssEnd[0]) -
+                                   reinterpret_cast<uint32_t>(&appCssStart[0]));
     response->addHeader("Content-Encoding", "gzip");
     request->send(response);
   }
