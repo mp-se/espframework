@@ -59,8 +59,7 @@ void DemoWebServer::setupWebHandlers() {
   handler = new AsyncCallbackJsonWebHandler(
       "/api/config",
       std::bind(&DemoWebServer::webHandleConfigWrite, this,
-                std::placeholders::_1, std::placeholders::_2),
-      JSON_BUFFER_SIZE_L);
+                std::placeholders::_1, std::placeholders::_2));
   _server->addHandler(handler);
 }
 

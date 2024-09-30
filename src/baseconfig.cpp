@@ -29,8 +29,7 @@ SOFTWARE.
 #include <Preferences.h>
 #endif
 
-BaseConfig::BaseConfig(String baseMDNS, String fileName, int dynamicJsonSize) {
-  _dynamicJsonSize = dynamicJsonSize;
+BaseConfig::BaseConfig(String baseMDNS, String fileName) {
 
   char buf[30];
 #if defined(ESP8266)
@@ -232,7 +231,7 @@ bool BaseConfig::saveFile() {
     return false;
   }
 
-  DynamicJsonDocument doc(_dynamicJsonSize);
+  JsonDocument doc;
   JsonObject obj = doc.createNestedObject();
   createJson(obj);
 #if LOG_LEVEL == 6
@@ -276,7 +275,7 @@ bool BaseConfig::loadFile() {
     return false;
   }
 
-  DynamicJsonDocument doc(_dynamicJsonSize);
+  JsonDocument doc;
   DeserializationError err = deserializeJson(doc, configFile);
 #if LOG_LEVEL == 6
   serializeJson(doc, EspSerial);
@@ -285,8 +284,7 @@ bool BaseConfig::loadFile() {
   configFile.close();
 
   if (err) {
-    Log.error(F("CFG : Failed to parse file, Err: %s, %d." CR), err.c_str(),
-              doc.capacity());
+    Log.error(F("CFG : Failed to parse file, Err: %s." CR), err.c_str());
     getWifiPreference();
     return false;
   }
@@ -352,7 +350,7 @@ bool BaseConfig::saveFileWifiOnly() {
     return false;
   }
 
-  DynamicJsonDocument doc(JSON_BUFFER_SIZE_S);
+  JsonDocument doc;
   JsonObject obj = doc.createNestedObject();
 
   obj[PARAM_SSID] = getWifiSSID(0);

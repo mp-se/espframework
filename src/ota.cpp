@@ -119,7 +119,7 @@ bool OtaUpdate::checkFirmwareVersion() {
   }
 
   // Send HTTP GET request
-  DynamicJsonDocument ver(300);
+  JsonDocument ver;
   int httpResponseCode = http.GET();
 
   if (httpResponseCode == 200) {

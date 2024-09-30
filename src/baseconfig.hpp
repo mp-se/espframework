@@ -69,7 +69,6 @@ class BaseConfig : public WifiConfig,
   String _id;
   char _tempUnit = 'C';
   String _fileName;
-  int _dynamicJsonSize;
   bool _darkMode = false;
 
   // WebServer
@@ -97,7 +96,7 @@ class BaseConfig : public WifiConfig,
   void parseJsonPush(JsonObject& doc);
 
  public:
-  BaseConfig(String baseMDNS, String fileName, int dynamicJsonSize);
+  BaseConfig(String baseMDNS, String fileName);
 
   // WebServer
   bool getCorsAllowed() { return _corsAllowed; }
