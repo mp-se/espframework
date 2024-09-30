@@ -29,13 +29,13 @@ SOFTWARE.
 #include <ota.hpp>
 #include <perf.hpp>
 #include <serialws.hpp>
-#include <wificonnection.hpp>
 #include <uptime.hpp>
+#include <wificonnection.hpp>
 
 SerialDebug mySerial(115200L);
 DemoConfig myConfig("mdnsbase", "/esplib.cfg");
 WifiConnection myWifi(&myConfig, "espSSID", "password", "esplib", "", "");
-OtaUpdate myOta(&myConfig, "1.0.0");
+OtaUpdate myOta(&myConfig, "1.1.0");
 DemoPush myPush(&myConfig);
 
 #include <demo-webserver.hpp>
@@ -44,6 +44,7 @@ SerialWebSocket mySerialWebSocket;
 
 void setup() {
   delay(4000);
+
   Log.notice(F("Main: Started setup." CR));
 
 #if defined(PERF_ENABLE)
@@ -63,9 +64,9 @@ void setup() {
   } else {
     PERF_BEGIN("wifi-connect");
     myWifi.connect(WIFI_AP_STA);
-    myWifi.setAP("extra", "password");  // Will create an AP as well as
-                                        // connecting to the defined wifi
-    myWifi.startAP(WIFI_AP_STA);
+    // myWifi.setAP("extra", "password");  // Will create an AP as well as
+    // connecting to the defined wifi
+    // myWifi.startAP(WIFI_AP_STA);
     PERF_END("wifi-connect");
     PERF_PUSH();
     myWifi.timeSync();
@@ -77,10 +78,10 @@ void setup() {
   }
 
   myDemoWebServer.setupWebServer();
-  mySerialWebSocket.begin(myDemoWebServer.getWebServer(), &Serial);
+  mySerialWebSocket.begin(myDemoWebServer.getWebServer(), &EspSerial);
   mySerial.begin(&mySerialWebSocket);
 
-  Serial.println("Setup() complete");
+  EspSerial.println("Setup() complete");
   Log.notice(F("Main: Setup is completed." CR));
 }
 
@@ -92,7 +93,9 @@ void loop() {
   delay(2000);
 
   myUptime.calculate();
-  Log.notice(F("Loop: Uptime %d days, %d hours, %d minutes, %d seconds." CR), myUptime.getDays(), myUptime.getHours(), myUptime.getMinutes(), myUptime.getSeconds());
+  /*Log.notice(F("Loop: Uptime %d days, %d hours, %d minutes, %d seconds." CR),
+             myUptime.getDays(), myUptime.getHours(), myUptime.getMinutes(),
+             myUptime.getSeconds());*/
 }
 
 // EOF

@@ -71,10 +71,10 @@ On ESP32 the following can be used to set the max size for firmware updates.
   - https://github.com/mathieucarbou/ESPAsyncWebServer#v3.3.4
 
   ESP8266
-  - https://github.com/mathieucarbou/esphome-ESPAsyncTCP#v2.0.0
+  - https://github.com/esphome/ESPAsyncTCP#v2.0.0
 
   ESP32
-  - https://github.com/mathieucarbou/AsyncTCP#v3.2.5
+  - https://github.com/esphome/AsyncTCP#v2.1.4
 
 
 ## Features
