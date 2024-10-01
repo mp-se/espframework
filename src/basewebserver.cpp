@@ -432,8 +432,6 @@ void BaseWebServer::webHandlePing(AsyncWebServerRequest *request) {
 void BaseWebServer::setupWebHandlers() {
   if (!_server) return;
 
-  MDNS.begin(_webConfig->getMDNS());
-
   Log.notice(F("WEB : Setting up async web handlers." CR));
   _server->on("/", std::bind(&BaseWebServer::webReturnIndexHtml, this,
                              std::placeholders::_1));
