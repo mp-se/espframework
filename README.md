@@ -21,23 +21,9 @@ This is a framework that I use in my own ESP projects as a base. It contains a l
   - [Misc helper methods](#misc-helper-methods)
 - [Credits](#credits)
 
-## Changes from 0.x to 1.x
+## Changes from 1.1 to 2.0
 
-The v1.x is different from the previous releases on the following:
-
-* Moved UI to VueJS instead of html and jQuery since JQuery is no longer being developed
-* API's now require authentication header
-* API's now use JSON for request/response (move away from form-data)
-* Now only supports async webserver
-* Changed name of webserver class to BaseWebServer
-
-## Migration to 1.0
-
-* Now support VueJS build instead of plain html files. Do a build of the UI project and place the following files in the html directory (index.html, app.css.gz, app.js.gz). All the configuration is already done in the framework for using these files.
-* Secure that all tags in json documents use the '_' chararacter and not '-', this will make the JavaScript development much simpler. 
-* WebServer now only support AsyncWebServer so replace (baseasyncwebhandler.hpp) with (basewebserver.hpp) and use the new base class BaseWebServer and all post requests uses the built in JSON handler
-* BaseConfig functions for creating json has new signature using JsonObject& as parameter
-* Starting wifi portal is done via .startWifiAP() and replace .startPortal()
+- Migrated to Arduino 3.x
 
 ## Supported targets
 
