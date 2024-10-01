@@ -21,23 +21,13 @@ This is a framework that I use in my own ESP projects as a base. It contains a l
   - [Misc helper methods](#misc-helper-methods)
 - [Credits](#credits)
 
-## Changes from 0.x to 1.x
+## Changes from 1.0 to 1.1
 
-The v1.x is different from the previous releases on the following:
-
-* Moved UI to VueJS instead of html and jQuery since JQuery is no longer being developed
-* API's now require authentication header
-* API's now use JSON for request/response (move away from form-data)
-* Now only supports async webserver
-* Changed name of webserver class to BaseWebServer
-
-## Migration to 1.0
-
-* Now support VueJS build instead of plain html files. Do a build of the UI project and place the following files in the html directory (index.html, app.css.gz, app.js.gz). All the configuration is already done in the framework for using these files.
-* Secure that all tags in json documents use the '_' chararacter and not '-', this will make the JavaScript development much simpler. 
-* WebServer now only support AsyncWebServer so replace (baseasyncwebhandler.hpp) with (basewebserver.hpp) and use the new base class BaseWebServer and all post requests uses the built in JSON handler
-* BaseConfig functions for creating json has new signature using JsonObject& as parameter
-* Starting wifi portal is done via .startWifiAP() and replace .startPortal()
+- Switched to AsynTCP from esphome 
+- Switched to AsyncWebServer from mathieucarbou
+- Switched to ArduinoJSON v7
+- Included ArduinoLog and Incbin projects into the codebase since they are not really mainted anymore.
+- Added feature to save wifi settings to Preferences API on ESP32 to make it easier to switch between project during development.
 
 ## Supported targets
 
@@ -55,7 +45,7 @@ The following defines configures the framework for the target platform
 - ESP32
 - ESP32C3
 - ESP32S2
-- ESP32S4
+- ESP32S3
 
 On ESP32 the following can be used to set the max size for firmware updates.
 
@@ -434,15 +424,3 @@ void printHeap(String prefix); // Print out current heap information to logger
 void ledOn(LedColor l = LedColor::WHITE); // Set the builtin led, supports RGB leds on C3/S3 boards
 void ledOff();
 ```
-
-# Credits
-This library is based on the following projects, without the work of these authors this would have been impossible.
-
-- [https://github.com/mp-se/Arduino-Log](https://github.com/mp-se/Arduino-Log)
-- [https://github.com/mp-se/ArduinoJson](https://github.com/mp-se/ArduinoJson)
-- [https://github.com/mp-se/arduino-mqtt](https://github.com/mp-se/arduino-mqtt)
-- [https://github.com/mp-se/incbin](https://github.com/mp-se/incbin, esp8266 only)
-- [https://github.com/mp-se/ESPAsyncWebServer](https://github.com/mp-se/ESPAsyncWebServer)
-- [https://github.com/mp-se/ESPAsyncTCP](https://github.com/mp-se/ESPAsyncTCP)
-- [https://github.com/esp8266/Arduino](https://github.com/esp8266/Arduino, esp8266 only)
-- [https://github.com/espressif/arduino-esp32](https://github.com/espressif/arduino-esp32, esp32 only)
