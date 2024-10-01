@@ -55,7 +55,7 @@ The following defines configures the framework for the target platform
 - ESP32
 - ESP32C3
 - ESP32S2
-- ESP32S4
+- ESP32S3
 
 On ESP32 the following can be used to set the max size for firmware updates.
 
@@ -435,15 +435,3 @@ void printHeap(String prefix); // Print out current heap information to logger
 void ledOn(LedColor l = LedColor::WHITE); // Set the builtin led, supports RGB leds on C3/S3 boards
 void ledOff();
 ```
-
-# Credits
-This library is based on the following projects, without the work of these authors this would have been impossible.
-
-- [https://github.com/mp-se/Arduino-Log](https://github.com/mp-se/Arduino-Log)
-- [https://github.com/mp-se/ArduinoJson](https://github.com/mp-se/ArduinoJson)
-- [https://github.com/mp-se/arduino-mqtt](https://github.com/mp-se/arduino-mqtt)
-- [https://github.com/mp-se/incbin](https://github.com/mp-se/incbin, esp8266 only)
-- [https://github.com/mp-se/ESPAsyncWebServer](https://github.com/mp-se/ESPAsyncWebServer)
-- [https://github.com/mp-se/ESPAsyncTCP](https://github.com/mp-se/ESPAsyncTCP)
-- [https://github.com/esp8266/Arduino](https://github.com/esp8266/Arduino, esp8266 only)
-- [https://github.com/espressif/arduino-esp32](https://github.com/espressif/arduino-esp32, esp32 only)
