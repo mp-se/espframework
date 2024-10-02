@@ -48,6 +48,8 @@ void DemoWebServer::setupWebHandlers() {
   Log.notice(F("WEB : Setting up web handlers." CR));
   BaseWebServer::setupWebHandlers();
 
+  MDNS.addService("espfwk", "tcp", 80);
+
   _server->on(
       "/api/status", HTTP_GET,
       std::bind(&DemoWebServer::webHandleStatus, this, std::placeholders::_1));
