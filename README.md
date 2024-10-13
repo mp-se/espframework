@@ -67,6 +67,8 @@ On ESP32 the following can be used to set the max size for firmware updates.
   - https://github.com/esphome/AsyncTCP#v2.1.4
 
 
+- DISABLE_LED
+
 ## Features
 
 1. **WIFI Connection**

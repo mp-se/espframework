@@ -27,6 +27,13 @@ SOFTWARE.
 #include <led.hpp>
 #include <log.hpp>
 
+#if defined(DISABLE_LED)
+
+void ledOn(LedColor l) { }
+void ledOff() { }
+
+#else
+
 #if defined(ESP32C3) || defined(ESP32S3)
 void ledOn(LedColor l) {
   uint8_t r, g, b, pin;
@@ -67,5 +74,7 @@ void ledOn(LedColor l) {
 #endif
 
 void ledOff() { ledOn(LedColor::OFF); }
+
+#endif
 
 // EOF
