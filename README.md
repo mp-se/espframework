@@ -64,6 +64,8 @@ On ESP32 the following can be used to set the max size for firmware updates.
   - https://github.com/mathieucarbou/AsyncTCP#v3.2.5 (For arduino 3.x)
 
 
+- DISABLE_LED
+
 ## Features
 
 1. **WIFI Connection**
