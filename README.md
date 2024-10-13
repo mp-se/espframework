@@ -57,6 +57,8 @@ The following defines configures the framework for the target platform
 - ESP32S2
 - ESP32S4
 
+- DISABLE_LED
+
 ## Features
 
 1. **WIFI Connection**
