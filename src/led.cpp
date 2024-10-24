@@ -29,8 +29,8 @@ SOFTWARE.
 
 #if defined(DISABLE_LED)
 
-void ledOn(LedColor l) { }
-void ledOff() { }
+void ledOn(LedColor l) {}
+void ledOff() {}
 
 #else
 

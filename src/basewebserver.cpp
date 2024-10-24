@@ -303,7 +303,7 @@ void BaseWebServer::webHandleFileSystem(AsyncWebServerRequest *request,
       Dir dir = LittleFS.openDir("/");
       int i = 0;
       JsonArray arr = obj[PARAM_FILES].to<JsonArray>();
-      
+
       while (dir.next()) {
         arr[i][PARAM_FILE] = "/" + String(dir.fileName());
         arr[i][PARAM_SIZE] = static_cast<int>(dir.fileSize());
