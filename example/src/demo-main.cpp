@@ -31,6 +31,7 @@ SOFTWARE.
 #include <serialws.hpp>
 #include <uptime.hpp>
 #include <wificonnection.hpp>
+#include <looptimer.hpp>
 
 SerialDebug mySerial(115200L);
 DemoConfig myConfig("mdnsbase", "/esplib.cfg");
@@ -85,7 +86,14 @@ void setup() {
   Log.notice(F("Main: Setup is completed." CR));
 }
 
+LoopTimer intLoop(3000);
+
 void loop() {
+  if(intLoop.hasExipred()) {
+    Log.notice(F("Loop: loop timer expired." CR));
+    intLoop.reset();
+  }
+
   myWifi.loop();
   myDemoWebServer.loop();
   mySerialWebSocket.loop();
