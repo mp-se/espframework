@@ -231,7 +231,7 @@ bool BaseConfig::saveFile() {
   }
 
   JsonDocument doc;
-  JsonObject obj = doc.as<JsonObject>();
+  JsonObject obj = doc.to<JsonObject>();
   createJson(obj);
 #if LOG_LEVEL == 6
   serializeJson(doc, EspSerial);
