@@ -246,6 +246,8 @@ void BaseWebServer::webHandlePageNotFound(AsyncWebServerRequest *request) {
           "Access-Control-Request-Headers, Authorization");
       request->send(resp);
       return;
+    } else {
+      Log.error(F("WEB : CORS is not enabled in configuration, ignoring OPTIONS request." CR));
     }
   }
 
