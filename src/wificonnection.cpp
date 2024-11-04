@@ -284,6 +284,11 @@ bool WifiConnection::disconnect() {
 }
 
 void WifiConnection::timeSync(String timeZone) {
+  if(!isConnected()) {
+    Log.notice(F("WIFI: No active wifi connection, skip timesync."));
+    return;
+  }
+
   configTime(0, 0, "pool.ntp.org", "time.nist.gov");
 
   Log.notice(F("WIFI: Waiting for NTP sync."));
