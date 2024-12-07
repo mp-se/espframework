@@ -32,7 +32,7 @@ class JsonFileSystemHelper {
   String _fileName = "";
 
  public:
-  JsonFileSystemHelper(String fileName);
+  explicit JsonFileSystemHelper(String fileName);
 
   bool saveJson(JsonDocument& doc);
   bool loadJson(JsonDocument& doc);

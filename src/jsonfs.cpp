@@ -21,12 +21,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-#include <jsonfs.hpp>
-#include <log.hpp>
 #include <LittleFS.h>
 
+#include <jsonfs.hpp>
+#include <log.hpp>
+
 JsonFileSystemHelper::JsonFileSystemHelper(String fileName) {
-  _fileName = fileName; 
+  _fileName = fileName;
 }
 
 bool JsonFileSystemHelper::saveJson(JsonDocument& doc) {
@@ -38,10 +39,10 @@ bool JsonFileSystemHelper::saveJson(JsonDocument& doc) {
     return false;
   }
 
-// #if LOG_LEVEL == 6
-//   serializeJson(doc, EspSerial);
-//   EspSerial.print(CR);
-// #endif
+  // #if LOG_LEVEL == 6
+  //   serializeJson(doc, EspSerial);
+  //   EspSerial.print(CR);
+  // #endif
   serializeJson(doc, jsonFile);
   jsonFile.flush();
   jsonFile.close();
@@ -66,10 +67,10 @@ bool JsonFileSystemHelper::loadJson(JsonDocument& doc) {
   }
 
   DeserializationError err = deserializeJson(doc, jsonFile);
-// #if LOG_LEVEL == 6
-//   serializeJson(doc, EspSerial);
-//   EspSerial.print(CR);
-// #endif
+  // #if LOG_LEVEL == 6
+  //   serializeJson(doc, EspSerial);
+  //   EspSerial.print(CR);
+  // #endif
   jsonFile.close();
 
   if (err) {

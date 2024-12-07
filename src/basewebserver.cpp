@@ -247,7 +247,9 @@ void BaseWebServer::webHandlePageNotFound(AsyncWebServerRequest *request) {
       request->send(resp);
       return;
     } else {
-      Log.error(F("WEB : CORS is not enabled in configuration, ignoring OPTIONS request." CR));
+      Log.error(
+          F("WEB : CORS is not enabled in configuration, ignoring OPTIONS "
+            "request." CR));
     }
   }
 
