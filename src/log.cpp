@@ -63,7 +63,9 @@ void dumpErrorLog1() { dumpErrorLog(ERR_FILENAME); }
 
 void dumpErrorLog2() { dumpErrorLog(ERR_FILENAME2); }
 
-SerialDebug::SerialDebug(const uint32_t serialSpeed) {
+SerialDebug::SerialDebug(const uint32_t serialSpeed, bool autoBegin) {
+  _serialSpeed = serialSpeed;
+
 #if defined(USE_SERIAL_PINS) && defined(ESP8266)
   EspSerial.begin(serialSpeed);
 #warning "SerialPins is not implemented on ESP8266"
@@ -89,9 +91,15 @@ SerialDebug::SerialDebug(const uint32_t serialSpeed) {
 #endif
   EspSerial.println("Serial console activated.");
 
-  begin(&EspSerial);
+  if(autoBegin) {
+    begin(&EspSerial);
+  }
+}
+
+void SerialDebug::begin(Print* p) { 
+  getLog()->begin(LOG_LEVEL, p, true); 
   getLog()->setPrefix(printTimestamp);
-  getLog()->notice(F("SDBG: Serial logging started at %d." CR), serialSpeed);
+  getLog()->notice(F("SDBG: Serial logging started at %d." CR), _serialSpeed);
 }
 
 void printTimestamp(Print *_logOutput, int _logLevel) {

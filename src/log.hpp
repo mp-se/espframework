@@ -32,9 +32,12 @@ SOFTWARE.
 #define ERR_FILEMAXSIZE 2048
 
 class SerialDebug {
+ private:
+  uint32_t _serialSpeed;
  public:
-  explicit SerialDebug(const uint32_t serialSpeed = 115200L);
-  void begin(Print* p) { getLog()->begin(LOG_LEVEL, p, true); }
+  explicit SerialDebug(const uint32_t serialSpeed = 115200L, bool autoBegin = true);
+  void begin(Print* p);
+  uint32_t getSerialSpeed() { return _serialSpeed; }
   static Logging* getLog() { return &Log; }
 };
 
