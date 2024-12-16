@@ -124,6 +124,7 @@ class PushConfig {
   virtual const char* getPassMqtt();
   virtual void setPassMqtt(String pass);
   virtual bool hasTargetMqtt();
+  virtual bool isRetainEnabledMqtt();
 };
 
 #endif  // SRC_INTERFACE_HPP_
