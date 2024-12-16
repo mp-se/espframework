@@ -103,6 +103,7 @@ constexpr auto PARAM_MQTT_TARGET = "mqtt_target";
 constexpr auto PARAM_MQTT_PORT = "mqtt_port";
 constexpr auto PARAM_MQTT_USER = "mqtt_user";
 constexpr auto PARAM_MQTT_PASS = "mqtt_pass";
+constexpr auto PARAM_MQTT_RETAIN = "mqtt_retain";
 constexpr auto PARAM_WIFI_PORTAL_TIMEOUT = "wifi_portal_timeout";
 constexpr auto PARAM_WIFI_CONNECT_TIMEOUT = "wifi_connect_timeout";
 constexpr auto PARAM_PUSH_TIMEOUT = "push_timeout";

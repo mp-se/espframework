@@ -291,7 +291,7 @@ void BasePush::sendMqtt(String& payload, const char* target, int port,
     Log.verbose(F("PUSH: topic '%s', value '%s'." CR), topic.c_str(),
                 value.c_str());
 #endif
-    if (mqtt.publish(topic, value)) {
+    if (mqtt.publish(topic, value, _config->isRetainEnabledMqtt(), 0)) {
       _lastSuccess = true;
       Log.notice(F("PUSH: MQTT publish successful on %s" CR), topic.c_str());
       _lastResponseCode = 0;
