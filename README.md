@@ -47,6 +47,11 @@ On ESP32 the following can be used to set the max size for firmware updates.
 
 - MAX_SKETCH_SPACE default value is 0x1c0000 (1.8Mb)
 
+## Disabling features to reduce size
+
+- ESPFWK_DISABLE_OTA, Reduction 38kb on ESP32s3
+- ESPFWK_DISABLE_MQTT, Reduction 1kb on ESP32s3
+
 ## Dependant Libraries
 
   The framework is dependant on other projects which are listed here. These needs to be included into your project for a successful compilation.

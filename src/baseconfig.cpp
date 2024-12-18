@@ -129,6 +129,7 @@ void BaseConfig::createJsonPush(JsonObject& doc) {
   doc[PARAM_MQTT_PORT] = getPortMqtt();
   doc[PARAM_MQTT_USER] = getUserMqtt();
   doc[PARAM_MQTT_PASS] = getPassMqtt();
+  doc[PARAM_MQTT_RETAIN] = isRetainEnabledMqtt();
   doc[PARAM_PUSH_TIMEOUT] = getPushTimeout();
 }
 
@@ -171,6 +172,7 @@ void BaseConfig::parseJsonPush(JsonObject& doc) {
     setPortMqtt(doc[PARAM_MQTT_PORT].as<int>());
   if (!doc[PARAM_MQTT_USER].isNull()) setUserMqtt(doc[PARAM_MQTT_USER]);
   if (!doc[PARAM_MQTT_PASS].isNull()) setPassMqtt(doc[PARAM_MQTT_PASS]);
+  if (!doc[PARAM_MQTT_RETAIN].isNull()) setRetainEnabledMqtt(doc[PARAM_MQTT_RETAIN]);
 
   if (!doc[PARAM_PUSH_TIMEOUT].isNull())
     setPushTimeout(doc[PARAM_PUSH_TIMEOUT].as<int>());
@@ -231,7 +233,7 @@ bool BaseConfig::saveFile() {
   }
 
   JsonDocument doc;
-  JsonObject obj = doc.as<JsonObject>(); 
+  JsonObject obj = doc.to<JsonObject>();
   createJson(obj);
 #if LOG_LEVEL == 6
   serializeJson(doc, EspSerial);

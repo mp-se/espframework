@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2021-2024 Magnus
+Copyright (c) 2024 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -21,35 +21,36 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-#ifndef SRC_OTA_HPP_
-#define SRC_OTA_HPP_
+#ifndef SRC_LOOPTIMER_HPP_
+#define SRC_LOOPTIMER_HPP_
 
-#if !defined(ESPFWK_DISABLE_OTA)
-#if defined(ESP8266)
-#include <ESP8266HTTPClient.h>
-#else
-#include <HTTPClient.h>
-#endif
+#include <Arduino.h>
 
-#include <interface.hpp>
-
-class OtaUpdate {
+class LoopTimer {
  private:
-  OtaConfig* _otaConfig;
-  String _curVer;
-  bool _newFirmware = false;
-
-  bool parseFirmwareVersionString(int (&num)[3], const char* version);
-  void downloadFile(HTTPClient& http, String& fname);
+  uint64_t _startMillis = 0;
+  uint64_t _interval = 0;
+  uint64_t _loopCounter = 0;
 
  public:
-  OtaUpdate(OtaConfig* cfg, String ver);
+  explicit LoopTimer(uint64_t interval) {
+    _interval = interval;
+    reset();
+  }
 
-  bool updateFirmware();
-  bool checkFirmwareVersion();
+  bool hasExipred() {
+    if (abs((int32_t)(millis() - _startMillis)) > _interval) {
+      _loopCounter++;
+      return true;
+    }
+    return false;
+  }
+
+  void reset() { _startMillis = millis(); }
+  uint64_t getLoopCounter() { return _loopCounter; }
+  int32_t getTimePassed() { return abs((int32_t)(millis() - _startMillis)); }
 };
 
-#endif  // ESPFWK_DISABLE_OTA
-#endif  // SRC_OTA_HPP_
+#endif  // SRC_LOOPTIMER_HPP_
 
 // EOF

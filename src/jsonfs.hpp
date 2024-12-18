@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2021-2024 Magnus
+Copyright (c) 2024 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -21,35 +21,23 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-#ifndef SRC_OTA_HPP_
-#define SRC_OTA_HPP_
+#ifndef SRC_JSONFS_HPP_
+#define SRC_JSONFS_HPP_
 
-#if !defined(ESPFWK_DISABLE_OTA)
-#if defined(ESP8266)
-#include <ESP8266HTTPClient.h>
-#else
-#include <HTTPClient.h>
-#endif
+#include <Arduino.h>
+#include <ArduinoJson.h>
 
-#include <interface.hpp>
-
-class OtaUpdate {
+class JsonFileSystemHelper {
  private:
-  OtaConfig* _otaConfig;
-  String _curVer;
-  bool _newFirmware = false;
-
-  bool parseFirmwareVersionString(int (&num)[3], const char* version);
-  void downloadFile(HTTPClient& http, String& fname);
+  String _fileName = "";
 
  public:
-  OtaUpdate(OtaConfig* cfg, String ver);
+  explicit JsonFileSystemHelper(String fileName);
 
-  bool updateFirmware();
-  bool checkFirmwareVersion();
+  bool saveJson(JsonDocument& doc);
+  bool loadJson(JsonDocument& doc);
 };
 
-#endif  // ESPFWK_DISABLE_OTA
-#endif  // SRC_OTA_HPP_
+#endif  // SRC_JSONFS_HPP_
 
 // EOF

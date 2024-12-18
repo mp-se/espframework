@@ -31,11 +31,14 @@ SOFTWARE.
 #include <serialws.hpp>
 #include <uptime.hpp>
 #include <wificonnection.hpp>
+#include <looptimer.hpp>
 
 SerialDebug mySerial(115200L);
 DemoConfig myConfig("mdnsbase", "/esplib.cfg");
 WifiConnection myWifi(&myConfig, "espSSID", "password", "esplib", "", "");
+#if !defined(ESPFWK_DISABLE_OTA)
 OtaUpdate myOta(&myConfig, "1.1.0");
+#endif
 DemoPush myPush(&myConfig);
 
 #include <demo-webserver.hpp>
@@ -71,10 +74,12 @@ void setup() {
     PERF_PUSH();
     myWifi.timeSync();
 
+#if !defined(ESPFWK_DISABLE_OTA)
     if (!myWifi.isConnected() || myOta.checkFirmwareVersion()) {
       Log.notice(F("Main: New firmware available via OTA, doing update." CR));
       myOta.updateFirmware();
     }
+#endif
   }
 
   myDemoWebServer.setupWebServer();
@@ -85,7 +90,14 @@ void setup() {
   Log.notice(F("Main: Setup is completed." CR));
 }
 
+LoopTimer intLoop(3000);
+
 void loop() {
+  if(intLoop.hasExipred()) {
+    Log.notice(F("Loop: loop timer expired." CR));
+    intLoop.reset();
+  }
+
   myWifi.loop();
   myDemoWebServer.loop();
   mySerialWebSocket.loop();

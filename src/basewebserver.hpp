@@ -88,7 +88,7 @@ class BaseWebServer {
   void webReturnIndexHtml(AsyncWebServerRequest *request) {
     Log.notice(F("WEB : webServer callback for /index.html (Memory)." CR));
     request->send(200, "text/html", (const uint8_t *)gIndexHtmlData,
-                    gIndexHtmlSize);
+                  gIndexHtmlSize);
   }
   void webReturnAppJs(AsyncWebServerRequest *request) {
     if (LittleFS.exists("/app.js.gz")) {
@@ -124,8 +124,8 @@ class BaseWebServer {
   void webReturnIndexHtml(AsyncWebServerRequest *request) {
     Log.notice(F("WEB : webServer callback for /index.html (Memory)." CR));
     request->send(200, "text/html", (const uint8_t *)indexHtmlStart,
-                    reinterpret_cast<uint32_t>(&indexHtmlEnd[0]) -
-                        reinterpret_cast<uint32_t>(&indexHtmlStart[0]));
+                  reinterpret_cast<uint32_t>(&indexHtmlEnd[0]) -
+                      reinterpret_cast<uint32_t>(&indexHtmlStart[0]));
   }
   void webReturnAppJs(AsyncWebServerRequest *request) {
     if (LittleFS.exists("/app.js.gz")) {
