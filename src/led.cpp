@@ -44,11 +44,7 @@ void ledOn(LedColor l) {
   pin = LED_BUILTIN;
 
   Log.info(F("LED : Setting led %d to RGB %d-%d-%d" CR), pin, r, g, b);
-#if defined(ESP32S3)
-  neopixelWrite(pin, g, r, b);
-#else
-  neopixelWrite(pin, r, g, b);
-#endif
+  rgbLedWrite(pin, r, g, b);
 }
 #else
 bool ledInit = false;
