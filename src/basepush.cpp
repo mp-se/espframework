@@ -51,9 +51,9 @@ void BasePush::probeMFLN(String serverPath) {
 
   Log.notice(F("PUSH: Probing server to max fragment %s:%d" CR), host.c_str(),
              port);
-  if (_wifiSecure.probeMaxFragmentLength(host, port, 512)) {
+  if (_wifiSecure->probeMaxFragmentLength(host, port, 512)) {
     Log.notice(F("PUSH: Server supports smaller SSL buffer." CR));
-    _wifiSecure.setBufferSizes(512, 512);
+    _wifiSecure->setBufferSizes(512, 512);
   }
 #endif
 }
@@ -77,18 +77,18 @@ void BasePush::sendInfluxDb2(String& payload, const char* target,
 
   if (isSecure(target)) {
     Log.notice(F("PUSH: InfluxDB, SSL enabled without validation." CR));
-    _wifiSecure.setInsecure();
+    allocateSecure();
+    _wifiSecure->setInsecure();
     probeMFLN(serverPath);
-    _httpSecure.setTimeout(_config->getPushTimeout() * 1000);
-    _httpSecure.begin(_wifiSecure, serverPath);
-    _httpSecure.addHeader(F("Authorization"), authHeader.c_str());
-    _lastResponseCode = _httpSecure.POST(payload);
+    _http->setTimeout(_config->getPushTimeout() * 1000);
+    _http->begin(*_wifiSecure, serverPath);
   } else {
-    _http.setTimeout(_config->getPushTimeout() * 1000);
-    _http.begin(_wifi, serverPath);
-    _http.addHeader(F("Authorization"), authHeader.c_str());
-    _lastResponseCode = _http.POST(payload);
+    _http->setTimeout(_config->getPushTimeout() * 1000);
+    _http->begin(*_wifi, serverPath);
   }
+
+  _http->addHeader(F("Authorization"), authHeader.c_str());
+  _lastResponseCode = _http->POST(payload);
 
   if (_lastResponseCode == 204) {
     _lastSuccess = true;
@@ -99,18 +99,18 @@ void BasePush::sendInfluxDb2(String& payload, const char* target,
                _lastResponseCode);
   }
 
+  _http->end();
+
   if (isSecure(target)) {
-    _httpSecure.end();
-    _wifiSecure.stop();
+    _wifiSecure->stop();
   } else {
-    _http.end();
-    _wifi.stop();
+    _wifi->stop();
   }
 
   tcp_cleanup();
 }
 
-void BasePush::addHttpHeader(HTTPClient& http, String header) {
+void BasePush::addHttpHeader(String header) {
   // header=: Header: details
 
   if (!header.length()) return;
@@ -122,7 +122,7 @@ void BasePush::addHttpHeader(HTTPClient& http, String header) {
     value.trim();
     Log.notice(F("PUSH: Adding header '%s': '%s'" CR), name.c_str(),
                value.c_str());
-    http.addHeader(name, value);
+    _http->addHeader(name, value);
   } else {
     Log.error(F("PUSH: Unable to set header, invalid value %s" CR), header);
   }
@@ -142,40 +142,39 @@ String BasePush::sendHttpPost(String& payload, const char* target,
 
   if (isSecure(target)) {
     Log.notice(F("PUSH: HTTP, SSL enabled without validation." CR));
-    _wifiSecure.setInsecure();
+    allocateSecure();
+    _wifiSecure->setInsecure();
     probeMFLN(target);
-    _httpSecure.setTimeout(_config->getPushTimeout() * 1000);
-    _httpSecure.begin(_wifiSecure, target);
-    addHttpHeader(_httpSecure, header1);
-    addHttpHeader(_httpSecure, header2);
-    _lastResponseCode = _httpSecure.POST(payload);
+    _http->setTimeout(_config->getPushTimeout() * 1000);
+    _http->begin(*_wifiSecure, target);
   } else {
-    _http.setTimeout(_config->getPushTimeout() * 1000);
-    _http.begin(_wifi, target);
-    addHttpHeader(_http, header1);
-    addHttpHeader(_http, header2);
-    _lastResponseCode = _http.POST(payload);
+    _http->setTimeout(_config->getPushTimeout() * 1000);
+    _http->begin(*_wifi, target);
   }
+
+  addHttpHeader(header1);
+  addHttpHeader(header2);
+  _lastResponseCode = _http->POST(payload);
 
   if (_lastResponseCode == 200) {
     _lastSuccess = true;
     Log.notice(F("PUSH: HTTP post successful, response=%d" CR),
                _lastResponseCode);
     if (isSecure(target)) {
-      _response = _httpSecure.getString();
+      _response = _http->getString();
     } else {
-      _response = _http.getString();
+      _response = _http->getString();
     }
   } else {
     Log.error(F("PUSH: HTTP post failed, response=%d" CR), _lastResponseCode);
   }
 
+  _http->end();
+
   if (isSecure(target)) {
-    _httpSecure.end();
-    _wifiSecure.stop();
+    _wifiSecure->stop();
   } else {
-    _http.end();
-    _wifi.stop();
+    _wifi->stop();
   }
 
   tcp_cleanup();
@@ -197,40 +196,35 @@ String BasePush::sendHttpGet(String& payload, const char* target,
 
   if (isSecure(target)) {
     Log.notice(F("PUSH: HTTP, SSL enabled without validation." CR));
-    _wifiSecure.setInsecure();
+    allocateSecure();
+    _wifiSecure->setInsecure();
     probeMFLN(target);
-    _httpSecure.setTimeout(_config->getPushTimeout() * 1000);
-    _httpSecure.begin(_wifiSecure, url);
-    addHttpHeader(_httpSecure, header1);
-    addHttpHeader(_httpSecure, header2);
-    _lastResponseCode = _httpSecure.GET();
+    _http->setTimeout(_config->getPushTimeout() * 1000);
+    _http->begin(*_wifiSecure, url);
   } else {
-    _http.setTimeout(_config->getPushTimeout() * 1000);
-    _http.begin(_wifi, url);
-    addHttpHeader(_http, header1);
-    addHttpHeader(_http, header2);
-    _lastResponseCode = _http.GET();
+    _http->setTimeout(_config->getPushTimeout() * 1000);
+    _http->begin(*_wifi, url);
   }
+
+  addHttpHeader(header1);
+  addHttpHeader(header2);
+  _lastResponseCode = _http->GET();
 
   if (_lastResponseCode == 200) {
     _lastSuccess = true;
     Log.notice(F("PUSH: HTTP get successful, response=%d" CR),
                _lastResponseCode);
-    if (isSecure(target)) {
-      _response = _httpSecure.getString();
-    } else {
-      _response = _http.getString();
-    }
+    _response = _http->getString();
   } else {
     Log.error(F("PUSH: HTTP get failed, response=%d" CR), _lastResponseCode);
   }
 
+  _http->end();
+
   if (isSecure(target)) {
-    _httpSecure.end();
-    _wifiSecure.stop();
+    _wifiSecure->stop();
   } else {
-    _http.end();
-    _wifi.stop();
+    _wifi->stop();
   }
 
   tcp_cleanup();
@@ -245,27 +239,29 @@ void BasePush::sendMqtt(String& payload, const char* target, int port,
   _lastResponseCode = 0;
   _lastSuccess = false;
 
-  MQTTClient mqtt(512);
+  std::unique_ptr<MQTTClient> mqtt;
+  mqtt = std::make_unique<MQTTClient>(512);
 
   if (port > 8000) {
     Log.notice(F("PUSH: MQTT, SSL enabled without validation." CR));
-    _wifiSecure.setInsecure();
+    allocateSecure();
+    _wifiSecure->setInsecure();
 
 #if defined(ESP8266)
-    if (_wifiSecure.probeMaxFragmentLength(target, port, 512)) {
+    if (_wifiSecure->probeMaxFragmentLength(target, port, 512)) {
       Log.notice(F("PUSH: MQTT server supports smaller SSL buffer." CR));
-      _wifiSecure.setBufferSizes(512, 512);
+      _wifiSecure->setBufferSizes(512, 512);
     }
 #endif
 
-    mqtt.setTimeout(_config->getPushTimeout() * 1000);
-    mqtt.begin(target, port, _wifiSecure);
+    mqtt->setTimeout(_config->getPushTimeout() * 1000);
+    mqtt->begin(target, port, *_wifiSecure);
   } else {
-    mqtt.setTimeout(_config->getPushTimeout() * 1000);
-    mqtt.begin(target, port, _wifi);
+    mqtt->setTimeout(_config->getPushTimeout() * 1000);
+    mqtt->begin(target, port, *_wifi);
   }
 
-  mqtt.connect(_config->getMDNS(), user, pass);
+  mqtt->connect(_config->getMDNS(), user, pass);
 
 #if LOG_LEVEL == 6
   Log.verbose(F("PUSH: url %s." CR), target);
@@ -291,26 +287,26 @@ void BasePush::sendMqtt(String& payload, const char* target, int port,
     Log.verbose(F("PUSH: topic '%s', value '%s'." CR), topic.c_str(),
                 value.c_str());
 #endif
-    if (mqtt.publish(topic, value, _config->isRetainEnabledMqtt(), 0)) {
+    if (mqtt->publish(topic, value, false, 0)) {
       _lastSuccess = true;
       Log.notice(F("PUSH: MQTT publish successful on %s" CR), topic.c_str());
       _lastResponseCode = 0;
     } else {
-      _lastResponseCode = mqtt.lastError();
+      _lastResponseCode = mqtt->lastError();
       Log.error(F("PUSH: MQTT publish failed on %s with error %d" CR),
-                topic.c_str(), mqtt.lastError());
+                topic.c_str(), mqtt->lastError());
     }
 
     index = next + 1;
     lines--;
   }
 
-  mqtt.disconnect();
+  mqtt->disconnect();
 
   if (port > 8000) {
-    _wifiSecure.stop();
+    _wifiSecure->stop();
   } else {
-    _wifi.stop();
+    _wifi->stop();
   }
 
   tcp_cleanup();
