@@ -311,7 +311,6 @@ void BaseWebServer::webHandleFileSystem(AsyncWebServerRequest *request,
       while (dir.next()) {
         arr[i][PARAM_FILE] = "/" + String(dir.fileName());
         arr[i][PARAM_SIZE] = static_cast<int>(dir.fileSize());
-        arr.add(file);
         i++;
       }
 #else  // ESP32
