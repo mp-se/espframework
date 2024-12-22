@@ -491,7 +491,7 @@ void BaseWebServer::setupWebHandlers() {
 bool BaseWebServer::setupWebServer() {
   Log.notice(F("WEB : Configuring web server." CR));
 
-  _server = new AsyncWebServer(80);
+  _server = std::make_unique<AsyncWebServer>(80);
 
   MDNS.begin(_webConfig->getMDNS());
   MDNS.addService("http", "tcp", 80);
