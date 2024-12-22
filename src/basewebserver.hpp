@@ -24,6 +24,8 @@ SOFTWARE.
 #ifndef SRC_BASEWEBSERVER_HPP_
 #define SRC_BASEWEBSERVER_HPP_
 
+#include <memory>
+
 #if defined(ESP32)
 #include <freertos/FreeRTOS.h>
 #endif
@@ -46,7 +48,6 @@ SOFTWARE.
 #include <espframework.hpp>
 #include <interface.hpp>
 #include <log.hpp>
-#include <memory>
 
 #if defined(ESP8266)
 #include <incbin.hpp>

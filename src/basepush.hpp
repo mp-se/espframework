@@ -24,6 +24,8 @@ SOFTWARE.
 #ifndef SRC_BASEPUSH_HPP_
 #define SRC_BASEPUSH_HPP_
 
+#include <memory>
+
 #if defined(ESP8266)
 #include <ESP8266HTTPClient.h>
 #include <WiFiClientSecure.h>
@@ -47,14 +49,14 @@ class BasePush {
 
   void allocateSecure() {
     if(_wifiSecure == nullptr)    
-      _wifiSecure = std::make_unique<WiFiClientSecure>();
+      _wifiSecure.reset(new WiFiClientSecure());
   }
 
  public:
   explicit BasePush(PushConfig* config) { 
     _config = config; 
-    _wifi = std::make_unique<WiFiClient>();
-    _http = std::make_unique<HTTPClient>();
+    _wifi.reset(new WiFiClient());
+    _http.reset(new HTTPClient());
   }
 
   int getLastResponseCode() { return _lastResponseCode; }
