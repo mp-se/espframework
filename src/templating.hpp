@@ -25,10 +25,10 @@ SOFTWARE.
 #define SRC_TEMPLATING_HPP_
 
 #include <algorithm>
+#include <memory>
 #include <espframework.hpp>
 #include <log.hpp>
 #include <utils.hpp>
-#include <memory>
 
 constexpr auto MAX_KEY_VAL = 30;
 
@@ -65,7 +65,7 @@ class TemplatingEngine {
 
     Log.notice(F("TPL : Buffer needed %d." CR), size);
 
-    _output = std::make_unique<char[]>(size + 20);
+    _output.reset(new char[size + 20]);
 
     if (!_output) {
       Log.error(F("TPL : Unable to allocate memory for transforming template, "
@@ -138,6 +138,7 @@ class TemplatingEngine {
     }
   }
 
+  void freeMemory() { _output.reset(); }
   const char *create(const char *base);
 };
 

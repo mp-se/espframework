@@ -240,7 +240,7 @@ void BasePush::sendMqtt(String& payload, const char* target, int port,
   _lastSuccess = false;
 
   std::unique_ptr<MQTTClient> mqtt;
-  mqtt = std::make_unique<MQTTClient>(512);
+  mqtt.reset(new MQTTClient(512));
 
   if (port > 8000) {
     Log.notice(F("PUSH: MQTT, SSL enabled without validation." CR));
