@@ -24,6 +24,8 @@ SOFTWARE.
 #ifndef SRC_BASEWEBSERVER_HPP_
 #define SRC_BASEWEBSERVER_HPP_
 
+#include <memory>
+
 #if defined(ESP32)
 #include <freertos/FreeRTOS.h>
 #endif
@@ -46,6 +48,7 @@ SOFTWARE.
 #include <espframework.hpp>
 #include <interface.hpp>
 #include <log.hpp>
+#include <memory>
 
 #if defined(ESP8266)
 #include <incbin.hpp>
@@ -66,7 +69,7 @@ extern const uint8_t faviconIcoEnd[] asm("_binary_html_favicon_ico_gz_end");
 
 class BaseWebServer {
  protected:
-  AsyncWebServer *_server = 0;
+  std::unique_ptr<AsyncWebServer> _server;
   File _uploadFile;
   WebConfig *_webConfig;
   int _uploadReturn = 200;
@@ -184,7 +187,7 @@ class BaseWebServer {
   explicit BaseWebServer(WebConfig *config);
 
   virtual bool setupWebServer();
-  virtual AsyncWebServer *getWebServer() { return _server; }
+  virtual AsyncWebServer *getWebServer() { return _server.get(); }
   virtual void setWifiSetup(bool wifiSetup) { _wifiSetup = wifiSetup; }
   virtual void loop();
 };

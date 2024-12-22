@@ -63,7 +63,6 @@ class BaseConfig : public WifiConfig,
   int _portMqtt = 1883;
   String _userMqtt;
   String _passMqtt;
-  bool _retainFlagMqtt = false;
 
   int _pushTimeout = 10;
 
@@ -277,11 +276,6 @@ class BaseConfig : public WifiConfig,
   const char* getPassMqtt() { return _passMqtt.c_str(); }
   void setPassMqtt(String pass) {
     _passMqtt = pass;
-    _saveNeeded = true;
-  }
-  bool isRetainEnabledMqtt() { return _retainFlagMqtt; }
-  void setRetainEnabledMqtt(bool retain) {
-    _retainFlagMqtt = retain;
     _saveNeeded = true;
   }
 

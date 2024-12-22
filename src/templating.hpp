@@ -25,6 +25,7 @@ SOFTWARE.
 #define SRC_TEMPLATING_HPP_
 
 #include <algorithm>
+#include <memory>
 #include <espframework.hpp>
 #include <log.hpp>
 #include <utils.hpp>
@@ -41,7 +42,7 @@ class TemplatingEngine {
   KeyVal _items[MAX_KEY_VAL];
 
   char _buffer[20] = "";
-  char *_output = NULL;
+  std::unique_ptr<char[]> _output;
 
   void transform(const char *format) {
     int len = strlen(format);
@@ -64,8 +65,7 @@ class TemplatingEngine {
 
     Log.notice(F("TPL : Buffer needed %d." CR), size);
 
-    freeMemory();  // In case this is reused
-    _output = static_cast<char *>(malloc(size + 20));
+    _output.reset(new char[size + 20]);
 
     if (!_output) {
       Log.error(F("TPL : Unable to allocate memory for transforming template, "
@@ -73,8 +73,6 @@ class TemplatingEngine {
                 size);
       return;
     }
-
-    memset(_output, 0, size + 20);
 
     // Lets do the transformation
     int k = 0;
@@ -87,8 +85,8 @@ class TemplatingEngine {
             if (strncmp(format + j, _items[i].key.c_str(),
                         _items[i].key.length()) == 0) {
               // Found key
-              strncat(_output, format + k, j - k);
-              strncat(_output, _items[i].val.c_str(), _items[i].val.length());
+              strncat(_output.get(), format + k, j - k);
+              strncat(_output.get(), _items[i].val.c_str(), _items[i].val.length());
               k = j + _items[i].key.length();
             }
           }
@@ -96,14 +94,13 @@ class TemplatingEngine {
       }
     }
     // strncat(_output, format + k, size - k);
-    strncat(_output, format + k, strlen(format + k));
+    strncat(_output.get(), format + k, strlen(format + k));
     Log.notice(F("TPL : Transformed template %d chars to %d chars" CR),
-               strlen(format), strlen(_output));
+               strlen(format), strlen(_output.get()));
   }
 
  public:
   TemplatingEngine() {}
-  ~TemplatingEngine() { freeMemory(); }
 
   void setVal(String key, float val, int dec = 2) {
     String s = convertFloatToString(val, &_buffer[0], dec);
@@ -141,11 +138,7 @@ class TemplatingEngine {
     }
   }
 
-  void freeMemory() {
-    if (_output) free(_output);
-    _output = NULL;
-  }
-
+  void freeMemory() { _output.reset(); }
   const char *create(const char *base);
 };
 

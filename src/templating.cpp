@@ -33,10 +33,10 @@ const char* TemplatingEngine::create(const char* base) {
   transform(base);
 
 #if LOG_LEVEL == 6
-  Log.verbose(F("TPL : Transformed '%s'." CR), _output == NULL ? "" : _output);
+  Log.verbose(F("TPL : Transformed '%s'." CR), !_output.get() ? "" : _output.get());
 #endif
 
-  if (_output) return _output;
+  if (_output) return _output.get();
 
   return "";
 }

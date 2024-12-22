@@ -24,6 +24,8 @@ SOFTWARE.
 #ifndef SRC_BASEPUSH_HPP_
 #define SRC_BASEPUSH_HPP_
 
+#include <memory>
+
 #if defined(ESP8266)
 #include <ESP8266HTTPClient.h>
 #include <WiFiClientSecure.h>
@@ -37,20 +39,28 @@ SOFTWARE.
 
 class BasePush {
  protected:
-  WiFiClient _wifi;
-  WiFiClientSecure _wifiSecure;
-  HTTPClient _http;
-  HTTPClient _httpSecure;
+  std::unique_ptr<WiFiClient> _wifi;
+  std::unique_ptr<WiFiClientSecure> _wifiSecure;
+  std::unique_ptr<HTTPClient> _http;
   int _lastResponseCode = 0;
   bool _lastSuccess = false;
   PushConfig* _config;
 
   void probeMFLN(String serverPath);
-  void addHttpHeader(HTTPClient& http, String header);
+  void addHttpHeader(String header);
   bool isSecure(String target) { return target.startsWith("https://"); }
 
+  void allocateSecure() {
+    if(_wifiSecure == nullptr)    
+      _wifiSecure.reset(new WiFiClientSecure());
+  }
+
  public:
-  explicit BasePush(PushConfig* config) { _config = config; }
+  explicit BasePush(PushConfig* config) { 
+    _config = config; 
+    _wifi.reset(new WiFiClient());
+    _http.reset(new HTTPClient());
+  }
 
   int getLastResponseCode() { return _lastResponseCode; }
   bool wasLastSuccessful() { return _lastSuccess; }
