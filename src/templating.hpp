@@ -65,7 +65,8 @@ class TemplatingEngine {
 
     Log.notice(F("TPL : Buffer needed %d." CR), size);
 
-    _output.reset(new char[size + 20]);
+    _output.reset(new char[size + 10]);
+    memset(_output.get(), 0, size + 10);
 
     if (!_output) {
       Log.error(F("TPL : Unable to allocate memory for transforming template, "
