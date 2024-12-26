@@ -18,6 +18,9 @@ This is a framework that I use in my own ESP projects as a base. It contains a l
   - [class TemplatingEngine](#class-templatingengine)
   - [class BasePush](#class-basepush)
   - [class PerfLogging](#class-perflogging)
+  - [class LoopTimer](#class-looptimer)
+  - [class JsonFS](#class-jsonfs)
+  - [class Uptime](#class-uptime)
   - [Misc helper methods](#misc-helper-methods)
 - [Credits](#credits)
 
@@ -364,6 +367,38 @@ push.sendHttpPost("Payload"); // Send to configured http post
 push.sendHttpGet("Payload");  // Send to configured http get
 push.sendInfluxDb2("Payload"); // Send to configured influxdb2
 push.sendMqtt("Topic:payload|Topic2:payload2|"); // Send to mqtt, can contain multiple topics and payloads. 
+```
+
+## class LoopTimer
+Used to trigger an action when timer has expired.
+```cpp
+LoopTimer intLoop(3000); // Time in ms = 3 seconds
+
+void loop() {
+  if(intLoop.hasExipred()) {
+    Log.notice(F("Loop: loop timer expired %d." CR), intLoop.getLoopCounter()); // How many times has it been triggered
+    intLoop.reset(); // Reset the timer 
+  }
+}
+```
+
+## class JsonFS
+Helper class to load / save a json document.
+```cpp
+JsonDocument doc;
+String file = "/myfile.json";
+
+JsonFileSystemHelper json(file);
+json.saveFile(doc);
+```
+
+## class Uptime
+Helper class to load / save a json document.
+```cpp
+myUptime.calculate();
+Log.notice(F("Loop: Uptime %d days, %d hours, %d minutes, %d seconds." CR),
+            myUptime.getDays(), myUptime.getHours(), myUptime.getMinutes(),
+            myUptime.getSeconds());
 ```
 
 ## class PerfLogging
