@@ -26,7 +26,7 @@ SOFTWARE.
 #include <jsonfs.hpp>
 #include <log.hpp>
 
-JsonFileSystemHelper::JsonFileSystemHelper(String fileName) {
+JsonFileSystemHelper::JsonFileSystemHelper(const String& fileName) {
   _fileName = fileName;
 }
 
@@ -44,6 +44,13 @@ bool JsonFileSystemHelper::saveJson(JsonDocument& doc) {
   //   EspSerial.print(CR);
   // #endif
   serializeJson(doc, jsonFile);
+
+ if (serializeJson(doc, jsonFile) == 0) {
+    Log.error(F("Failed to write to file" CR));
+    jsonFile.close();
+    return false;
+  }
+
   jsonFile.flush();
   jsonFile.close();
   Log.notice(F("CFG : Data saved to file." CR));

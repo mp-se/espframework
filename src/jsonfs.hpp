@@ -29,10 +29,10 @@ SOFTWARE.
 
 class JsonFileSystemHelper {
  private:
-  String _fileName = "";
+  String _fileName;
 
  public:
-  explicit JsonFileSystemHelper(String fileName);
+  explicit JsonFileSystemHelper(const String& fileName);
 
   bool saveJson(JsonDocument& doc);
   bool loadJson(JsonDocument& doc);
