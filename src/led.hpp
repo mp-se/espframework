@@ -24,8 +24,10 @@ SOFTWARE.
 #ifndef SRC_LED_HPP_
 #define SRC_LED_HPP_
 
+#include <pins_arduino.h>
+
 enum LedColor {
-#if defined(ESP32C3) || defined(ESP32S3)
+#if defined(RGB_BUILTIN) || defined(ESP32C3) // C3 mini has support for RGB LED but not using RGB_BUILTIN
   OFF = 0x000000,
   BLACK = 0x000000,
   RED = 0xff0000,

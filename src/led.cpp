@@ -34,7 +34,7 @@ void ledOff() {}
 
 #else
 
-#if defined(ESP32C3) || defined(ESP32S3)
+#if defined(RGB_BUILTIN) || defined(ESP32C3)
 void ledOn(LedColor l) {
   uint8_t r, g, b, pin;
 
@@ -44,10 +44,10 @@ void ledOn(LedColor l) {
   pin = LED_BUILTIN;
 
   Log.info(F("LED : Setting led %d to RGB %d-%d-%d" CR), pin, r, g, b);
-#if defined(ESP32S3)
-  neopixelWrite(pin, g, r, b);
+#if defined(ESP32C3)
+  neopixelWrite(pin, r, g, b);  // C3 mini has a different API for rgb led
 #else
-  neopixelWrite(pin, r, g, b);
+  neopixelWrite(pin, g, r, b);
 #endif
 }
 #else
