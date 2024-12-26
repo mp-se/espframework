@@ -10,20 +10,15 @@ This is a framework that I use in my own ESP projects as a base. It contains a l
 
 The master branch dones not contain any code. There are a number of version of the framework which is stored in seprate branches for easy maintenance
 
-### Branch 1.0
+### Branch 1.0 (Deprecated)
 
-- This is the current version used in my projects for Arduino 2.x
+- This version is no longer maintained and its no longer the primary version for my projects.
 
-### Branch 1.1
+### Branch 1.1 (Primary branch)
 
-- Updated with newer version of the dependant libraries like Arduino Json 7 and Async Webserver for Arduino 2.x
+- Updated with newer version of the dependant libraries like Arduino Json 7 and Async Webserver
+- ArduinoLog and incbin has now been merged into the library for easier maintenance since they are no longer maintained by their authors.
 
-- ArduinoLog has now been merged into the library for easier maintenance.
-
-- Note! This is currently under development and testing.
-
-### Branch 2,0
+### Branch 2.0 (Experimental)
 
 - Based on 1.1 this is migreted to work with Arduino 3.x
-
-- Note! This is currently under development and testing.
