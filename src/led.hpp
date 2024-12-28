@@ -24,8 +24,10 @@ SOFTWARE.
 #ifndef SRC_LED_HPP_
 #define SRC_LED_HPP_
 
+#include <pins_arduino.h>
+
 enum LedColor {
-#if defined(ESP32C3) || defined(ESP32S3)
+#if defined(RGB_BUILTIN) || defined(ESPFWK_ENABLE_RGB_LED)
   OFF = 0x000000,
   BLACK = 0x000000,
   RED = 0xff0000,

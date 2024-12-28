@@ -27,14 +27,14 @@ SOFTWARE.
 #include <led.hpp>
 #include <log.hpp>
 
-#if defined(DISABLE_LED)
+#if defined(ESPFWK_DISABLE_LED)
 
 void ledOn(LedColor l) {}
 void ledOff() {}
 
 #else
 
-#if defined(ESP32C3) || defined(ESP32S3)
+#if defined(RGB_BUILTIN) || defined(ESPFWK_ENABLE_RGB_LED)
 void ledOn(LedColor l) {
   uint8_t r, g, b, pin;
 
@@ -67,10 +67,10 @@ void ledOn(LedColor l) {
     digitalWrite(LED_BUILTIN, l);
   }
 }
-#endif
+#endif 
 
 void ledOff() { ledOn(LedColor::OFF); }
 
-#endif
+#endif // ESPFWK_DISABLE_LED
 
 // EOF

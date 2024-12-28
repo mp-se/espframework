@@ -50,29 +50,32 @@ On ESP32 the following can be used to set the max size for firmware updates.
 
 - MAX_SKETCH_SPACE default value is 0x1c0000 (1.8Mb)
 
-## Disabling features to reduce size
+## Feature flags
 
 - ESPFWK_DISABLE_OTA, Reduction 38kb on ESP32s3
 - ESPFWK_DISABLE_MQTT, Reduction 1kb on ESP32s3
+- ESPFWK_DISABLE_LED, Can be used to disable led functionallity if the PIN is used for other purposes
+
+- ESPFWK_ENABLE_RGB_LED, can be used to force the use of RGB led (Required for some C3 boards which use a different API)
 
 ## Dependant Libraries
 
   The framework is dependant on other projects which are listed here. These needs to be included into your project for a successful compilation.
 
+  Platform IO:
+  - platform = espressif8266 @ 4.2.1
+  - platform32 = espressif32 @ 6.9.0
+
   ALL
-  - https://github.com/bblanchon/ArduinoJson##v7.2.0
+  - https://github.com/bblanchon/ArduinoJson##v7.2.1
   - https://github.com/256dpi/arduino-mqtt#v2.5.2
-  - https://github.com/mathieucarbou/ESPAsyncWebServer#v3.3.4
+  - https://github.com/mathieucarbou/ESPAsyncWebServer#v3.4.5
 
   ESP8266
   - https://github.com/esphome/ESPAsyncTCP#v2.0.0
 
-  ESP32 (One of these)
-  - https://github.com/esphome/AsyncTCP#v2.1.4 (For arduino 2.x)
-  - https://github.com/mathieucarbou/AsyncTCP#v3.2.5 (For arduino 3.x)
-
-
-- DISABLE_LED
+  ESP32
+  - https://github.com/mathieucarbou/AsyncTCP#v3.3.1
 
 ## Features
 
