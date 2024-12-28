@@ -61,7 +61,7 @@ On ESP32 the following can be used to set the max size for firmware updates.
 - ESPFWK_DISABLE_LED, Can be used to disable led functionallity if the PIN is used for other purposes
 
 - ESPFWK_ENABLE_RGB_LED, can be used to force the use of RGB led (Required for some C3 boards which use a different API)
-s
+
 ## Dependant Libraries
 
   The framework is dependant on other projects which are listed here. These needs to be included into your project for a successful compilation.
