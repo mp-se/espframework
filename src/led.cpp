@@ -27,14 +27,14 @@ SOFTWARE.
 #include <led.hpp>
 #include <log.hpp>
 
-#if defined(DISABLE_LED)
+#if defined(ESPFWK_DISABLE_LED)
 
 void ledOn(LedColor l) {}
 void ledOff() {}
 
 #else
 
-#if defined(RGB_BUILTIN) || defined(ESP32C3)
+#if defined(RGB_BUILTIN)
 void ledOn(LedColor l) {
   uint8_t r, g, b, pin;
 
@@ -44,11 +44,19 @@ void ledOn(LedColor l) {
   pin = LED_BUILTIN;
 
   Log.info(F("LED : Setting led %d to RGB %d-%d-%d" CR), pin, r, g, b);
-#if defined(ESP32C3)
-  neopixelWrite(pin, r, g, b);  // C3 mini has a different API for rgb led
-#else
   neopixelWrite(pin, g, r, b);
-#endif
+}
+#elif defined(ESPFWK_ENABLE_RGB_LED)
+void ledOn(LedColor l) {
+  uint8_t r, g, b, pin;
+
+  r = (l & 0xff0000) >> 16;
+  g = (l & 0x00ff00) >> 8;
+  b = (l & 0x0000ff);
+  pin = LED_BUILTIN;
+
+  Log.info(F("LED : Setting led %d to RGB %d-%d-%d (2)" CR), pin, r, g, b);
+  neopixelWrite(pin, r, g, b);  // C3 mini has a different API for rgb led
 }
 #else
 bool ledInit = false;
@@ -71,10 +79,10 @@ void ledOn(LedColor l) {
     digitalWrite(LED_BUILTIN, l);
   }
 }
-#endif
+#endif 
 
 void ledOff() { ledOn(LedColor::OFF); }
 
-#endif
+#endif // ESPFWK_DISABLE_LED
 
 // EOF

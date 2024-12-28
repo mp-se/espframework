@@ -27,7 +27,7 @@ SOFTWARE.
 #include <pins_arduino.h>
 
 enum LedColor {
-#if defined(RGB_BUILTIN) || defined(ESP32C3) // C3 mini has support for RGB LED but not using RGB_BUILTIN
+#if defined(RGB_BUILTIN) || defined(ESPFWK_ENABLE_RGB_LED)
   OFF = 0x000000,
   BLACK = 0x000000,
   RED = 0xff0000,
