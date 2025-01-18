@@ -38,12 +38,13 @@ class OtaUpdate {
   OtaConfig* _otaConfig;
   String _curVer;
   bool _newFirmware = false;
+  String _fileName;
 
   bool parseFirmwareVersionString(int (&num)[3], const char* version);
   void downloadFile(HTTPClient& http, String& fname);
 
  public:
-  OtaUpdate(OtaConfig* cfg, String ver);
+  OtaUpdate(OtaConfig* cfg, String ver, String filename = "");
 
   bool updateFirmware();
   bool checkFirmwareVersion();
