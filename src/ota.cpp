@@ -67,16 +67,18 @@ bool OtaUpdate::updateFirmware() {
   Log.verbose(F("OTA : Updating firmware." CR));
 #endif
 
-if (_fileName.length() == 0) {
-  Log.notice(F("OTA : Filename is not defined, skipping update." CR));
-  return false;
-}
+  if (_fileName.length() == 0) {
+    Log.notice(F("OTA : Filename is not defined, skipping update." CR));
+    return false;
+  }
 
   WiFiClient wifi;
   WiFiClientSecure wifiSecure;
   HTTPUpdateResult ret;
   String serverPath = _otaConfig->getOtaURL();
   serverPath += _fileName; 
+
+  Log.notice(F("OTA : Performing ota with %s." CR), serverPath.c_str());
 
   if (serverPath.startsWith("https://")) {
     wifiSecure.setInsecure();
