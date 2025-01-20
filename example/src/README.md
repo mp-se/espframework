@@ -1,0 +1,1 @@
+This is a complete example that shows how to build an firmware based on the framework.
