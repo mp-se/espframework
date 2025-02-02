@@ -53,18 +53,14 @@ void espReset();
 
 #include "esp32s3/rom/rtc.h"
 #define ESP_RESET forcedReset
-#elif defined(ESP32LITE)
+#elif defined(ESP32)
 #include <FS.h>
 #include <LittleFS.h>
 
 #include "esp32/rom/rtc.h"
 #define ESP_RESET forcedReset
-#else  // defined (ESP32)
-#include <FS.h>
-#include <LittleFS.h>
-
-#include "esp32/rom/rtc.h"
-#define ESP_RESET forcedReset
+#else  
+#error "You must define what platform is used, valid are: ESP8266, ESP32, ESP32S2, ESP32S3 or ESP32C3"
 #endif
 
 // Config

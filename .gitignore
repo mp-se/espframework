@@ -5,7 +5,7 @@ __pycache__
 # These files are under examples and should not be checked in.
 script/
 src/demo*.*
-platformio.ini
+platformio*.ini
 html/*
 test/*
 /diagram.json
@@ -13,3 +13,4 @@ test/*
 /partitions.csv
 /output.map
 .DS_Store
+development/*

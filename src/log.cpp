@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
 #include <log.hpp>
+#include <HardwareSerial.h>
 
 void writeErrorLog(const char *format, ...) {
   File f = LittleFS.open(ERR_FILENAME, "a");
@@ -66,29 +67,33 @@ void dumpErrorLog2() { dumpErrorLog(ERR_FILENAME2); }
 SerialDebug::SerialDebug(const uint32_t serialSpeed, bool autoBegin) {
   _serialSpeed = serialSpeed;
 
-#if defined(USE_SERIAL_PINS) && defined(ESP8266)
-  EspSerial.begin(serialSpeed);
-#warning "SerialPins is not implemented on ESP8266"
-#elif defined(ESP8266)
-  EspSerial.begin(serialSpeed);
-#elif defined(USE_SERIAL_PINS) && defined(ESP32C3)
-  // EspSerial.begin(serialSpeed, SERIAL_8N1, 20, 21);
-  EspSerial.begin(serialSpeed);
-#elif defined(ESP32C3)
-  EspSerial.begin(serialSpeed);
-#elif defined(USE_SERIAL_PINS) && defined(ESP32S2)
-  EspSerial.begin(serialSpeed, SERIAL_8N1, 37, 39);
-#elif defined(ESP32S2)
-  EspSerial.begin(serialSpeed);
-#elif defined(USE_SERIAL_PINS) && defined(ESP32S3)
-  EspSerial.begin(serialSpeed, SERIAL_8N1, 44, 43);
-#elif defined(ESP32S3)
-  EspSerial.begin(serialSpeed);
-#elif defined(USE_SERIAL_PINS) && defined(ESP32)
-  EspSerial.begin(serialSpeed, SERIAL_8N1, 3, 1);
-#elif defined(ESP32)
+#if defined(ESPFWK_USE_SERIAL_PINS) && (ARDUINO_USB_CDC_ON_BOOT == 0)
+  EspSerial.begin(serialSpeed, SERIAL_8N1, RX, TX);
+#elif defined(ESPFWK_USE_SERIAL_PINS) && defined(ESP8266)
+  EspSerial.begin(serialSpeed, SERIAL_8N1, TX);
+#else
   EspSerial.begin(serialSpeed);
 #endif
+
+  EspSerial.println("Serial console activated.");
+
+  if(autoBegin) {
+    begin(&EspSerial);
+  }
+}
+
+SerialDebug::SerialDebug(const uint32_t serialSpeed, uint8_t tx, uint8_t rx, bool autoBegin) {
+  _serialSpeed = serialSpeed;
+
+#if defined(ESP8266)
+  EspSerial.begin(serialSpeed, SERIAL_8N1, tx);
+#elif (ARDUINO_USB_CDC_ON_BOOT == 0)
+  EspSerial.begin(serialSpeed, SERIAL_8N1, rx, tx);
+#else
+  EspSerial.println("ARDUINO_USB_CDC_ON_BOOT cannot be set to 1 when using custom serial tx/rx pins.");
+  EspSerial.begin(serialSpeed);
+#endif
+
   EspSerial.println("Serial console activated.");
 
   if(autoBegin) {
@@ -103,8 +108,6 @@ void SerialDebug::begin(Print* p) {
 }
 
 void printTimestamp(Print *_logOutput, int _logLevel) {
-  // TODO: Add real time if we are using NTP
-
   char c[12];
   snprintf(c, sizeof(c), "%10lu ", millis());
   _logOutput->print(c);

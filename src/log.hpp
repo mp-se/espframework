@@ -36,6 +36,7 @@ class SerialDebug {
   uint32_t _serialSpeed;
  public:
   explicit SerialDebug(const uint32_t serialSpeed = 115200L, bool autoBegin = true);
+  explicit SerialDebug(const uint32_t serialSpeed = 115200L, uint8_t tx, uint8_t rx, bool autoBegin = true);
   void begin(Print* p);
   uint32_t getSerialSpeed() { return _serialSpeed; }
   static Logging* getLog() { return &Log; }

@@ -112,8 +112,6 @@ void DemoWebServer::webHandleStatus(AsyncWebServerRequest *request) {
   obj[PARAM_PLATFORM] = "esp32s2";
 #elif defined(ESP32S3)
   obj[PARAM_PLATFORM] = "esp32s3";
-#elif defined(ESP32LITE)
-  obj[PARAM_PLATFORM] = "esp32lite";
 #else  // esp32 mini
   obj[PARAM_PLATFORM] = "esp32";
 #endif
