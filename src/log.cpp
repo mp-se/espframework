@@ -64,33 +64,23 @@ void dumpErrorLog1() { dumpErrorLog(ERR_FILENAME); }
 
 void dumpErrorLog2() { dumpErrorLog(ERR_FILENAME2); }
 
-SerialDebug::SerialDebug(const uint32_t serialSpeed, bool autoBegin) {
+SerialDebug::SerialDebug(const uint32_t serialSpeed, bool autoBegin, uint8_t tx, uint8_t rx) {
   _serialSpeed = serialSpeed;
 
 #if defined(ESPFWK_USE_SERIAL_PINS) && (ARDUINO_USB_CDC_ON_BOOT == 0)
-  EspSerial.begin(serialSpeed, SERIAL_8N1, RX, TX);
-#elif defined(ESPFWK_USE_SERIAL_PINS) && defined(ESP8266)
-  EspSerial.begin(serialSpeed, SERIAL_8N1, TX);
-#else
-  EspSerial.begin(serialSpeed);
-#endif
+  if(tx == -1)
+    tx = TX;
 
-  EspSerial.println("Serial console activated.");
+  if(rx == -1)
+    rx = RX;
 
-  if(autoBegin) {
-    begin(&EspSerial);
-  }
-}
-
-SerialDebug::SerialDebug(const uint32_t serialSpeed, uint8_t tx, uint8_t rx, bool autoBegin) {
-  _serialSpeed = serialSpeed;
-
-#if defined(ESP8266)
-  EspSerial.begin(serialSpeed, SERIAL_8N1, tx);
-#elif (ARDUINO_USB_CDC_ON_BOOT == 0)
   EspSerial.begin(serialSpeed, SERIAL_8N1, rx, tx);
+#elif defined(ESPFWK_USE_SERIAL_PINS) && defined(ESP8266)
+  if(tx == -1)
+    tx = TX;
+
+  EspSerial.begin(serialSpeed, SERIAL_8N1, tx);
 #else
-  EspSerial.println("ARDUINO_USB_CDC_ON_BOOT cannot be set to 1 when using custom serial tx/rx pins.");
   EspSerial.begin(serialSpeed);
 #endif
 
