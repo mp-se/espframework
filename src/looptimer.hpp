@@ -49,6 +49,7 @@ class LoopTimer {
   void reset() { _startMillis = millis(); }
   uint64_t getLoopCounter() { return _loopCounter; }
   int32_t getTimePassed() { return abs((int32_t)(millis() - _startMillis)); }
+  void setInterval(uint64_t interval) { _interval = interval; }
 };
 
 #endif  // SRC_LOOPTIMER_HPP_
