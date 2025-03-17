@@ -19,6 +19,8 @@ The master branch dones not contain any code. There are a number of version of t
 - Updated with newer version of the dependant libraries like Arduino Json 7 and Async Webserver
 - ArduinoLog and incbin has now been merged into the library for easier maintenance since they are no longer maintained by their authors.
 
-### Branch 2.0 (Experimental)
+### Branch 1.2 (Work in progress)
 
-- Based on 1.1 this is migreted to work with Arduino 3.x
+- Merged changes related to Arduino 3.x into this version so it supports both Arduino 3.x and 2.x
+- Added 16Mb partitions example
+
