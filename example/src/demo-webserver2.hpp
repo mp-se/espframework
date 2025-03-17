@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2021-2024 Magnus
+Copyright (c) 2025 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -21,38 +21,29 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-#ifndef SRC_LOG_HPP_
-#define SRC_LOG_HPP_
+#ifndef SRC_DEMO_WEBSERVER2_HPP_
+#define SRC_DEMO_WEBSERVER2_HPP_
 
-#include <ArduinoLog.hpp>
-#include <espframework.hpp>
+#if defined(ESPFWK_PSYCHIC_HTTP)
 
-#define ERR_FILENAME "/error.log"
-#define ERR_FILENAME2 "/error2.log"
-#define ERR_FILEMAXSIZE 2048
+#include <basewebserver2.hpp>
+#include <demo-push.hpp>
 
-class SerialDebug {
+class DemoWebServer : public BaseWebServer {
  private:
-  uint32_t _serialSpeed;
+  DemoPush *_push;
+
+  void setupWebHandlers();
+  esp_err_t webHandleStatus(PsychicRequest *request);
+  esp_err_t webHandleConfigRead(PsychicRequest *request);
+  esp_err_t webHandleConfigWrite(PsychicRequest *request, JsonVariant &json);
 
  public:
-  explicit SerialDebug(const uint32_t serialSpeed = 115200L,
-                       bool autoBegin = true, uint8_t tx = -1, uint8_t rx = -1);
-
-  void begin(Print* p);
-  uint32_t getSerialSpeed() { return _serialSpeed; }
-  static Logging* getLog() { return &Log; }
+  explicit DemoWebServer(WebConfig *config, DemoPush *push);
 };
 
-void printTimestamp(Print* _logOutput, int _logLevel);
-void printNewline(Print* _logOutput);
+#endif  // ESPFWK_PSYCHIC_HTTP
 
-void writeErrorLog(const char* format, ...);
-void dumpErrorLog1();
-void dumpErrorLog2();
-
-#define EspSerial Serial
-
-#endif  // SRC_LOG_HPP_
+#endif  // SRC_DEMO_WEBSERVER2_HPP_
 
 // EOF

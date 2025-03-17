@@ -97,8 +97,8 @@ void printHeap(String prefix) {
 
 void forcedReset() {
 #if !defined(ESP8266) && ESP_ARDUINO_VERSION_MAJOR >= 3
-  esp_task_wdt_config_t task = { 1000, 0, false };
-    
+  esp_task_wdt_config_t task = {1000, 0, false};
+
   ledOff();
   LittleFS.end();
   delay(100);
@@ -107,7 +107,8 @@ void forcedReset() {
   while (true) {
     // wait for watchdog timer to be triggered
   }
-#elif !defined(ESP8266) && ESP_ARDUINO_VERSION_MAJOR >= 2 && ESP_ARDUINO_VERSION_MAJOR < 3
+#elif !defined(ESP8266) && ESP_ARDUINO_VERSION_MAJOR >= 2 && \
+    ESP_ARDUINO_VERSION_MAJOR < 3
   ledOff();
   LittleFS.end();
   delay(100);

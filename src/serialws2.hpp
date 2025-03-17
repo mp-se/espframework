@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2021-2024 Magnus
+Copyright (c) 2025 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -21,38 +21,36 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-#ifndef SRC_LOG_HPP_
-#define SRC_LOG_HPP_
+#ifndef SRC_SERIALWS2_HPP_
+#define SRC_SERIALWS2_HPP_
 
-#include <ArduinoLog.hpp>
+#if defined(ESPFWK_PSYCHIC_HTTP)
+
+#include <Print.h>
+
 #include <espframework.hpp>
+#include <freertos/FreeRTOS.h>
+#include <PsychicHttp.h>
 
-#define ERR_FILENAME "/error.log"
-#define ERR_FILENAME2 "/error2.log"
-#define ERR_FILEMAXSIZE 2048
-
-class SerialDebug {
- private:
-  uint32_t _serialSpeed;
+class SerialWebSocket : public Print {
+ protected:
+ PsychicHttpServer *_server = 0;
+  PsychicWebSocketHandler *_webSocket = 0;
+  Print *_secondayLog = 0;
+  uint8_t _buf[40] = {0};
+  uint32_t _bufSize = 0;
 
  public:
-  explicit SerialDebug(const uint32_t serialSpeed = 115200L,
-                       bool autoBegin = true, uint8_t tx = -1, uint8_t rx = -1);
-
-  void begin(Print* p);
-  uint32_t getSerialSpeed() { return _serialSpeed; }
-  static Logging* getLog() { return &Log; }
+  SerialWebSocket() {}
+  void begin(PsychicHttpServer *_server, Print *secondary = 0);
+  size_t write(uint8_t c);
+  using Print::write;
+  void flush();
+  void loop() {}
 };
 
-void printTimestamp(Print* _logOutput, int _logLevel);
-void printNewline(Print* _logOutput);
+#endif  // ESPFWK_PSYCHIC_HTTP
 
-void writeErrorLog(const char* format, ...);
-void dumpErrorLog1();
-void dumpErrorLog2();
-
-#define EspSerial Serial
-
-#endif  // SRC_LOG_HPP_
+#endif  // SRC_SERIALWS2_HPP_
 
 // EOF

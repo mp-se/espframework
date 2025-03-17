@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2021-2024 Magnus
+Copyright (c) 2021-2025 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,14 +24,17 @@ SOFTWARE.
 #include <demo-config.hpp>
 #include <demo-main.hpp>
 #include <demo-push.hpp>
+#include <demo-webserver.hpp>
+#include <demo-webserver2.hpp>
 #include <espframework.hpp>
 #include <log.hpp>
+#include <looptimer.hpp>
 #include <ota.hpp>
 #include <perf.hpp>
 #include <serialws.hpp>
+#include <serialws2.hpp>
 #include <uptime.hpp>
 #include <wificonnection.hpp>
-#include <looptimer.hpp>
 
 SerialDebug mySerial(115200L);
 DemoConfig myConfig("mdnsbase", "/esplib.cfg");
@@ -41,7 +44,6 @@ OtaUpdate myOta(&myConfig, "1.1.0");
 #endif
 DemoPush myPush(&myConfig);
 
-#include <demo-webserver.hpp>
 DemoWebServer myDemoWebServer(&myConfig, &myPush);
 SerialWebSocket mySerialWebSocket;
 
@@ -93,7 +95,7 @@ void setup() {
 LoopTimer intLoop(3000);
 
 void loop() {
-  if(intLoop.hasExipred()) {
+  if (intLoop.hasExipred()) {
     Log.notice(F("Loop: loop timer expired." CR));
     intLoop.reset();
   }

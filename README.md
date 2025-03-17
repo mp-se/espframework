@@ -24,6 +24,11 @@ This is a framework that I use in my own ESP projects as a base. It contains a l
   - [Misc helper methods](#misc-helper-methods)
 - [Credits](#credits)
 
+## Changes from 1.1 to 1.2
+
+- Added support for Arduino 3.x
+- Added alternative http server, PsychicHttp that supports SSL (but not ESP8266)
+
 ## Changes from 1.0 to 1.1
 
 - Switched to AsynTCP from esphome 
@@ -61,6 +66,7 @@ On ESP32 the following can be used to set the max size for firmware updates.
 - ESPFWK_DISABLE_LED, Can be used to disable led functionallity if the PIN is used for other purposes
 - ESPFWK_ENABLE_RGB_LED, can be used to force the use of RGB led (Required for some C3 boards which use a different API)
 - ESPFWK_USE_SERIAL_PINS, Use the RX/TX Pins for serial output
+- ESPFWK_PSYCHIC_HTTP, use alternative webserver with SSL support (does not work on ESP8266)
 
 Note! When using TX/RX pins for serial output then ARDUINO_USB_CDC_ON_BOOT=0 must be disabled for this to work. On some boards 
 this is set by default and others it needs to be defined. This applies to boards with an USBC port.
@@ -69,19 +75,25 @@ this is set by default and others it needs to be defined. This applies to boards
 
   The framework is dependant on other projects which are listed here. These needs to be included into your project for a successful compilation.
 
-  Platform IO:
+  PlatformIO:
   - platform = espressif8266 @ 4.2.1
   - platform32 = espressif32 @ 6.10.0
+  - platform32 = https://github.com/pioarduino/platform-espressif32#53.03.13
 
   ALL
   - https://github.com/bblanchon/ArduinoJson##v7.3.0
   - https://github.com/256dpi/arduino-mqtt#v2.5.2
+
+  ALL (AsyncWebServer)
   - https://github.com/mathieucarbou/ESPAsyncWebServer#v3.6.0
+
+  ALL (Psychic WebServer)
+  - https://github.com/hoeken/PsychicHttp#1.2.1
 
   ESP8266
   - https://github.com/esphome/ESPAsyncTCP#v2.0.0
 
-  ESP32
+  ESP32 (AsyncWebServer)
   - https://github.com/mathieucarbou/AsyncTCP#v3.3.2
 
 ## Features
@@ -301,7 +313,7 @@ void setup() {
 }
 ```
 
-## class BaseWebServer
+## class BaseWebServer (AsyncWebServer)
 To create a webserver you need to create your own class that inherits from the base class. 
 
 ```cpp

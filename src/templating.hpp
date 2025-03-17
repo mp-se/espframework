@@ -25,9 +25,9 @@ SOFTWARE.
 #define SRC_TEMPLATING_HPP_
 
 #include <algorithm>
-#include <memory>
 #include <espframework.hpp>
 #include <log.hpp>
+#include <memory>
 #include <utils.hpp>
 
 constexpr auto MAX_KEY_VAL = 30;
@@ -87,7 +87,8 @@ class TemplatingEngine {
                         _items[i].key.length()) == 0) {
               // Found key
               strncat(_output.get(), format + k, j - k);
-              strncat(_output.get(), _items[i].val.c_str(), _items[i].val.length());
+              strncat(_output.get(), _items[i].val.c_str(),
+                      _items[i].val.length());
               k = j + _items[i].key.length();
             }
           }

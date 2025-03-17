@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2021-2024 Magnus
+Copyright (c) 2025 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -21,38 +21,41 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-#ifndef SRC_LOG_HPP_
-#define SRC_LOG_HPP_
+#if defined(ESPFWK_PSYCHIC_HTTP)
 
-#include <ArduinoLog.hpp>
-#include <espframework.hpp>
+#include <log.hpp>
+#include <serialws2.hpp>
 
-#define ERR_FILENAME "/error.log"
-#define ERR_FILENAME2 "/error2.log"
-#define ERR_FILEMAXSIZE 2048
+void SerialWebSocket::begin(PsychicHttpServer *server, Print *secondary) {
+  Log.notice(F("WS  : Starting serial websocket" CR));
+  _server = server;
+  _secondayLog = secondary;
+  _webSocket = new PsychicWebSocketHandler();
+  _server->on("/serialws", _webSocket);
+}
 
-class SerialDebug {
- private:
-  uint32_t _serialSpeed;
+size_t SerialWebSocket::write(uint8_t c) {
+  _buf[_bufSize++] = c;
 
- public:
-  explicit SerialDebug(const uint32_t serialSpeed = 115200L,
-                       bool autoBegin = true, uint8_t tx = -1, uint8_t rx = -1);
+  if (_bufSize >= (sizeof(_buf)-1) || c == '\n') {
+    flush();
+  }
 
-  void begin(Print* p);
-  uint32_t getSerialSpeed() { return _serialSpeed; }
-  static Logging* getLog() { return &Log; }
-};
+  return sizeof(c);
+}
 
-void printTimestamp(Print* _logOutput, int _logLevel);
-void printNewline(Print* _logOutput);
+void SerialWebSocket::flush() {
+  if (_secondayLog) _secondayLog->write(_buf, _bufSize);
 
-void writeErrorLog(const char* format, ...);
-void dumpErrorLog1();
-void dumpErrorLog2();
+  if (_webSocket->count()) {
+    // Only send data to socket if there are connected clients
+    _webSocket->sendAll(reinterpret_cast<const char *>(_buf));
+  }
 
-#define EspSerial Serial
+  memset(_buf, 0, sizeof(_buf));
+  _bufSize = 0;
+}
 
-#endif  // SRC_LOG_HPP_
+#endif // ESPFWK_PSYCHIC_HTTP
 
 // EOF

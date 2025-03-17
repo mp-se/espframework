@@ -24,6 +24,8 @@ SOFTWARE.
 #ifndef SRC_SERIALWS_HPP_
 #define SRC_SERIALWS_HPP_
 
+#if !defined(ESPFWK_PSYCHIC_HTTP)
+
 #include <Print.h>
 
 #include <espframework.hpp>
@@ -59,6 +61,8 @@ class SerialWebSocket : public Print {
     if (_webSocket) _webSocket->cleanupClients();
   }
 };
+
+#endif  // !ESPFWK_PSYCHIC_HTTP
 
 #endif  // SRC_SERIALWS_HPP_
 

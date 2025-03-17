@@ -60,7 +60,7 @@ void ledOn(LedColor l) {
   pin = LED_BUILTIN;
 
   Log.info(F("LED : Setting led %d to RGB %d-%d-%d (2)" CR), pin, r, g, b);
-  #if ESP_ARDUINO_VERSION_MAJOR >= 3
+#if ESP_ARDUINO_VERSION_MAJOR >= 3
   rgbLedWrite(pin, r, g, b);
 #elif ESP_ARDUINO_VERSION_MAJOR >= 2 && ESP_ARDUINO_VERSION_MAJOR < 3
   neopixelWrite(pin, r, g, b);  // C3 mini has a different API for rgb led
@@ -87,10 +87,10 @@ void ledOn(LedColor l) {
     digitalWrite(LED_BUILTIN, l);
   }
 }
-#endif 
+#endif
 
 void ledOff() { ledOn(LedColor::OFF); }
 
-#endif // ESPFWK_DISABLE_LED
+#endif  // ESPFWK_DISABLE_LED
 
 // EOF

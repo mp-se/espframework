@@ -43,7 +43,7 @@ OtaUpdate::OtaUpdate(OtaConfig *cfg, String ver, String fileName) {
   _curVer = ver;
   _fileName = fileName;
 
-  if(_fileName.length() == 0) {
+  if (_fileName.length() == 0) {
 #if defined(ESP8266)
     _fileName = "firmware.bin";
 #elif defined(ESP32S3)
@@ -55,7 +55,8 @@ OtaUpdate::OtaUpdate(OtaConfig *cfg, String ver, String fileName) {
 #elif defined(ESP32)
     _fileName = "firmware32.bin";
 #else
-  #warning "OTA filename is not defined or can be extrapolated, OTA will not work in this build"
+#warning \
+    "OTA filename is not defined or can be extrapolated, OTA will not work in this build"
 #endif
   }
 }
@@ -78,7 +79,7 @@ bool OtaUpdate::updateFirmware() {
   WiFiClientSecure wifiSecure;
   HTTPUpdateResult ret;
   String serverPath = _otaConfig->getOtaURL();
-  serverPath += _fileName; 
+  serverPath += _fileName;
 
   Log.notice(F("OTA : Performing ota with %s." CR), serverPath.c_str());
 

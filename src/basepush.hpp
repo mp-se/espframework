@@ -51,13 +51,12 @@ class BasePush {
   bool isSecure(String target) { return target.startsWith("https://"); }
 
   void allocateSecure() {
-    if(_wifiSecure == nullptr)    
-      _wifiSecure.reset(new WiFiClientSecure());
+    if (_wifiSecure == nullptr) _wifiSecure.reset(new WiFiClientSecure());
   }
 
  public:
-  explicit BasePush(PushConfig* config) { 
-    _config = config; 
+  explicit BasePush(PushConfig* config) {
+    _config = config;
     _wifi.reset(new WiFiClient());
     _http.reset(new HTTPClient());
   }

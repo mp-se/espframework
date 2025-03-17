@@ -21,6 +21,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
+#if !defined(ESPFWK_PSYCHIC_HTTP)
+
 #include <log.hpp>
 #include <serialws.hpp>
 
@@ -53,5 +55,7 @@ void SerialWebSocket::flush() {
   memset(_buf, 0, sizeof(_buf));
   _bufSize = 0;
 }
+
+#endif  // !ESPFWK_PSYCHIC_HTTP
 
 // EOF

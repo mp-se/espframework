@@ -24,6 +24,8 @@ SOFTWARE.
 #ifndef SRC_BASEWEBSERVER_HPP_
 #define SRC_BASEWEBSERVER_HPP_
 
+#if !defined(ESPFWK_PSYCHIC_HTTP)
+
 #include <memory>
 
 #if defined(ESP32)
@@ -191,6 +193,8 @@ class BaseWebServer {
   virtual void setWifiSetup(bool wifiSetup) { _wifiSetup = wifiSetup; }
   virtual void loop();
 };
+
+#endif  // !ESPFWK_PSYCHIC_HTTP
 
 #endif  // SRC_BASEWEBSERVER_HPP_
 

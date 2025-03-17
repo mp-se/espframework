@@ -45,7 +45,7 @@ bool JsonFileSystemHelper::saveJson(JsonDocument& doc) {
   // #endif
   serializeJson(doc, jsonFile);
 
- if (serializeJson(doc, jsonFile) == 0) {
+  if (serializeJson(doc, jsonFile) == 0) {
     Log.error(F("Failed to write to file" CR));
     jsonFile.close();
     return false;

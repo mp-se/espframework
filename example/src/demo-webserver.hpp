@@ -24,6 +24,8 @@ SOFTWARE.
 #ifndef SRC_DEMO_WEBSERVER_HPP_
 #define SRC_DEMO_WEBSERVER_HPP_
 
+#if !defined(ESPFWK_PSYCHIC_HTTP)
+
 #include <basewebserver.hpp>
 #include <demo-push.hpp>
 
@@ -39,6 +41,8 @@ class DemoWebServer : public BaseWebServer {
  public:
   explicit DemoWebServer(WebConfig *config, DemoPush *push);
 };
+
+#endif  // !ESPFWK_PSYCHIC_HTTP
 
 #endif  // SRC_DEMO_WEBSERVER_HPP_
 
