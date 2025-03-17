@@ -26,7 +26,10 @@ SOFTWARE.
 #include <log.hpp>
 #include <utils.hpp>
 
-#if !defined(ESP8266)
+#if !defined(ESP8266) && ARDUINO >= 300
+#include <esp_chip_info.h>
+#include <esp_task_wdt.h>
+#elif !defined(ESP8266) && ARDUINO >= 200 && ARDUINO < 300
 #include <esp_int_wdt.h>
 #include <esp_task_wdt.h>
 #else
@@ -93,7 +96,18 @@ void printHeap(String prefix) {
 }
 
 void forcedReset() {
-#if !defined(ESP8266)
+#if !defined(ESP8266) && ESP_ARDUINO_VERSION_MAJOR >= 3
+  esp_task_wdt_config_t task = { 1000, 0, false };
+    
+  ledOff();
+  LittleFS.end();
+  delay(100);
+  esp_task_wdt_init(&task);
+  esp_task_wdt_add(NULL);
+  while (true) {
+    // wait for watchdog timer to be triggered
+  }
+#elif !defined(ESP8266) && ESP_ARDUINO_VERSION_MAJOR >= 2 && ESP_ARDUINO_VERSION_MAJOR < 3
   ledOff();
   LittleFS.end();
   delay(100);

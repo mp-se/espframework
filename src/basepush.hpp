@@ -31,6 +31,9 @@ SOFTWARE.
 #include <WiFiClientSecure.h>
 #else
 #include <HTTPClient.h>
+#include <WiFi.h>
+#include <WiFiClient.h>
+#include <WiFiClientSecure.h>
 #endif
 #include <interface.hpp>
 

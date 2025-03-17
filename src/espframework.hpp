@@ -27,7 +27,7 @@ SOFTWARE.
 #include <Arduino.h>
 #include <ArduinoJson.h>
 
-#define ESPFWK_VER "1.1"
+#define ESPFWK_VER "1.2"
 
 void forcedReset();
 void espReset();
