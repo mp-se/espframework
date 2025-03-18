@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2021-2024 Magnus
+Copyright (c) 2021-2025 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
 #include <baseconfig.hpp>
+#include <cstdio>
 #include <espframework.hpp>
 #include <log.hpp>
 
@@ -187,6 +188,8 @@ void BaseConfig::createJsonBase(JsonObject& doc) {
   doc[PARAM_TEMP_UNIT] = String(getTempFormat());
   doc[PARAM_DARK_MODE] = getDarkMode();
   doc[PARAM_CORS_ALLOWED] = getCorsAllowed();
+  // doc[PARAM_ADMIN_USER] = getAdminUser();
+  doc[PARAM_ADMIN_PASS] = getAdminPass();
 }
 
 void BaseConfig::parseJsonBase(JsonObject& doc) {
@@ -210,6 +213,10 @@ void BaseConfig::parseJsonBase(JsonObject& doc) {
 
   if (!doc[PARAM_CORS_ALLOWED].isNull())
     setCorsAllowed(doc[PARAM_CORS_ALLOWED].as<bool>());
+
+  // if (!doc[PARAM_ADMIN_USER].isNull())
+  //   setAdminUser(doc[PARAM_ADMIN_USER]);
+  if (!doc[PARAM_ADMIN_PASS].isNull()) setAdminPass(doc[PARAM_ADMIN_PASS]);
 
   _saveNeeded = true;
 }

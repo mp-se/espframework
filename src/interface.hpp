@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2021-2024 Magnus
+Copyright (c) 2021-2025 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -46,6 +46,9 @@ class WebConfig {
   virtual int getWifiPortalTimeout();
 
   virtual bool isCorsAllowed();
+  virtual bool hasAdminPass();
+  virtual const char* getAdminUser();
+  virtual const char* getAdminPass();
 };
 
 class WifiConfig {

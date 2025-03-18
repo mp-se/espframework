@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2021-2024 Magnus
+Copyright (c) 2021-2025 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -72,12 +72,14 @@ class BaseConfig : public WifiConfig,
   String _fileName;
   bool _darkMode = false;
 
-  // WebServer
+  // Security
 #if defined(ENABLE_REMOTE_UI_DEVELOPMENT)
   bool _corsAllowed = true;
 #else
   bool _corsAllowed = false;
 #endif
+  String _adminUser = "admin";
+  String _adminPass = "";
 
   void formatFileSystem();
   void getWifiPreference();
@@ -99,13 +101,25 @@ class BaseConfig : public WifiConfig,
  public:
   BaseConfig(String baseMDNS, String fileName);
 
-  // WebServer
+  // Security
   bool getCorsAllowed() { return _corsAllowed; }
   void setCorsAllowed(bool b) {
     _corsAllowed = b;
     _saveNeeded = true;
   }
   bool isCorsAllowed() { return getCorsAllowed(); }
+
+  const char* getAdminUser() { return _adminUser.c_str(); }
+  void setAdminUser(String s) {
+    _adminUser = s;
+    _saveNeeded = true;
+  }
+  const char* getAdminPass() { return _adminPass.c_str(); }
+  void setAdminPass(String s) {
+    _adminPass = s;
+    _saveNeeded = true;
+  }
+  bool hasAdminPass() { return _adminPass.length() > 0 ? true : false; }
 
   // WifiConfig
   const char* getMDNS() { return _mDNS.c_str(); }

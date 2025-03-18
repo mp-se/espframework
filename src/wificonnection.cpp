@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2021-2024 Magnus
+Copyright (c) 2021-2025 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -155,7 +155,7 @@ void WifiConnection::startAP(wifi_mode_t _mode) {
 }
 
 void WifiConnection::loop() {
-  if (abs((int32_t)(millis() - _timer)) > _timeout) {
+  if (abs(static_cast<int32_t>((millis() - _timer))) > _timeout) {
     _timer = millis();
     _resetCounter = 0;
     writeReset();

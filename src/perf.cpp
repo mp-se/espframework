@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2021-2024 Magnus
+Copyright (c) 2021-2025 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,7 @@ SOFTWARE.
  */
 #if defined(PERF_ENABLE)
 
+#include <cstdio>
 #include <espframework.hpp>
 #include <log.hpp>
 #include <perf.hpp>

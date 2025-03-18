@@ -79,7 +79,7 @@ void BaseWebServer::loop() {
 #endif
 
   if (_wifiSetup) {
-    if (abs((int32_t)(millis() - _wifiPortalTimer)) >
+    if (abs(static_cast<int32_t>(millis() - _wifiPortalTimer)) >
         (_webConfig->getWifiPortalTimeout() * 1000)) {
       Log.notice(F("WEB : Wifi portal timeout, reboot device." CR));
       delay(500);
@@ -88,7 +88,7 @@ void BaseWebServer::loop() {
   }
 
   if (_rebootTask) {
-    if (abs((int32_t)(millis() - _rebootTimer)) > 1000) {
+    if (abs(static_cast<int32_t>((millis() - _rebootTimer))) > 1000) {
       Log.notice(F("WEB : Rebooting..." CR));
       delay(500);
       ESP_RESET();

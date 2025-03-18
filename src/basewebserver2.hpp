@@ -29,6 +29,7 @@ SOFTWARE.
 #include <ArduinoJson.h>
 #include <ESPmDNS.h>
 #include <PsychicHttp.h>
+#include <PsychicHttpsServer.h>
 #include <WiFi.h>
 #include <freertos/FreeRTOS.h>
 
@@ -48,31 +49,44 @@ extern const uint8_t faviconIcoEnd[] asm("_binary_html_favicon_ico_gz_end");
 
 class BaseWebServer {
  protected:
+#if defined(ESPFWK_PSYCHIC_SSL)
+  std::unique_ptr<PsychicHttpsServer> _server;
+  std::unique_ptr<PsychicHttpServer> _redirectServer;
+  String _sslCert;
+  String _sslKey;
+#else
   std::unique_ptr<PsychicHttpServer> _server;
+#endif
   File _uploadFile;
   File _tempFile;
   WebConfig *_webConfig;
+  String _wifiScanData;
+
   int _uploadReturn = 200;
-  bool _wifiSetup = false;
   uint32_t _uploadedSize = 0;
   uint32_t _rebootTimer = 0;
   uint32_t _wifiPortalTimer = 0;
+
+  bool _wifiSetup = false;
   volatile bool _wifiScanTask = false;
-  String _wifiScanData;
   volatile bool _rebootTask = false;
 
   void resetWifiPortalTimer() { _wifiPortalTimer = millis(); }
   bool isAuthenticated(PsychicRequest *request);
 
-  esp_err_t webReturnOK(PsychicRequest *request) {
-    request->reply(_uploadReturn);
-    return ESP_OK;
+  bool isSslEnabled() {
+#if defined(ESPFWK_PSYCHIC_SSL)
+    return _sslCert.length() && _sslKey.length();
+#else
+    return false;
+#endif
   }
+
   esp_err_t webReturnIndexHtml(PsychicRequest *request) {
     Log.notice(F("WEB : webServer callback for /index.html (Memory)." CR));
     PsychicResponse response(request);
 
-    response.addHeader("Content-Type", "text/html");
+    response.setContentType("text/html");
     response.setCode(200);
     response.setContent(reinterpret_cast<const uint8_t *>(indexHtmlStart),
                         reinterpret_cast<size_t>(&indexHtmlEnd[0]) -
@@ -86,8 +100,6 @@ class BaseWebServer {
     Log.notice(F("WEB : webServer callback for /app.js (Memory)." CR));
     response.setContentType("application/javascript");
     response.addHeader("content-encoding", "gzip");
-    response.addHeader("Connection", "close");
-    response.addHeader("Accept-Ranges", "none");
     response.setCode(200);
     response.setContent(reinterpret_cast<const uint8_t *>(appJsStart),
                         reinterpret_cast<size_t>(&appJsEnd[0]) -
@@ -123,6 +135,7 @@ class BaseWebServer {
   }
 
   esp_err_t webHandleAuth(PsychicRequest *request);
+  esp_err_t webHandleLogin(PsychicRequest *request);
   esp_err_t webHandleWifiScan(PsychicRequest *request);
   esp_err_t webHandleWifiScanStatus(PsychicRequest *request);
   esp_err_t webHandleWifiClear(PsychicRequest *request);

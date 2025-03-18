@@ -34,6 +34,7 @@ SOFTWARE.
 #define ESPhttpUpdate httpUpdate
 #endif
 
+#include <cstdio>
 #include <espframework.hpp>
 #include <log.hpp>
 #include <ota.hpp>

@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <cstdio>
 #include <incbin.hpp>
 
 #ifndef PATH_MAX

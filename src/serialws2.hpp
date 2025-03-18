@@ -27,14 +27,14 @@ SOFTWARE.
 #if defined(ESPFWK_PSYCHIC_HTTP)
 
 #include <Print.h>
+#include <PsychicHttp.h>
+#include <freertos/FreeRTOS.h>
 
 #include <espframework.hpp>
-#include <freertos/FreeRTOS.h>
-#include <PsychicHttp.h>
 
 class SerialWebSocket : public Print {
  protected:
- PsychicHttpServer *_server = 0;
+  PsychicHttpServer *_server = 0;
   PsychicWebSocketHandler *_webSocket = 0;
   Print *_secondayLog = 0;
   uint8_t _buf[40] = {0};

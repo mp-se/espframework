@@ -37,7 +37,7 @@ void SerialWebSocket::begin(PsychicHttpServer *server, Print *secondary) {
 size_t SerialWebSocket::write(uint8_t c) {
   _buf[_bufSize++] = c;
 
-  if (_bufSize >= (sizeof(_buf)-1) || c == '\n') {
+  if (_bufSize >= (sizeof(_buf) - 1) || c == '\n') {
     flush();
   }
 
@@ -56,6 +56,6 @@ void SerialWebSocket::flush() {
   _bufSize = 0;
 }
 
-#endif // ESPFWK_PSYCHIC_HTTP
+#endif  // ESPFWK_PSYCHIC_HTTP
 
 // EOF

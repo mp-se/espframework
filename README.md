@@ -14,7 +14,8 @@ This is a framework that I use in my own ESP projects as a base. It contains a l
   - [class SerialWebSocket](#class-serialwebsocket)
   - [class WifiConnection](#class-wificonnection)
   - [class OtaUpdate](#class-otaupdate)
-  - [class BaseWebServer](#class-BaseWebServer)
+  - [class BaseWebServer](#class-basewebserver)
+  - [class BaseWebServer2](#class-basewebserver2)
   - [class TemplatingEngine](#class-templatingengine)
   - [class BasePush](#class-basepush)
   - [class PerfLogging](#class-perflogging)
@@ -27,7 +28,8 @@ This is a framework that I use in my own ESP projects as a base. It contains a l
 ## Changes from 1.1 to 1.2
 
 - Added support for Arduino 3.x
-- Added alternative http server, PsychicHttp that supports SSL (but not ESP8266)
+- Added alternative http server, PsychicHttp that supports SSL (but not ESP8266), default is still AsyncWebServer
+- Enabled SSL support in PsychicHttp
 
 ## Changes from 1.0 to 1.1
 
@@ -67,9 +69,14 @@ On ESP32 the following can be used to set the max size for firmware updates.
 - ESPFWK_ENABLE_RGB_LED, can be used to force the use of RGB led (Required for some C3 boards which use a different API)
 - ESPFWK_USE_SERIAL_PINS, Use the RX/TX Pins for serial output
 - ESPFWK_PSYCHIC_HTTP, use alternative webserver with SSL support (does not work on ESP8266)
+- ESPFWK_PSYCHIC_SSL, use SSL if cert and key is in filesystem (does not work on ESP8266)
 
 Note! When using TX/RX pins for serial output then ARDUINO_USB_CDC_ON_BOOT=0 must be disabled for this to work. On some boards 
 this is set by default and others it needs to be defined. This applies to boards with an USBC port.
+
+## Create own SSL cert and key
+
+openssl req -x509 -newkey rsa:4096 -nodes -keyout server.key -out server.crt -sha256 -days 1000
 
 ## Dependant Libraries
 
@@ -85,7 +92,7 @@ this is set by default and others it needs to be defined. This applies to boards
   - https://github.com/256dpi/arduino-mqtt#v2.5.2
 
   ALL (AsyncWebServer)
-  - https://github.com/mathieucarbou/ESPAsyncWebServer#v3.6.0
+  - https://github.com/ESP32Async/ESPAsyncWebServer#v3.7.3
 
   ALL (Psychic WebServer)
   - https://github.com/hoeken/PsychicHttp#1.2.1
@@ -94,7 +101,7 @@ this is set by default and others it needs to be defined. This applies to boards
   - https://github.com/esphome/ESPAsyncTCP#v2.0.0
 
   ESP32 (AsyncWebServer)
-  - https://github.com/mathieucarbou/AsyncTCP#v3.3.2
+  - https://github.com/ESP32Async/AsyncTCP#v3.3.7
 
 ## Features
 
@@ -313,8 +320,8 @@ void setup() {
 }
 ```
 
-## class BaseWebServer (AsyncWebServer)
-To create a webserver you need to create your own class that inherits from the base class. 
+## class BaseWebServer
+To create a webserver using the AsyncWebServer base you need to create your own class that inherits from the base class.
 
 ```cpp
 class DemoWebServer : public BaseWebServer {
@@ -367,6 +374,68 @@ void setup() {
 
 void loop() {
   myBaseWebServer.loop();
+}
+```
+
+## class BaseWebServer2
+To create a webserver using the PsychicWebServer (ESP32 Only) you need to create your own class that inherits from the base class. 
+
+```cpp
+class DemoWebServer : public BaseWebServer {
+ private:
+  DemoPush *_push;
+
+  // Method to return a html page stored in memory
+  esp_err_t webReturnTestHtm(PsychicRequest *request) {
+    PsychicResponse response(request);
+
+    response.setContentType("text/html");
+    response.setCode(200);
+    response.setContent(reinterpret_cast<const uint8_t *>(indexHtmlStart),
+                        reinterpret_cast<size_t>(&indexHtmlEnd[0]) -
+                            reinterpret_cast<size_t>(&indexHtmlStart[0]));
+    response.send();
+    return ESP_OK;
+  }
+
+  void setupWebHandlers();
+
+  // Method to handle incoming request for a defined endpoint
+  esp_err_t webHandleStatus(PsychicRequest *request);
+
+ public:
+  explicit DemoBaseWebServer(WebConfig *config, DemoPush *push);
+};
+```
+
+```cpp
+DemoBaseWebServer::DemoBaseWebServer(WebConfig *config, DemoPush *push)
+    : BaseWebServer(config) {
+  _push = push;
+}
+
+void DemoBaseWebServer::setupWebHandlers() {
+  BaseWebServer::setupWebHandlers();
+
+  // Add bindings for various endpoints
+  _server->on(
+      "/api/status", HTTP_GET,
+      (PsychicHttpRequestCallback)std::bind(&BaseWebServer::webHandleStatus,
+                                            this, std::placeholders::_1));
+}
+```
+
+Create a global instance of your class
+```cpp
+DemoBaseWebServer myWebServer(&myConfig, &myPush);
+```
+
+Initialize and run the webserver.
+```cpp
+void setup() {
+  if (myWifi.isConnected()) {
+    myBaseWebServer.setuWebServer();
+  }
 }
 ```
 

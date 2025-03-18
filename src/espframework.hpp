@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2021-2024 Magnus
+Copyright (c) 2021-2025 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -68,6 +68,8 @@ void espReset();
 constexpr auto PARAM_ID = "id";
 constexpr auto PARAM_MDNS = "mdns";
 constexpr auto PARAM_CORS_ALLOWED = "cors_allowed";
+constexpr auto PARAM_ADMIN_USER = "admin_user";
+constexpr auto PARAM_ADMIN_PASS = "admin_pass";
 constexpr auto PARAM_SSID = "wifi_ssid";
 constexpr auto PARAM_PASS = "wifi_pass";
 constexpr auto PARAM_SSID2 = "wifi_ssid2";

@@ -42,7 +42,7 @@ class DemoWebServer : public BaseWebServer {
   explicit DemoWebServer(WebConfig *config, DemoPush *push);
 };
 
-#endif  // !ESPFWK_PSYCHIC_HTTP
+#endif  // !ENABLE_PSYCHIC_HTTP
 
 #endif  // SRC_DEMO_WEBSERVER_HPP_
 
