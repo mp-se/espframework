@@ -76,8 +76,7 @@ esp_err_t DemoWebServer::webHandleConfigRead(PsychicRequest *request) {
   JsonObject obj = response.getRoot().as<JsonObject>();
 
   _webConfig->createJson(obj);
-  response.send();
-  return ESP_OK;
+  return response.send();
 }
 
 esp_err_t DemoWebServer::webHandleConfigWrite(PsychicRequest *request,
@@ -98,8 +97,7 @@ esp_err_t DemoWebServer::webHandleConfigWrite(PsychicRequest *request,
   obj = response.getRoot().as<JsonObject>();
   obj[PARAM_SUCCESS] = true;
   obj[PARAM_MESSAGE] = "Configuration updated";
-  response.send();
-  return ESP_OK;
+  return response.send();
 }
 
 esp_err_t DemoWebServer::webHandleStatus(PsychicRequest *request) {
@@ -126,8 +124,7 @@ esp_err_t DemoWebServer::webHandleStatus(PsychicRequest *request) {
   obj[PARAM_FREE_HEAP] = ESP.getFreeHeap();
   obj[PARAM_IP] = WiFi.localIP().toString();
   obj[PARAM_WIFI_SETUP] = _wifiSetup;
-  response.send();
-  return ESP_OK;
+  return response.send();
 }
 
 #endif  // ESPFWK_PSYCHIC_HTTP

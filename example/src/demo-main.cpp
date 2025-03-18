@@ -96,7 +96,7 @@ LoopTimer intLoop(3000);
 
 void loop() {
   if (intLoop.hasExipred()) {
-    Log.notice(F("Loop: loop timer expired." CR));
+    // Log.notice(F("Loop: loop timer expired." CR));
     intLoop.reset();
   }
 
