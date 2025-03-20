@@ -237,21 +237,18 @@ esp_err_t BaseWebServer::webHandlePageNotFound(PsychicRequest *request) {
 
 esp_err_t BaseWebServer::webHandleAuth(PsychicRequest *request) {
   Log.notice(F("WEB : webServer callback for /api/auth." CR));
+
+  if(isSslEnabled() && !_wifiSetup) {
+    if( !request->authenticate(_webConfig->getAdminUser(), _webConfig->getAdminPass()) ) {
+      return request->reply(401);
+    }
+  } 
+
   PsychicJsonResponse response(request);
   JsonObject obj = response.getRoot().as<JsonObject>();
 
   obj[PARAM_TOKEN] = _webConfig->getID();
   return response.send();
-}
-
-esp_err_t BaseWebServer::webHandleLogin(PsychicRequest *request) {
-  Log.notice(F("WEB : webServer callback for /api/login." CR));
-
-  if (!isAuthenticated(request)) {
-    return ESP_FAIL;
-  }
-
-  return request->reply(200);
 }
 
 esp_err_t BaseWebServer::webHandleFileSystem(PsychicRequest *request,
@@ -440,9 +437,6 @@ void BaseWebServer::setupWebHandlers() {
   _server->on("/api/auth", HTTP_GET,
               (PsychicHttpRequestCallback)std::bind(
                   &BaseWebServer::webHandleAuth, this, std::placeholders::_1));
-  _server->on("/api/login", HTTP_GET,
-              (PsychicHttpRequestCallback)std::bind(
-                  &BaseWebServer::webHandleLogin, this, std::placeholders::_1));
   _server->on("/api/wifi/status", HTTP_GET,
               (PsychicHttpRequestCallback)std::bind(
                   &BaseWebServer::webHandleWifiScanStatus, this,

@@ -135,7 +135,6 @@ class BaseWebServer {
   }
 
   esp_err_t webHandleAuth(PsychicRequest *request);
-  esp_err_t webHandleLogin(PsychicRequest *request);
   esp_err_t webHandleWifiScan(PsychicRequest *request);
   esp_err_t webHandleWifiScanStatus(PsychicRequest *request);
   esp_err_t webHandleWifiClear(PsychicRequest *request);
