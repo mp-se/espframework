@@ -24,7 +24,11 @@ SOFTWARE.
 #ifndef SRC_SERIALWS_HPP_
 #define SRC_SERIALWS_HPP_
 
-#if !defined(ESPFWK_PSYCHIC_HTTP)
+#if defined(ESPFWK_PSYCHIC_HTTP)
+
+#include <serialws.hpp>
+
+#else
 
 #include <Print.h>
 

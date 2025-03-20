@@ -24,7 +24,11 @@ SOFTWARE.
 #ifndef SRC_BASEWEBSERVER_HPP_
 #define SRC_BASEWEBSERVER_HPP_
 
-#if !defined(ESPFWK_PSYCHIC_HTTP)
+#if defined(ESPFWK_PSYCHIC_HTTP)
+
+#include <basewebserver2.hpp>
+
+#else
 
 #include <memory>
 
