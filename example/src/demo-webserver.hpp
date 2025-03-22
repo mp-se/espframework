@@ -24,7 +24,11 @@ SOFTWARE.
 #ifndef SRC_DEMO_WEBSERVER_HPP_
 #define SRC_DEMO_WEBSERVER_HPP_
 
-#if !defined(ESPFWK_PSYCHIC_HTTP)
+#if defined(ESPFWK_PSYCHIC_HTTP)
+
+#include <demo-webserver2.hpp>
+
+#else 
 
 #include <basewebserver.hpp>
 #include <demo-push.hpp>

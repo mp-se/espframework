@@ -41,25 +41,32 @@ bool BaseWebServer::isAuthenticated(PsychicRequest *request) {
   // Authentication using password is only done when ssl is enabled and not
   // using wifi setup mode Authentication using device id in other cases
 
-  if (_webConfig->hasAdminPass() && !_wifiSetup &&
-      request->hasHeader("Authorization") && isSslEnabled()) {
+  if (!_wifiSetup && request->hasHeader("authorization") && isSslEnabled()) {
     Log.info(F("WEB : Authentication, checking for admin password." CR));
 
     String token("Bearer ");
     token += _webConfig->getAdminPass();
 
-    if (request->header("Authorization") == token) {
+    if (request->header("authorization") == token || (strlen(_webConfig->getAdminPass()) == 0 && request->header("authorization") == "Bearer")) {
+      Log.info(F("WEB : Authorized." CR));
       return true;
     }
-  } else if (request->hasHeader("Authorization")) {
+
+    Log.info(F("WEB : %s." CR), request->header("authorization").c_str());
+
+  } else if (request->hasHeader("authorization")) {
     Log.info(F("WEB : Authentication, checking for device id." CR));
 
     String token("Bearer ");
     token += _webConfig->getID();
 
     if (request->header("Authorization") == token) {
+      Log.info(F("WEB : Authorized." CR));
       return true;
     }
+
+    Log.info(F("WEB : NOT Authorized." CR));
+    return false;
   }
 
   Log.info(F("WEB : No valid authorization header found, returning error 401. "
