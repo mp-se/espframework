@@ -28,7 +28,7 @@ SOFTWARE.
 
 #include <demo-webserver2.hpp>
 
-#else 
+#else
 
 #include <basewebserver.hpp>
 #include <demo-push.hpp>
