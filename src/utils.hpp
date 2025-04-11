@@ -50,6 +50,8 @@ void checkResetReason();
 String urldecode(String str);
 String urlencode(String str);
 
+extern const char *platform;
+
 #endif  // SRC_UTILS_HPP_
 
 // EOF

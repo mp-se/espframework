@@ -33,6 +33,19 @@ SOFTWARE.
 #include <user_interface.h>
 #endif
 
+#if defined(ESP32S3)
+const char *platform = "ESP32S3";
+#elif defined(ESP32S2)
+const char *platform = "ESP32S2";
+#elif defined(ESP32C3)
+const char *platform = "ESP32C3";
+#elif defined(ESP32)
+const char *platform = "ESP32";
+#elif defined(ESP8266)
+const char *platform = "ESP8266";
+#endif
+
+
 float convertCtoF(float c) { return (c * 1.8) + 32.0; }
 float convertFtoC(float f) { return (f - 32.0) / 1.8; }
 

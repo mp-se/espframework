@@ -63,6 +63,7 @@ void setup() {
         F("Main: Missing wifi config or double reset detected, entering wifi "
           "setup." CR));
     myDemoWebServer.setWifiSetup(true);
+    myWifi.enableImprov(true);
     myWifi.startAP();
   } else {
     PERF_BEGIN("wifi-connect");
@@ -101,13 +102,7 @@ void loop() {
   myWifi.loop();
   myDemoWebServer.loop();
   mySerialWebSocket.loop();
-  // Log.notice(F("Loop:" CR));
-  delay(2000);
-
   myUptime.calculate();
-  /*Log.notice(F("Loop: Uptime %d days, %d hours, %d minutes, %d seconds." CR),
-             myUptime.getDays(), myUptime.getHours(), myUptime.getMinutes(),
-             myUptime.getSeconds());*/
 }
 
 // EOF

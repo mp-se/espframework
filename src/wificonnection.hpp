@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2021-2024 Magnus
+Copyright (c) 2021-2025 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -41,6 +41,8 @@ SOFTWARE.
 #define wifi_mode_t WiFiMode_t
 #endif
 
+#include <improvWiFi/ImprovWiFi.h>
+
 class WifiConnection {
  private:
   String _apSSID;
@@ -50,8 +52,8 @@ class WifiConnection {
   String _userPWD;
   WifiConfig* _wifiConfig;
   DNSServer* _dnsServer = NULL;
-
-  // Double reset
+  ImprovWiFi* _improvWiFi = NULL;
+  bool _enableImprov = false;
   uint32_t _timer = 0;
   uint32_t _timeout = 3000;  // 3 seconds
   uint8_t _resetCounter = 0;
@@ -63,11 +65,19 @@ class WifiConnection {
   void writeReset();
   const uint8_t* findStrongestAP(String& ssid);
 
+  void improveSetWifiCredentials(const char *ssid, const char *password);  
+  void improveInfo(const char *info);
+  void improveDebug(const char *debug);  
+  
  public:
   WifiConnection(WifiConfig* cfg, String apSSID, String apPWD, String apMDNS,
                  String userSSID = "", String userPWD = "");
   void init();
   void timeSync(String timeZone = "");
+
+  void enableImprov(bool f) {
+    _enableImprov = f;
+  }
 
   bool connect(bool wifiDirect, wifi_mode_t mode = WIFI_STA);
   bool connect(wifi_mode_t mode = WIFI_STA) { return connect(false, mode); }
