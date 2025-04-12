@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2021-2024 Magnus
+Copyright (c) 2025 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -21,43 +21,28 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-#ifndef SRC_LOG_HPP_
-#define SRC_LOG_HPP_
-
-#include <ArduinoLog.hpp>
 #include <espframework.hpp>
+#include <log.hpp>
+#include <looptimer.hpp>
 
-#define ERR_FILENAME "/error.log"
-#define ERR_FILENAME2 "/error2.log"
-#define ERR_FILEMAXSIZE 2048
+SerialDebug mySerial(115200L);
+LoopTimer myTimer(1000);  
 
-class SerialDebug {
- private:
-  uint32_t _serialSpeed;
-
- public:
-  explicit SerialDebug(const uint32_t serialSpeed = 115200L,
-                       bool autoBegin = true, uint8_t tx = -1, uint8_t rx = -1);
-
-  void setup(const uint32_t serialSpeed = 115200L, uint8_t tx = -1, uint8_t rx = -1);
-  void begin(Print* p);
-  uint32_t getSerialSpeed() { return _serialSpeed; }
-  static Logging* getLog() { return &Log; }
-};
-
-void printTimestamp(Print* _logOutput, int _logLevel);
-void printNewline(Print* _logOutput);
-
-void writeErrorLog(const char* format, ...);
-void dumpErrorLog1();
-void dumpErrorLog2();
-
-#if defined(ESPFWK_USE_SERIAL_PINS) && !defined(ESP8266)
-#define EspSerial Serial1
+void setup() {
+#if defined(ESPFWK_USE_SERIAL_PINS)
+  // Setup serial with new pins and speed or just initialize it again if needed
+  mySerial.setup(115200L, TX, RX);
+  Log.notice(F("Main: Using serial pins as output." CR));
 #else
-#define EspSerial Serial
+  Log.notice(F("Main: Using usb connector as output." CR));
 #endif
+}
 
-#endif  // SRC_LOG_HPP_
+void loop() {
+  if(myTimer.hasExipred()) {
+    myTimer.reset();  
+    Log.notice(F("Loop: Timer triggered." CR));
+  }
+}
 
 // EOF

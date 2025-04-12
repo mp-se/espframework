@@ -38,6 +38,7 @@ This is a framework that I use in my own ESP projects as a base. It contains a l
 - Switched to ArduinoJSON v7
 - Included ArduinoLog and Incbin projects into the codebase since they are not really mainted anymore.
 - Added feature to save wifi settings to Preferences API on ESP32 to make it easier to switch between project during development.
+- Added support for ImprovWiFi that allows for wifi setup after flashing with web-flasher
 
 ## Supported targets
 
@@ -61,6 +62,15 @@ On ESP32 the following can be used to set the max size for firmware updates.
 
 - MAX_SKETCH_SPACE default value is 0x1c0000 (1.8Mb)
 
+- CFG_APPNAME name of the application
+- CFG_APPVER version of the application in format major.minor.patch, i.e 1.2.3
+- CFG_GITREV github revision to identify build
+- LOG_LEVEL log level SILENT=0, FATAL=1, ERROR=2, WARNING=3, INFO=4, TRACE=5, VERBOSE=6
+
+when using asyncwebserver its also recommended to add
+
+- CONFIG_ASYNC_TCP_RUNNING_CORE=1
+
 ## Feature flags
 
 - ESPFWK_DISABLE_OTA, Reduction 38kb on ESP32s3
@@ -80,7 +90,7 @@ openssl req -x509 -newkey rsa:4096 -nodes -keyout server.key -out server.crt -sh
 
 ## Dependant Libraries
 
-  The framework is dependant on other projects which are listed here. These needs to be included into your project for a successful compilation.
+  The framework is dependant on other projects which are listed here. These needs to be included into your project for a successful compilation. If Arduino 3.0 is used then that is supported from v1.2.0 (Branch 1.2)
 
   PlatformIO:
   - platform = espressif8266 @ 4.2.1
