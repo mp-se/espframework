@@ -37,8 +37,11 @@ class LoopTimer {
     _interval = interval;
     reset();
   }
+  bool hasExipred() { // Deprecated, remove this in future versions
+    return hasExpired();
+  }
 
-  bool hasExipred() {
+  bool hasExpired() {
     if (abs((int32_t)(millis() - _startMillis)) > _interval) {
       _loopCounter++;
       return true;
