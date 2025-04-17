@@ -32,6 +32,7 @@ SOFTWARE.
 #include <led.hpp>
 #include <utils.hpp>
 #include <wificonnection.hpp>
+#include <looptimer.hpp>
 #include <improvWiFi/ImprovWiFi.h>
 
 const int NTP_PACKET_SIZE =
@@ -310,12 +311,19 @@ bool WifiConnection::disconnect() {
 }
 
 void WifiConnection::timeSync(String timeZone) {
-  configTime(0, 0, "pool.ntp.org", "time.nist.gov");
+  LoopTimer timeout(10000);
+
+  configTime(0, 0, "pool.ntp.org", "time.nist.gov", "time.google.com");
 
   Log.notice(F("WIFI: Waiting for NTP sync."));
   time_t now = time(nullptr);
 
   while (now < 8 * 3600 * 2) {
+    if(timeout.hasExipred()) {
+      Log.error(F("WIFI: Failed to sync time." CR));
+      return;
+    }
+
     delay(500);
     EspSerial.print(".");
     now = time(nullptr);
