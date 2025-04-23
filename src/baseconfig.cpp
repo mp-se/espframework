@@ -51,7 +51,7 @@ BaseConfig::BaseConfig(String baseMDNS, String fileName) {
 #endif
 }
 
-void BaseConfig::createJsonWifi(JsonObject& doc) {
+void BaseConfig::createJsonWifi(JsonObject& doc) const {
 #if LOG_LEVEL == 6
   Log.verbose(F("CFG : Create json (wifi)." CR));
 #endif
@@ -90,7 +90,7 @@ void BaseConfig::parseJsonWifi(JsonObject& doc) {
   _saveNeeded = true;
 }
 
-void BaseConfig::createJsonOta(JsonObject& doc) {
+void BaseConfig::createJsonOta(JsonObject& doc) const {
 #if LOG_LEVEL == 6
   Log.verbose(F("CFG : Create json (ota)." CR));
 #endif
@@ -106,7 +106,7 @@ void BaseConfig::parseJsonOta(JsonObject& doc) {
   _saveNeeded = true;
 }
 
-void BaseConfig::createJsonPush(JsonObject& doc) {
+void BaseConfig::createJsonPush(JsonObject& doc) const {
 #if LOG_LEVEL == 6
   Log.verbose(F("CFG : Create json (push)." CR));
 #endif
@@ -178,7 +178,7 @@ void BaseConfig::parseJsonPush(JsonObject& doc) {
   _saveNeeded = true;
 }
 
-void BaseConfig::createJsonBase(JsonObject& doc) {
+void BaseConfig::createJsonBase(JsonObject& doc) const {
 #if LOG_LEVEL == 6
   Log.verbose(F("CFG : Create json (base)." CR));
 #endif
@@ -316,7 +316,7 @@ void BaseConfig::formatFileSystem() {
   LittleFS.format();
 }
 
-void BaseConfig::checkFileSystem() {
+void BaseConfig::checkFileSystem() const {
 #if LOG_LEVEL == 6
   Log.verbose(F("CFG : Checking if filesystem is valid." CR));
 #endif

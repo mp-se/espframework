@@ -225,7 +225,7 @@ void BaseWebServer::webHandleUploadFile(AsyncWebServerRequest *request,
   }
 }
 
-void BaseWebServer::webHandlePageNotFound(AsyncWebServerRequest *request) {
+void BaseWebServer::webHandlePageNotFound(AsyncWebServerRequest *request) const {
   if (_wifiSetup) {
     request->redirect("http://192.168.4.1");
     return;
@@ -272,7 +272,7 @@ void BaseWebServer::webHandlePageNotFound(AsyncWebServerRequest *request) {
   request->redirect("/");
 }
 
-void BaseWebServer::webHandleAuth(AsyncWebServerRequest *request) {
+void BaseWebServer::webHandleAuth(AsyncWebServerRequest *request) const {
   Log.notice(F("WEB : webServer callback for /api/auth." CR));
   AsyncJsonResponse *response = new AsyncJsonResponse(false);
   JsonObject obj = response->getRoot().as<JsonObject>();
@@ -423,7 +423,7 @@ void BaseWebServer::webHandleRestart(AsyncWebServerRequest *request) {
   _rebootTask = true;
 }
 
-void BaseWebServer::webHandlePing(AsyncWebServerRequest *request) {
+void BaseWebServer::webHandlePing(AsyncWebServerRequest *request) const {
   Log.notice(F("WEB : webServer callback for /api/ping." CR));
   AsyncJsonResponse *response = new AsyncJsonResponse(false);
   JsonObject obj = response->getRoot().as<JsonObject>();

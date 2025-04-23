@@ -59,8 +59,8 @@ class BasePush {
     _http.reset(new HTTPClient());
   }
 
-  int getLastResponseCode() { return _lastResponseCode; }
-  bool wasLastSuccessful() { return _lastSuccess; }
+  int getLastResponseCode() const { return _lastResponseCode; }
+  bool wasLastSuccessful() const { return _lastSuccess; }
 
   String sendHttpPost(String& payload, const char* target, const char* header1,
                       const char* header2);

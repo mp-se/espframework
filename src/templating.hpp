@@ -126,7 +126,7 @@ class TemplatingEngine {
     Log.warning(F("TPL : Too many keys, max is %d." CR), MAX_KEY_VAL);
   }
 
-  void dumpAll() {
+  void dumpAll() const {
     int max = sizeof(_items) / sizeof(KeyVal);
     for (int i = 0; i < max; i++) {
       if (!_items[i].key.equals("")) {

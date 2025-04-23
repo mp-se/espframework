@@ -28,46 +28,46 @@ SOFTWARE.
 
 class OtaConfig {
  public:
-  virtual const char* getOtaURL() = 0;
+  virtual const char* getOtaURL() const = 0;
   virtual void setOtaURL(String s);
-  virtual bool isOtaActive();
-  virtual bool isOtaSSL();
+  virtual bool isOtaActive() const;
+  virtual bool isOtaSSL() const;
 };
 
 class WebConfig {
  public:
-  virtual void createJson(JsonObject& doc);
+  virtual void createJson(JsonObject& doc) const;
   virtual void parseJson(JsonObject& doc);
 
   virtual bool saveFile();
 
-  virtual const char* getID();
-  virtual const char* getMDNS();
-  virtual int getWifiPortalTimeout();
+  virtual const char* getID() const;
+  virtual const char* getMDNS() const;
+  virtual int getWifiPortalTimeout() const;
 
-  virtual bool isCorsAllowed();
+  virtual bool isCorsAllowed() const;
 };
 
 class WifiConfig {
  public:
-  virtual int getWifiConnectionTimeout() = 0;
+  virtual int getWifiConnectionTimeout() const = 0;
   virtual void setWifiConnectionTimeout(int t);
-  virtual int getWifiPortalTimeout();
+  virtual int getWifiPortalTimeout() const;
   virtual void setWifiPortalTimeout(int t);
 
-  virtual bool getWifiScanAP();
+  virtual bool getWifiScanAP() const;
   virtual void setWifiScanAP(bool b);
 
-  virtual const char* getMDNS();
+  virtual const char* getMDNS() const;
   virtual void setMDNS(String s);
-  virtual const char* getWifiSSID(int idx);
+  virtual const char* getWifiSSID(int idx) const;
   virtual void setWifiSSID(String s, int idx);
-  virtual const char* getWifiPass(int idx);
+  virtual const char* getWifiPass(int idx) const;
   virtual void setWifiPass(String s, int idx);
 
-  virtual const char* getWifiDirectSSID();
+  virtual const char* getWifiDirectSSID() const;
   virtual void setWifiDirectSSID(String s);
-  virtual const char* getWifiDirectPass();
+  virtual const char* getWifiDirectPass() const;
   virtual void setWifiDirectPass(String s);
 
   virtual bool saveFile();
@@ -75,55 +75,55 @@ class WifiConfig {
 
 class PushConfig {
  public:
-  virtual const char* getID();
-  virtual const char* getMDNS();
+  virtual const char* getID() const;
+  virtual const char* getMDNS() const;
 
-  virtual int getPushTimeout();
+  virtual int getPushTimeout() const;
   virtual void setPushTimeout(int t);
 
-  virtual const char* getTargetHttpPost() = 0;
+  virtual const char* getTargetHttpPost()  const= 0;
   virtual void setTargetHttpPost(String target);
-  virtual const char* getHeader1HttpPost();
+  virtual const char* getHeader1HttpPost() const;
   virtual void setHeader1HttpPost(String header);
-  virtual const char* getHeader2HttpPost();
+  virtual const char* getHeader2HttpPost() const;
   virtual void setHeader2HttpPost(String header);
-  virtual bool hasTargetHttpPost();
+  virtual bool hasTargetHttpPost() const;
 
-  virtual const char* getTargetHttpPost2() = 0;
+  virtual const char* getTargetHttpPost2()  const= 0;
   virtual void setTargetHttpPost2(String target);
-  virtual const char* getHeader1HttpPost2();
+  virtual const char* getHeader1HttpPost2() const;
   virtual void setHeader1HttpPost2(String header);
-  virtual const char* getHeader2HttpPost2();
+  virtual const char* getHeader2HttpPost2() const;
   virtual void setHeader2HttpPost2(String header);
-  virtual bool hasTargetHttpPost2();
+  virtual bool hasTargetHttpPost2() const;
 
-  virtual const char* getTargetHttpGet();
+  virtual const char* getTargetHttpGet() const;
   virtual void setTargetHttpGet(String target);
-  virtual const char* getHeader1HttpGet();
+  virtual const char* getHeader1HttpGet() const;
   virtual void setHeader1HttpGet(String header);
-  virtual const char* getHeader2HttpGet();
+  virtual const char* getHeader2HttpGet() const;
   virtual void setHeader2HttpGet(String header);
-  virtual bool hasTargetHttpGet();
+  virtual bool hasTargetHttpGet() const;
 
-  virtual const char* getTargetInfluxDB2();
+  virtual const char* getTargetInfluxDB2() const;
   virtual void setTargetInfluxDB2(String target);
-  virtual const char* getOrgInfluxDB2();
+  virtual const char* getOrgInfluxDB2() const;
   virtual void setOrgInfluxDB2(String org);
-  virtual const char* getBucketInfluxDB2();
+  virtual const char* getBucketInfluxDB2() const;
   virtual void setBucketInfluxDB2(String bucket);
-  virtual const char* getTokenInfluxDB2();
+  virtual const char* getTokenInfluxDB2() const;
   virtual void setTokenInfluxDB2(String token);
-  virtual bool hasTargetInfluxDb2();
+  virtual bool hasTargetInfluxDb2() const;
 
-  virtual const char* getTargetMqtt();
+  virtual const char* getTargetMqtt() const;
   virtual void setTargetMqtt(String target);
-  virtual int getPortMqtt();
+  virtual int getPortMqtt() const;
   virtual void setPortMqtt(int port);
-  virtual const char* getUserMqtt();
+  virtual const char* getUserMqtt() const;
   virtual void setUserMqtt(String user);
-  virtual const char* getPassMqtt();
+  virtual const char* getPassMqtt() const;
   virtual void setPassMqtt(String pass);
-  virtual bool hasTargetMqtt();
+  virtual bool hasTargetMqtt() const;
 };
 
 #endif  // SRC_INTERFACE_HPP_

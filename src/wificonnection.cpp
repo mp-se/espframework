@@ -319,7 +319,7 @@ void WifiConnection::timeSync(String timeZone) {
   time_t now = time(nullptr);
 
   while (now < 8 * 3600 * 2) {
-    if(timeout.hasExipred()) {
+    if(timeout.hasExpired()) {
       Log.error(F("WIFI: Failed to sync time." CR));
       return;
     }

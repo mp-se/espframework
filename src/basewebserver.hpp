@@ -70,30 +70,34 @@ extern const uint8_t faviconIcoEnd[] asm("_binary_html_favicon_ico_gz_end");
 class BaseWebServer {
  protected:
   std::unique_ptr<AsyncWebServer> _server;
-  File _uploadFile;
   WebConfig *_webConfig;
-  int _uploadReturn = 200;
+
   bool _wifiSetup = false;
-  uint32_t _uploadedSize = 0;
-  uint32_t _rebootTimer = 0;
   uint32_t _wifiPortalTimer = 0;
-  volatile bool _wifiScanTask = false;
+
+  File _uploadFile;
+  int _uploadReturn = 200;
+  uint32_t _uploadedSize = 0;
+
   String _wifiScanData;
+  volatile bool _wifiScanTask = false;
+
   volatile bool _rebootTask = false;
+  uint32_t _rebootTimer = 0;
 
   void resetWifiPortalTimer() { _wifiPortalTimer = millis(); }
   bool isAuthenticated(AsyncWebServerRequest *request);
 
-  void webReturnOK(AsyncWebServerRequest *request) {
+  void webReturnOK(AsyncWebServerRequest *request) const {
     request->send(_uploadReturn);
   }
 #if defined(ESP8266)
-  void webReturnIndexHtml(AsyncWebServerRequest *request) {
+  void webReturnIndexHtml(AsyncWebServerRequest *request) const {
     Log.notice(F("WEB : webServer callback for /index.html (Memory)." CR));
     request->send(200, "text/html", (const uint8_t *)gIndexHtmlData,
                   gIndexHtmlSize);
   }
-  void webReturnAppJs(AsyncWebServerRequest *request) {
+  void webReturnAppJs(AsyncWebServerRequest *request) const {
     if (LittleFS.exists("/app.js.gz")) {
       Log.notice(F("WEB : webServer callback for /app.js (FileSystem)." CR));
       AsyncWebServerResponse *response = request->beginResponse(
@@ -109,14 +113,14 @@ class BaseWebServer {
       request->send(response);
     }
   }
-  void webReturnAppCss(AsyncWebServerRequest *request) {
+  void webReturnAppCss(AsyncWebServerRequest *request) const {
     Log.notice(F("WEB : webServer callback for /app.css (Memory)." CR));
     AsyncWebServerResponse *response = request->beginResponse(
         200, "text/css", (const uint8_t *)gAppCssData, gAppCssSize);
     response->addHeader("Content-Encoding", "gzip");
     request->send(response);
   }
-  void webReturnFavicon(AsyncWebServerRequest *request) {
+  void webReturnFavicon(AsyncWebServerRequest *request) const {
     Log.notice(F("WEB : webServer callback for /favicon.ico (Memory)." CR));
     AsyncWebServerResponse *response = request->beginResponse(
         200, "image/x-icon", (const uint8_t *)gFaviconIcoData, gFaviconIcoSize);
@@ -124,13 +128,13 @@ class BaseWebServer {
     request->send(response);
   }
 #else
-  void webReturnIndexHtml(AsyncWebServerRequest *request) {
+  void webReturnIndexHtml(AsyncWebServerRequest *request) const {
     Log.notice(F("WEB : webServer callback for /index.html (Memory)." CR));
     request->send(200, "text/html", (const uint8_t *)indexHtmlStart,
                   reinterpret_cast<uint32_t>(&indexHtmlEnd[0]) -
                       reinterpret_cast<uint32_t>(&indexHtmlStart[0]));
   }
-  void webReturnAppJs(AsyncWebServerRequest *request) {
+  void webReturnAppJs(AsyncWebServerRequest *request) const {
     if (LittleFS.exists("/app.js.gz")) {
       Log.notice(F("WEB : webServer callback for /app.js (FileSystem)." CR));
       AsyncWebServerResponse *response = request->beginResponse(
@@ -147,7 +151,7 @@ class BaseWebServer {
       request->send(response);
     }
   }
-  void webReturnAppCss(AsyncWebServerRequest *request) {
+  void webReturnAppCss(AsyncWebServerRequest *request) const {
     Log.notice(F("WEB : webServer callback for /app.css (Memory)." CR));
     AsyncWebServerResponse *response =
         request->beginResponse(200, "text/css", (const uint8_t *)appCssStart,
@@ -156,7 +160,7 @@ class BaseWebServer {
     response->addHeader("Content-Encoding", "gzip");
     request->send(response);
   }
-  void webReturnFavicon(AsyncWebServerRequest *request) {
+  void webReturnFavicon(AsyncWebServerRequest *request) const {
     Log.notice(F("WEB : webServer callback for /favicon.ico (Memory)." CR));
     AsyncWebServerResponse *response = request->beginResponse(
         200, "image/x-icon", (const uint8_t *)faviconIcoStart,
@@ -167,18 +171,18 @@ class BaseWebServer {
   }
 #endif
 
-  void webHandleAuth(AsyncWebServerRequest *request);
+  void webHandleAuth(AsyncWebServerRequest *request) const;
   void webHandleWifiScan(AsyncWebServerRequest *request);
   void webHandleWifiScanStatus(AsyncWebServerRequest *request);
   void webHandleWifiClear(AsyncWebServerRequest *request);
-  void webHandlePageNotFound(AsyncWebServerRequest *request);
+  void webHandlePageNotFound(AsyncWebServerRequest *request) const;
   void webHandleUploadFirmware(AsyncWebServerRequest *request, String filename,
                                size_t index, uint8_t *data, size_t len,
                                bool final);
   void webHandleUploadFile(AsyncWebServerRequest *request, String filename,
                            size_t index, uint8_t *data, size_t len, bool final);
   void webHandleRestart(AsyncWebServerRequest *request);
-  void webHandlePing(AsyncWebServerRequest *request);
+  void webHandlePing(AsyncWebServerRequest *request) const;
   void webHandleFileSystem(AsyncWebServerRequest *request, JsonVariant &json);
 
   virtual void setupWebHandlers();
@@ -187,7 +191,7 @@ class BaseWebServer {
   explicit BaseWebServer(WebConfig *config);
 
   virtual bool setupWebServer();
-  virtual AsyncWebServer *getWebServer() { return _server.get(); }
+  virtual AsyncWebServer *getWebServer() const { return _server.get(); }
   virtual void setWifiSetup(bool wifiSetup) { _wifiSetup = wifiSetup; }
   virtual void loop();
 };
