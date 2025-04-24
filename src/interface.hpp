@@ -26,7 +26,7 @@ SOFTWARE.
 
 #include <ArduinoJson.h>
 
-class OtaConfig {
+class OtaConfigInterface {
  public:
   virtual const char* getOtaURL() const = 0;
   virtual void setOtaURL(String s);
@@ -34,7 +34,7 @@ class OtaConfig {
   virtual bool isOtaSSL() const;
 };
 
-class WebConfig {
+class WebConfigInterface {
  public:
   virtual void createJson(JsonObject& doc) const;
   virtual void parseJson(JsonObject& doc);
@@ -48,7 +48,7 @@ class WebConfig {
   virtual bool isCorsAllowed() const;
 };
 
-class WifiConfig {
+class WifiConfigInterface {
  public:
   virtual int getWifiConnectionTimeout() const = 0;
   virtual void setWifiConnectionTimeout(int t);
@@ -73,7 +73,7 @@ class WifiConfig {
   virtual bool saveFile();
 };
 
-class PushConfig {
+class PushConfigInterface {
  public:
   virtual const char* getID() const;
   virtual const char* getMDNS() const;

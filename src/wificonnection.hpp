@@ -50,7 +50,7 @@ class WifiConnection {
   String _apMDNS;
   String _userSSID;
   String _userPWD;
-  WifiConfig* _wifiConfig;
+  WifiConfigInterface* _wifiConfig;
   DNSServer* _dnsServer = NULL;
   ImprovWiFi* _improvWiFi = NULL;
   bool _enableImprov = false;
@@ -70,7 +70,7 @@ class WifiConnection {
   void improveDebug(const char *debug);  
   
  public:
-  WifiConnection(WifiConfig* cfg, String apSSID, String apPWD, String apMDNS,
+  WifiConnection(WifiConfigInterface* cfg, String apSSID, String apPWD, String apMDNS,
                  String userSSID = "", String userPWD = "");
   void init();
   void timeSync(String timeZone = "");

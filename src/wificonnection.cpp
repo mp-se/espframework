@@ -40,7 +40,7 @@ const int NTP_PACKET_SIZE =
 
 const char *resetFilename = "/reset.dat";
 
-WifiConnection::WifiConnection(WifiConfig *cfg, String apSSID, String apPWD,
+WifiConnection::WifiConnection(WifiConfigInterface *cfg, String apSSID, String apPWD,
                                String apMDNS, String userSSID, String userPWD) {
   _wifiConfig = cfg;
   _apSSID = apSSID;

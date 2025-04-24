@@ -47,7 +47,7 @@ INCBIN(AppCss, "html/app.css.gz");
 INCBIN(FaviconIco, "html/favicon.ico.gz");
 #endif
 
-BaseWebServer::BaseWebServer(WebConfig *config) { _webConfig = config; }
+BaseWebServer::BaseWebServer(WebConfigInterface *config) { _webConfig = config; }
 
 bool BaseWebServer::isAuthenticated(AsyncWebServerRequest *request) {
   resetWifiPortalTimer();

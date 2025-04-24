@@ -41,7 +41,7 @@ class BasePush {
   std::unique_ptr<HTTPClient> _http;
   int _lastResponseCode = 0;
   bool _lastSuccess = false;
-  PushConfig* _config;
+  PushConfigInterface* _config;
 
   void probeMFLN(String serverPath);
   void addHttpHeader(String header);
@@ -53,7 +53,7 @@ class BasePush {
   }
 
  public:
-  explicit BasePush(PushConfig* config) { 
+  explicit BasePush(PushConfigInterface* config) { 
     _config = config; 
     _wifi.reset(new WiFiClient());
     _http.reset(new HTTPClient());

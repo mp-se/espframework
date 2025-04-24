@@ -37,7 +37,7 @@ class DemoWebServer : public BaseWebServer {
   void webHandleConfigWrite(AsyncWebServerRequest *request, JsonVariant &json);
 
  public:
-  explicit DemoWebServer(WebConfig *config, DemoPush *push);
+  explicit DemoWebServer(WebConfigInterface *config, DemoPush *push);
 };
 
 #endif  // SRC_DEMO_WEBSERVER_HPP_

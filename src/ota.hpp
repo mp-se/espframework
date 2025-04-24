@@ -35,7 +35,7 @@ SOFTWARE.
 
 class OtaUpdate {
  private:
-  OtaConfig* _otaConfig;
+  OtaConfigInterface* _otaConfig;
   String _curVer;
   bool _newFirmware = false;
   String _fileName;
@@ -44,7 +44,7 @@ class OtaUpdate {
   void downloadFile(HTTPClient& http, String& fname);
 
  public:
-  OtaUpdate(OtaConfig* cfg, String ver, String filename = "");
+  OtaUpdate(OtaConfigInterface* cfg, String ver, String filename = "");
 
   bool updateFirmware();
   bool checkFirmwareVersion();

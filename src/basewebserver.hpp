@@ -70,7 +70,7 @@ extern const uint8_t faviconIcoEnd[] asm("_binary_html_favicon_ico_gz_end");
 class BaseWebServer {
  protected:
   std::unique_ptr<AsyncWebServer> _server;
-  WebConfig *_webConfig;
+  WebConfigInterface *_webConfig;
 
   bool _wifiSetup = false;
   uint32_t _wifiPortalTimer = 0;
@@ -188,7 +188,7 @@ class BaseWebServer {
   virtual void setupWebHandlers();
 
  public:
-  explicit BaseWebServer(WebConfig *config);
+  explicit BaseWebServer(WebConfigInterface *config);
 
   virtual bool setupWebServer();
   virtual AsyncWebServer *getWebServer() const { return _server.get(); }

@@ -27,10 +27,10 @@ SOFTWARE.
 #include <espframework.hpp>
 #include <interface.hpp>
 
-class BaseConfig : public WifiConfig,
-                   public OtaConfig,
-                   public WebConfig,
-                   public PushConfig {
+class BaseConfig : public WifiConfigInterface,
+                   public OtaConfigInterface,
+                   public WebConfigInterface,
+                   public PushConfigInterface {
  private:
   // WifiConfig
   String _mDNS;
