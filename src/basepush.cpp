@@ -153,6 +153,7 @@ String BasePush::sendTcp(String& payload, const char* target) {
   Log.notice(F("PUSH: server %s, port %d" CR), host.c_str(), port);
 
   if (_wifi->connect(host.c_str(), port)) {
+    _lastSuccess = true;
     _wifi->print(payload.c_str());
 
     int t = 2000;  // 2 seconds timeout
