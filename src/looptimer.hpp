@@ -48,7 +48,9 @@ class LoopTimer {
 
   void reset() { _startMillis = millis(); }
   uint64_t getLoopCounter() const { return _loopCounter; }
-  int32_t getTimePassed() const { return abs((int32_t)(millis() - _startMillis)); }
+  int32_t getTimePassed() const {
+    return abs((int32_t)(millis() - _startMillis));
+  }
   void setInterval(uint64_t interval) { _interval = interval; }
 };
 

@@ -21,8 +21,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-#include <log.hpp>
 #include <HardwareSerial.h>
+
+#include <log.hpp>
 
 void writeErrorLog(const char *format, ...) {
   File f = LittleFS.open(ERR_FILENAME, "a");
@@ -64,12 +65,13 @@ void dumpErrorLog1() { dumpErrorLog(ERR_FILENAME); }
 
 void dumpErrorLog2() { dumpErrorLog(ERR_FILENAME2); }
 
-SerialDebug::SerialDebug(const uint32_t serialSpeed, bool autoBegin, uint8_t tx, uint8_t rx) {
+SerialDebug::SerialDebug(const uint32_t serialSpeed, bool autoBegin, uint8_t tx,
+                         uint8_t rx) {
   setup(serialSpeed, tx, rx);
 
   EspSerial.println("Serial console activated.");
 
-  if(autoBegin) {
+  if (autoBegin) {
     begin(&EspSerial);
   }
 }
@@ -78,16 +80,13 @@ void SerialDebug::setup(const uint32_t serialSpeed, uint8_t tx, uint8_t rx) {
   _serialSpeed = serialSpeed;
 
 #if defined(ESPFWK_USE_SERIAL_PINS) && !defined(ESP8266)
-  if(tx == -1)
-    tx = TX;
+  if (tx == -1) tx = TX;
 
-  if(rx == -1)
-    rx = RX;
+  if (rx == -1) rx = RX;
 
   EspSerial.begin(serialSpeed, SERIAL_8N1, rx, tx, false);
 #elif defined(ESPFWK_USE_SERIAL_PINS) && defined(ESP8266)
-  if(tx == -1)
-    tx = TX;
+  if (tx == -1) tx = TX;
 
   EspSerial.begin(serialSpeed, SERIAL_8N1, tx);
 #else
@@ -95,8 +94,8 @@ void SerialDebug::setup(const uint32_t serialSpeed, uint8_t tx, uint8_t rx) {
 #endif
 }
 
-void SerialDebug::begin(Print* p) { 
-  getLog()->begin(LOG_LEVEL, p, true); 
+void SerialDebug::begin(Print *p) {
+  getLog()->begin(LOG_LEVEL, p, true);
   getLog()->setPrefix(printTimestamp);
   getLog()->notice(F("SDBG: Serial logging started at %d." CR), _serialSpeed);
 }

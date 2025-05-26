@@ -27,21 +27,23 @@ SOFTWARE.
 #include <WiFi.h>
 #endif
 
+#include <improvWiFi/ImprovWiFi.h>
+
 #include <espframework.hpp>
-#include <log.hpp>
 #include <led.hpp>
+#include <log.hpp>
+#include <looptimer.hpp>
 #include <utils.hpp>
 #include <wificonnection.hpp>
-#include <looptimer.hpp>
-#include <improvWiFi/ImprovWiFi.h>
 
 const int NTP_PACKET_SIZE =
     48;  // NTP time stamp is in the first 48 bytes of the message
 
 const char *resetFilename = "/reset.dat";
 
-WifiConnection::WifiConnection(WifiConfigInterface *cfg, String apSSID, String apPWD,
-                               String apMDNS, String userSSID, String userPWD) {
+WifiConnection::WifiConnection(WifiConfigInterface *cfg, String apSSID,
+                               String apPWD, String apMDNS, String userSSID,
+                               String userPWD) {
   _wifiConfig = cfg;
   _apSSID = apSSID;
   _apPWD = apPWD;
@@ -124,14 +126,19 @@ void WifiConnection::startAP(wifi_mode_t _mode) {
   IPAddress local(192, 168, 4, 1);
   IPAddress subnet(255, 255, 255, 0);
 
-  if(_enableImprov) {
+  if (_enableImprov) {
     Log.notice(F("WIFI: Setting up improvWiFi." CR));
     ledOn(LedColor::PURPLE);
 
-    _improvWiFi = new ImprovWiFi(CFG_APPNAME, CFG_APPVER, platform, _wifiConfig->getMDNS());
-    _improvWiFi->setWiFiCallback(std::bind(&WifiConnection::improveSetWifiCredentials, this, std::placeholders::_1, std::placeholders::_2));
-    // _improvWiFi->setInfoCallback(std::bind(&WifiConnection::improveInfo, this, std::placeholders::_1));
-    // _improvWiFi->setDebugCallback(std::bind(&WifiConnection::improveDebug, this, std::placeholders::_1));
+    _improvWiFi = new ImprovWiFi(CFG_APPNAME, CFG_APPVER, platform,
+                                 _wifiConfig->getMDNS());
+    _improvWiFi->setWiFiCallback(
+        std::bind(&WifiConnection::improveSetWifiCredentials, this,
+                  std::placeholders::_1, std::placeholders::_2));
+    // _improvWiFi->setInfoCallback(std::bind(&WifiConnection::improveInfo,
+    // this, std::placeholders::_1));
+    // _improvWiFi->setDebugCallback(std::bind(&WifiConnection::improveDebug,
+    // this, std::placeholders::_1));
   }
 
   WiFi.mode(_mode);
@@ -182,11 +189,11 @@ void WifiConnection::loop() {
   if (_improvWiFi) {
     _improvWiFi->loop();
 
-    if(_improvWiFi->isConfigInitiated()) {
+    if (_improvWiFi->isConfigInitiated()) {
       ledOn(LedColor::YELLOW);
     }
 
-    if(_improvWiFi->isConfigCompleted()) {
+    if (_improvWiFi->isConfigCompleted()) {
       delay(500);
       ESP_RESET();
     }
@@ -319,7 +326,7 @@ void WifiConnection::timeSync(String timeZone) {
   time_t now = time(nullptr);
 
   while (now < 8 * 3600 * 2) {
-    if(timeout.hasExpired()) {
+    if (timeout.hasExpired()) {
       Log.error(F("WIFI: Failed to sync time." CR));
       return;
     }
@@ -345,14 +352,15 @@ void WifiConnection::timeSync(String timeZone) {
   Log.notice(F("WIFI: Current time: %s."), asctime(&timeinfo));
 }
 
-void WifiConnection::improveSetWifiCredentials(const char *ssid, const char *password) {
+void WifiConnection::improveSetWifiCredentials(const char *ssid,
+                                               const char *password) {
   _wifiConfig->setWifiSSID(ssid, 0);
   _wifiConfig->setWifiPass(password, 0);
   _wifiConfig->saveFile();
 }
 
-void WifiConnection::improveInfo(const char *info) { }
+void WifiConnection::improveInfo(const char *info) {}
 
-void WifiConnection::improveDebug(const char *debug) { }
+void WifiConnection::improveDebug(const char *debug) {}
 
 // EOF

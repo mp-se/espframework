@@ -65,19 +65,17 @@ class WifiConnection {
   void writeReset();
   const uint8_t* findStrongestAP(String& ssid);
 
-  void improveSetWifiCredentials(const char *ssid, const char *password);  
-  void improveInfo(const char *info);
-  void improveDebug(const char *debug);  
-  
+  void improveSetWifiCredentials(const char* ssid, const char* password);
+  void improveInfo(const char* info);
+  void improveDebug(const char* debug);
+
  public:
-  WifiConnection(WifiConfigInterface* cfg, String apSSID, String apPWD, String apMDNS,
-                 String userSSID = "", String userPWD = "");
+  WifiConnection(WifiConfigInterface* cfg, String apSSID, String apPWD,
+                 String apMDNS, String userSSID = "", String userPWD = "");
   void init();
   void timeSync(String timeZone = "");
 
-  void enableImprov(bool f) {
-    _enableImprov = f;
-  }
+  void enableImprov(bool f) { _enableImprov = f; }
 
   bool connect(bool wifiDirect, wifi_mode_t mode = WIFI_STA);
   bool connect(wifi_mode_t mode = WIFI_STA) { return connect(false, mode); }

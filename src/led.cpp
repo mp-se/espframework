@@ -79,10 +79,10 @@ void ledOn(LedColor l) {
     digitalWrite(LED_BUILTIN, l);
   }
 }
-#endif 
+#endif
 
 void ledOff() { ledOn(LedColor::OFF); }
 
-#endif // ESPFWK_DISABLE_LED
+#endif  // ESPFWK_DISABLE_LED
 
 // EOF
