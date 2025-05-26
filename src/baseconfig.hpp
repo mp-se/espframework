@@ -49,6 +49,7 @@ class BaseConfig : public WifiConfigInterface,
   String _targetHttpPost;
   String _header1HttpPost = "Content-Type: application/json";
   String _header2HttpPost;
+  bool _tcpHttpPost = false;
   String _targetHttpPost2;
   String _header1HttpPost2 = "Content-Type: application/json";
   String _header2HttpPost2;
@@ -105,7 +106,7 @@ class BaseConfig : public WifiConfigInterface,
     _corsAllowed = b;
     _saveNeeded = true;
   }
-  bool isCorsAllowed()  const { return getCorsAllowed(); }
+  bool isCorsAllowed() const { return getCorsAllowed(); }
 
   // WifiConfig
   const char* getMDNS() const { return _mDNS.c_str(); }
@@ -177,16 +178,28 @@ class BaseConfig : public WifiConfigInterface,
   bool isOtaSSL() const { return _otaURL.startsWith("https://"); }
 
   // PushConfig
-  bool hasTargetHttpPost() const { return _targetHttpPost.length() ? true : false; }
-  bool hasTargetHttpPost2() const { return _targetHttpPost2.length() ? true : false; }
-  bool hasTargetHttpGet() const { return _targetHttpGet.length() ? true : false; }
-  bool hasTargetInfluxDb2() const { return _targetInfluxDb2.length() ? true : false; }
+  bool hasTargetHttpPost() const {
+    return _targetHttpPost.length() ? true : false;
+  }
+  bool hasTargetHttpPost2() const {
+    return _targetHttpPost2.length() ? true : false;
+  }
+  bool hasTargetHttpGet() const {
+    return _targetHttpGet.length() ? true : false;
+  }
+  bool hasTargetInfluxDb2() const {
+    return _targetInfluxDb2.length() ? true : false;
+  }
   bool hasTargetMqtt() const { return _targetMqtt.length() ? true : false; }
 
   bool isHttpPostSSL() const { return _targetHttpPost.startsWith("https://"); }
-  bool isHttpPost2SSL() const { return _targetHttpPost2.startsWith("https://"); }
+  bool isHttpPost2SSL() const {
+    return _targetHttpPost2.startsWith("https://");
+  }
   bool isHttpGetSSL() const { return _targetHttpGet.startsWith("https://"); }
-  bool isHttpInfluxDb2SSL() const { return _targetInfluxDb2.startsWith("https://"); }
+  bool isHttpInfluxDb2SSL() const {
+    return _targetInfluxDb2.startsWith("https://");
+  }
   bool isMqttSSL() const { return _portMqtt > 8000 ? true : false; }
 
   const char* getTargetHttpPost() const { return _targetHttpPost.c_str(); }
@@ -202,6 +215,11 @@ class BaseConfig : public WifiConfigInterface,
   const char* getHeader2HttpPost() const { return _header2HttpPost.c_str(); }
   void setHeader2HttpPost(String header) {
     _header2HttpPost = header;
+    _saveNeeded = true;
+  }
+  bool getTcpHttpPost() const { return _tcpHttpPost; }
+  void setTcpHttpPost(bool tcp) {
+    _tcpHttpPost = tcp;
     _saveNeeded = true;
   }
 
@@ -282,7 +300,7 @@ class BaseConfig : public WifiConfigInterface,
   // Base
   const char* getID() const { return _id.c_str(); }
 
-  char getTempFormat() const{
+  char getTempFormat() const {
     return getTempUnit();
   }  // @deprecated, use setTempUnit()
   void setTempFormat(char c) {

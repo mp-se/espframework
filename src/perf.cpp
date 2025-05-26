@@ -23,6 +23,7 @@ SOFTWARE.
  */
 #if defined(PERF_ENABLE)
 
+#include <cstdio>
 #include <espframework.hpp>
 #include <log.hpp>
 #include <perf.hpp>

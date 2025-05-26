@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
 #include <baseconfig.hpp>
+#include <cstdio>
 #include <espframework.hpp>
 #include <log.hpp>
 
@@ -113,6 +114,7 @@ void BaseConfig::createJsonPush(JsonObject& doc) const {
   JsonArray headers;
 
   doc[PARAM_HTTP_POST_TARGET] = getTargetHttpPost();
+  doc[PARAM_HTTP_POST_TCP] = getTcpHttpPost();
   doc[PARAM_HTTP_POST_HEADER1] = getHeader1HttpPost();
   doc[PARAM_HTTP_POST_HEADER2] = getHeader2HttpPost();
   doc[PARAM_HTTP_POST2_TARGET] = getTargetHttpPost2();
@@ -138,6 +140,8 @@ void BaseConfig::parseJsonPush(JsonObject& doc) {
 #endif
   if (!doc[PARAM_HTTP_POST_TARGET].isNull())
     setTargetHttpPost(doc[PARAM_HTTP_POST_TARGET]);
+  if (!doc[PARAM_HTTP_POST_TCP].isNull())
+    setTcpHttpPost(doc[PARAM_HTTP_POST_TCP].as<bool>());
   if (!doc[PARAM_HTTP_POST_HEADER1].isNull())
     setHeader1HttpPost(doc[PARAM_HTTP_POST_HEADER1]);
   if (!doc[PARAM_HTTP_POST_HEADER2].isNull())

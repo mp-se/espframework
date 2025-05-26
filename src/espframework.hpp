@@ -59,8 +59,9 @@ void espReset();
 
 #include "esp32/rom/rtc.h"
 #define ESP_RESET forcedReset
-#else  
-#error "You must define what platform is used, valid are: ESP8266, ESP32, ESP32S2, ESP32S3 or ESP32C3"
+#else
+#error \
+    "You must define what platform is used, valid are: ESP8266, ESP32, ESP32S2, ESP32S3 or ESP32C3"
 #endif
 
 // Config
@@ -78,6 +79,7 @@ constexpr auto PARAM_OTA_URL = "ota_url";
 constexpr auto PARAM_TEMP_FORMAT = "temp_format";  // Alias is temp_unit
 constexpr auto PARAM_TEMP_UNIT = "temp_unit";
 constexpr auto PARAM_HTTP_POST_TARGET = "http_post_target";
+constexpr auto PARAM_HTTP_POST_TCP = "http_post_tcp";
 constexpr auto PARAM_HTTP_POST_HEADER1 = "http_post_header1";
 constexpr auto PARAM_HTTP_POST_HEADER2 = "http_post_header2";
 constexpr auto PARAM_HTTP_POST2_TARGET = "http_post2_target";

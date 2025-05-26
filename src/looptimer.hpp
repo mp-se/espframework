@@ -39,7 +39,7 @@ class LoopTimer {
   }
 
   bool hasExpired() {
-    if (abs((int32_t)(millis() - _startMillis)) > _interval) {
+    if (abs(static_cast<int32_t>((millis() - _startMillis))) > _interval) {
       _loopCounter++;
       return true;
     }
@@ -49,7 +49,7 @@ class LoopTimer {
   void reset() { _startMillis = millis(); }
   uint64_t getLoopCounter() const { return _loopCounter; }
   int32_t getTimePassed() const {
-    return abs((int32_t)(millis() - _startMillis));
+    return abs(static_cast<int32_t>(millis() - _startMillis));
   }
   void setInterval(uint64_t interval) { _interval = interval; }
 };

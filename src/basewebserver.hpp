@@ -48,7 +48,6 @@ SOFTWARE.
 #include <espframework.hpp>
 #include <interface.hpp>
 #include <log.hpp>
-#include <memory>
 
 #if defined(ESP8266)
 #include <incbin.hpp>

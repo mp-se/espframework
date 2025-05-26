@@ -48,13 +48,14 @@ class BasePush {
   bool isSecure(String target) { return target.startsWith("https://"); }
 
   void allocateSecure() {
-    if(_wifiSecure == nullptr)    
-      _wifiSecure.reset(new WiFiClientSecure());
+    if (_wifiSecure == nullptr) _wifiSecure.reset(new WiFiClientSecure());
   }
 
+  String sendTcp(String& payload, const char* target);
+
  public:
-  explicit BasePush(PushConfigInterface* config) { 
-    _config = config; 
+  explicit BasePush(PushConfigInterface* config) {
+    _config = config;
     _wifi.reset(new WiFiClient());
     _http.reset(new HTTPClient());
   }
@@ -63,7 +64,7 @@ class BasePush {
   bool wasLastSuccessful() const { return _lastSuccess; }
 
   String sendHttpPost(String& payload, const char* target, const char* header1,
-                      const char* header2);
+                      const char* header2, bool sendTcpFlag = false);
   String sendHttpPost2(String& payload, const char* target, const char* header1,
                        const char* header2);
   String sendHttpGet(String& payload, const char* target, const char* header1,

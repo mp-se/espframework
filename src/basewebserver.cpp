@@ -47,7 +47,9 @@ INCBIN(AppCss, "html/app.css.gz");
 INCBIN(FaviconIco, "html/favicon.ico.gz");
 #endif
 
-BaseWebServer::BaseWebServer(WebConfigInterface *config) { _webConfig = config; }
+BaseWebServer::BaseWebServer(WebConfigInterface *config) {
+  _webConfig = config;
+}
 
 bool BaseWebServer::isAuthenticated(AsyncWebServerRequest *request) {
   resetWifiPortalTimer();
@@ -77,7 +79,7 @@ void BaseWebServer::loop() {
 #endif
 
   if (_wifiSetup) {
-    if (abs((int32_t)(millis() - _wifiPortalTimer)) >
+    if (abs(static_cast<int32_t>(millis() - _wifiPortalTimer)) >
         (_webConfig->getWifiPortalTimeout() * 1000)) {
       Log.notice(F("WEB : Wifi portal timeout, reboot device." CR));
       delay(500);
@@ -86,7 +88,7 @@ void BaseWebServer::loop() {
   }
 
   if (_rebootTask) {
-    if (abs((int32_t)(millis() - _rebootTimer)) > 1000) {
+    if (abs(static_cast<int32_t>(millis() - _rebootTimer)) > 1000) {
       Log.notice(F("WEB : Rebooting..." CR));
       delay(500);
       ESP_RESET();
@@ -225,7 +227,8 @@ void BaseWebServer::webHandleUploadFile(AsyncWebServerRequest *request,
   }
 }
 
-void BaseWebServer::webHandlePageNotFound(AsyncWebServerRequest *request) const {
+void BaseWebServer::webHandlePageNotFound(
+    AsyncWebServerRequest *request) const {
   if (_wifiSetup) {
     request->redirect("http://192.168.4.1");
     return;

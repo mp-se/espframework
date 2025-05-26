@@ -169,7 +169,7 @@ void Logging::printFormat(const char format, va_list *args) {
   } else if (format == 'X') {
     _logOutput->print("0x");
     // _logOutput->print(va_arg(*args, int), HEX);
-    uint16_t h = (uint16_t)va_arg(*args, int);
+    uint16_t h = static_cast<uint16_t>(va_arg(*args, int));
     if (h < 0xFFF) _logOutput->print('0');
     if (h < 0xFF) _logOutput->print('0');
     if (h < 0xF) _logOutput->print('0');

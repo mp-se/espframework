@@ -23,6 +23,7 @@ SOFTWARE.
  */
 #include <HardwareSerial.h>
 
+#include <cstdio>
 #include <log.hpp>
 
 void writeErrorLog(const char *format, ...) {
