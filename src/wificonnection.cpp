@@ -70,9 +70,14 @@ void WifiConnection::readReset() {
     Log.warning(F("WIFI: Failed to read reset counter." CR));
     _resetCounter = 0;
   }
+
+  _initialResetCounter = _resetCounter;
 }
 
 void WifiConnection::writeReset() {
+  if(_initialResetCounter == _resetCounter)
+    return;
+
   File file = LittleFS.open(resetFilename, "w");
 
   if (file) {
@@ -83,6 +88,8 @@ void WifiConnection::writeReset() {
     Log.warning(F("WIFI: Failed to write reset counter." CR));
     _resetCounter = 0;
   }
+
+  _initialResetCounter = _resetCounter;
 }
 
 bool WifiConnection::hasConfig() {

@@ -57,6 +57,7 @@ class WifiConnection {
   uint32_t _timer = 0;
   uint32_t _timeout = 3000;  // 3 seconds
   uint8_t _resetCounter = 0;
+  uint8_t _initialResetCounter = 0;
   const uint8_t _minResetCount = 2;
 
   void connectAsync(String ssid, String pass, wifi_mode_t mode);
