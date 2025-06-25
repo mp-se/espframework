@@ -36,6 +36,15 @@ void setup() {
   Printer::setPrinter(&Serial);
   // TestRunner::setVerbosity(Verbosity::kAll);
 
+  // TestRunner::exclude("WifiConnection_*");
+  // TestRunner::exclude("BaseConfig_*");
+  // TestRunner::exclude("TemplatingEngine_*");
+  // TestRunner::exclude("Uptime_*");
+  // TestRunner::exclude("Utils_*");
+  // TestRunner::exclude("LoopTimer_*");
+  // TestRunner::exclude("JsonFS_*");
+  // TestRunner::exclude("Led_*");
+
   // TestRunner::exclude("wifi_*");
 }
 
