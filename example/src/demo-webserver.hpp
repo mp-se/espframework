@@ -43,7 +43,7 @@ class DemoWebServer : public BaseWebServer {
   void webHandleConfigWrite(AsyncWebServerRequest *request, JsonVariant &json);
 
  public:
-  explicit DemoWebServer(WebConfig *config, DemoPush *push);
+  explicit DemoWebServer(WebConfigInterface *config, DemoPush *push);
 };
 
 #endif  // !ENABLE_PSYCHIC_HTTP

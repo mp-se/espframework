@@ -41,7 +41,7 @@ constexpr auto PARAM_WIFI_SETUP = "wifi_setup";
 constexpr auto PARAM_APP_VER = "app_ver";
 constexpr auto PARAM_APP_BUILD = "app_build";
 
-DemoWebServer::DemoWebServer(WebConfig *config, DemoPush *push)
+DemoWebServer::DemoWebServer(WebConfigInterface *config, DemoPush *push)
     : BaseWebServer(config) {
   _push = push;
 }
@@ -106,7 +106,17 @@ void DemoWebServer::webHandleStatus(AsyncWebServerRequest *request) {
 
   obj[PARAM_ID] = _webConfig->getID();
   obj[PARAM_MDNS] = _webConfig->getMDNS();
-  obj[PARAM_PLATFORM] = platform;
+#if defined(ESP8266)
+  obj[PARAM_PLATFORM] = "esp8266";
+#elif defined(ESP32C3)
+  obj[PARAM_PLATFORM] = "esp32c3";
+#elif defined(ESP32S2)
+  obj[PARAM_PLATFORM] = "esp32s2";
+#elif defined(ESP32S3)
+  obj[PARAM_PLATFORM] = "esp32s3";
+#else  // esp32 mini
+  obj[PARAM_PLATFORM] = "esp32";
+#endif
   obj[PARAM_RSSI] = WiFi.RSSI();
   obj[PARAM_SSID] = WiFi.SSID();
   obj[PARAM_APP_VER] = CFG_APPVER;

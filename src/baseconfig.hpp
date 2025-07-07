@@ -27,10 +27,10 @@ SOFTWARE.
 #include <espframework.hpp>
 #include <interface.hpp>
 
-class BaseConfig : public WifiConfig,
-                   public OtaConfig,
-                   public WebConfig,
-                   public PushConfig {
+class BaseConfig : public WifiConfigInterface,
+                   public OtaConfigInterface,
+                   public WebConfigInterface,
+                   public PushConfigInterface {
  private:
   // WifiConfig
   String _mDNS;
@@ -49,6 +49,7 @@ class BaseConfig : public WifiConfig,
   String _targetHttpPost;
   String _header1HttpPost = "Content-Type: application/json";
   String _header2HttpPost;
+  bool _tcpHttpPost = false;
   String _targetHttpPost2;
   String _header1HttpPost2 = "Content-Type: application/json";
   String _header2HttpPost2;
@@ -88,10 +89,10 @@ class BaseConfig : public WifiConfig,
  protected:
   bool _saveNeeded;
 
-  void createJsonBase(JsonObject& doc);
-  void createJsonOta(JsonObject& doc);
-  void createJsonWifi(JsonObject& doc);
-  void createJsonPush(JsonObject& doc);
+  void createJsonBase(JsonObject& doc) const;
+  void createJsonOta(JsonObject& doc) const;
+  void createJsonWifi(JsonObject& doc) const;
+  void createJsonPush(JsonObject& doc) const;
 
   void parseJsonBase(JsonObject& doc);
   void parseJsonOta(JsonObject& doc);
@@ -101,53 +102,41 @@ class BaseConfig : public WifiConfig,
  public:
   BaseConfig(String baseMDNS, String fileName);
 
-  // Security
-  bool getCorsAllowed() { return _corsAllowed; }
+  // WebServer
+  bool getCorsAllowed() const { return _corsAllowed; }
   void setCorsAllowed(bool b) {
     _corsAllowed = b;
     _saveNeeded = true;
   }
-  bool isCorsAllowed() { return getCorsAllowed(); }
-
-  const char* getAdminUser() { return _adminUser.c_str(); }
-  void setAdminUser(String s) {
-    _adminUser = s;
-    _saveNeeded = true;
-  }
-  const char* getAdminPass() { return _adminPass.c_str(); }
-  void setAdminPass(String s) {
-    _adminPass = s;
-    _saveNeeded = true;
-  }
-  bool hasAdminPass() { return _adminPass.length() > 0 ? true : false; }
+  bool isCorsAllowed() const { return getCorsAllowed(); }
 
   // WifiConfig
-  const char* getMDNS() { return _mDNS.c_str(); }
+  const char* getMDNS() const { return _mDNS.c_str(); }
   void setMDNS(String s) {
     _mDNS = s;
     _saveNeeded = true;
   }
-  const char* getWifiSSID(int idx) { return _wifiSSID[idx].c_str(); }
+  const char* getWifiSSID(int idx) const { return _wifiSSID[idx].c_str(); }
   void setWifiSSID(String s, int idx) {
     _wifiSSID[idx] = s;
     _saveNeeded = true;
   }
-  const char* getWifiPass(int idx) { return _wifiPASS[idx].c_str(); }
+  const char* getWifiPass(int idx) const { return _wifiPASS[idx].c_str(); }
   void setWifiPass(String s, int idx) {
     _wifiPASS[idx] = s;
     _saveNeeded = true;
   }
-  const char* getWifiDirectSSID() { return _wifiDirectSSID.c_str(); }
+  const char* getWifiDirectSSID() const { return _wifiDirectSSID.c_str(); }
   void setWifiDirectSSID(String s) {
     _wifiDirectSSID = s;
     _saveNeeded = true;
   }
-  const char* getWifiDirectPass() { return _wifiDirectPASS.c_str(); }
+  const char* getWifiDirectPass() const { return _wifiDirectPASS.c_str(); }
   void setWifiDirectPass(String s) {
     _wifiDirectPASS = s;
     _saveNeeded = true;
   }
-  bool dualWifiConfigured() {
+  bool dualWifiConfigured() const {
     return _wifiSSID[0].length() > 0 && _wifiSSID[1].length() > 0 ? true
                                                                   : false;
   }
@@ -162,164 +151,181 @@ class BaseConfig : public WifiConfig,
 
     _saveNeeded = true;
   }
-  int getWifiConnectionTimeout() { return _wifiConnectionTimeout; }
+  int getWifiConnectionTimeout() const { return _wifiConnectionTimeout; }
   void setWifiConnectionTimeout(int t) {
     _wifiConnectionTimeout = t;
     _saveNeeded = true;
   }
-  int getWifiPortalTimeout() { return _wifiPortalTimeout; }
+  int getWifiPortalTimeout() const { return _wifiPortalTimeout; }
   void setWifiPortalTimeout(int t) {
     _wifiPortalTimeout = t;
     _saveNeeded = true;
   }
-  bool getWifiScanAP() { return _wifiScanAP; }
+  bool getWifiScanAP() const { return _wifiScanAP; }
   void setWifiScanAP(bool t) {
     _wifiScanAP = t;
     _saveNeeded = true;
   }
 
-  int getPushTimeout() { return _pushTimeout; }
+  int getPushTimeout() const { return _pushTimeout; }
   void setPushTimeout(int t) { _pushTimeout = t; }
 
   // OtaConfig
-  const char* getOtaURL() { return _otaURL.c_str(); }
+  const char* getOtaURL() const { return _otaURL.c_str(); }
   void setOtaURL(String s) {
     _otaURL = s;
     _saveNeeded = true;
   }
-  bool isOtaActive() { return _otaURL.length() > 0 ? true : false; }
-  bool isOtaSSL() { return _otaURL.startsWith("https://"); }
+  bool isOtaActive() const { return _otaURL.length() > 0 ? true : false; }
+  bool isOtaSSL() const { return _otaURL.startsWith("https://"); }
 
   // PushConfig
-  bool hasTargetHttpPost() { return _targetHttpPost.length() ? true : false; }
-  bool hasTargetHttpPost2() { return _targetHttpPost2.length() ? true : false; }
-  bool hasTargetHttpGet() { return _targetHttpGet.length() ? true : false; }
-  bool hasTargetInfluxDb2() { return _targetInfluxDb2.length() ? true : false; }
-  bool hasTargetMqtt() { return _targetMqtt.length() ? true : false; }
+  bool hasTargetHttpPost() const {
+    return _targetHttpPost.length() ? true : false;
+  }
+  bool hasTargetHttpPost2() const {
+    return _targetHttpPost2.length() ? true : false;
+  }
+  bool hasTargetHttpGet() const {
+    return _targetHttpGet.length() ? true : false;
+  }
+  bool hasTargetInfluxDb2() const {
+    return _targetInfluxDb2.length() ? true : false;
+  }
+  bool hasTargetMqtt() const { return _targetMqtt.length() ? true : false; }
 
-  bool isHttpPostSSL() { return _targetHttpPost.startsWith("https://"); }
-  bool isHttpPost2SSL() { return _targetHttpPost2.startsWith("https://"); }
-  bool isHttpGetSSL() { return _targetHttpGet.startsWith("https://"); }
-  bool isHttpInfluxDb2SSL() { return _targetInfluxDb2.startsWith("https://"); }
-  bool isMqttSSL() { return _portMqtt > 8000 ? true : false; }
+  bool isHttpPostSSL() const { return _targetHttpPost.startsWith("https://"); }
+  bool isHttpPost2SSL() const {
+    return _targetHttpPost2.startsWith("https://");
+  }
+  bool isHttpGetSSL() const { return _targetHttpGet.startsWith("https://"); }
+  bool isHttpInfluxDb2SSL() const {
+    return _targetInfluxDb2.startsWith("https://");
+  }
+  bool isMqttSSL() const { return _portMqtt > 8000 ? true : false; }
 
-  const char* getTargetHttpPost() { return _targetHttpPost.c_str(); }
+  const char* getTargetHttpPost() const { return _targetHttpPost.c_str(); }
   void setTargetHttpPost(String target) {
     _targetHttpPost = target;
     _saveNeeded = true;
   }
-  const char* getHeader1HttpPost() { return _header1HttpPost.c_str(); }
+  const char* getHeader1HttpPost() const { return _header1HttpPost.c_str(); }
   void setHeader1HttpPost(String header) {
     _header1HttpPost = header;
     _saveNeeded = true;
   }
-  const char* getHeader2HttpPost() { return _header2HttpPost.c_str(); }
+  const char* getHeader2HttpPost() const { return _header2HttpPost.c_str(); }
   void setHeader2HttpPost(String header) {
     _header2HttpPost = header;
     _saveNeeded = true;
   }
+  bool getTcpHttpPost() const { return _tcpHttpPost; }
+  void setTcpHttpPost(bool tcp) {
+    _tcpHttpPost = tcp;
+    _saveNeeded = true;
+  }
 
-  const char* getTargetHttpPost2() { return _targetHttpPost2.c_str(); }
+  const char* getTargetHttpPost2() const { return _targetHttpPost2.c_str(); }
   void setTargetHttpPost2(String target) {
     _targetHttpPost2 = target;
     _saveNeeded = true;
   }
-  const char* getHeader1HttpPost2() { return _header1HttpPost2.c_str(); }
+  const char* getHeader1HttpPost2() const { return _header1HttpPost2.c_str(); }
   void setHeader1HttpPost2(String header) {
     _header1HttpPost2 = header;
     _saveNeeded = true;
   }
-  const char* getHeader2HttpPost2() { return _header2HttpPost2.c_str(); }
+  const char* getHeader2HttpPost2() const { return _header2HttpPost2.c_str(); }
   void setHeader2HttpPost2(String header) {
     _header2HttpPost2 = header;
     _saveNeeded = true;
   }
 
-  const char* getTargetHttpGet() { return _targetHttpGet.c_str(); }
+  const char* getTargetHttpGet() const { return _targetHttpGet.c_str(); }
   void setTargetHttpGet(String target) {
     _targetHttpGet = target;
     _saveNeeded = true;
   }
-  const char* getHeader1HttpGet() { return _header1HttpGet.c_str(); }
+  const char* getHeader1HttpGet() const { return _header1HttpGet.c_str(); }
   void setHeader1HttpGet(String header) {
     _header1HttpGet = header;
     _saveNeeded = true;
   }
-  const char* getHeader2HttpGet() { return _header2HttpGet.c_str(); }
+  const char* getHeader2HttpGet() const { return _header2HttpGet.c_str(); }
   void setHeader2HttpGet(String header) {
     _header2HttpGet = header;
     _saveNeeded = true;
   }
 
-  const char* getTargetInfluxDB2() { return _targetInfluxDb2.c_str(); }
+  const char* getTargetInfluxDB2() const { return _targetInfluxDb2.c_str(); }
   void setTargetInfluxDB2(String target) {
     _targetInfluxDb2 = target;
     _saveNeeded = true;
   }
-  const char* getOrgInfluxDB2() { return _orgInfluxDb2.c_str(); }
+  const char* getOrgInfluxDB2() const { return _orgInfluxDb2.c_str(); }
   void setOrgInfluxDB2(String org) {
     _orgInfluxDb2 = org;
     _saveNeeded = true;
   }
-  const char* getBucketInfluxDB2() { return _bucketInfluxDb2.c_str(); }
+  const char* getBucketInfluxDB2() const { return _bucketInfluxDb2.c_str(); }
   void setBucketInfluxDB2(String bucket) {
     _bucketInfluxDb2 = bucket;
     _saveNeeded = true;
   }
-  const char* getTokenInfluxDB2() { return _tokenInfluxDb2.c_str(); }
+  const char* getTokenInfluxDB2() const { return _tokenInfluxDb2.c_str(); }
   void setTokenInfluxDB2(String token) {
     _tokenInfluxDb2 = token;
     _saveNeeded = true;
   }
 
-  const char* getTargetMqtt() { return _targetMqtt.c_str(); }
+  const char* getTargetMqtt() const { return _targetMqtt.c_str(); }
   void setTargetMqtt(String target) {
     _targetMqtt = target;
     _saveNeeded = true;
   }
-  int getPortMqtt() { return _portMqtt; }
+  int getPortMqtt() const { return _portMqtt; }
   void setPortMqtt(int port) {
     _portMqtt = port;
     _saveNeeded = true;
   }
-  const char* getUserMqtt() { return _userMqtt.c_str(); }
+  const char* getUserMqtt() const { return _userMqtt.c_str(); }
   void setUserMqtt(String user) {
     _userMqtt = user;
     _saveNeeded = true;
   }
-  const char* getPassMqtt() { return _passMqtt.c_str(); }
+  const char* getPassMqtt() const { return _passMqtt.c_str(); }
   void setPassMqtt(String pass) {
     _passMqtt = pass;
     _saveNeeded = true;
   }
 
   // Base
-  const char* getID() { return _id.c_str(); }
+  const char* getID() const { return _id.c_str(); }
 
-  char getTempFormat() {
+  char getTempFormat() const {
     return getTempUnit();
   }  // @deprecated, use setTempUnit()
   void setTempFormat(char c) {
     setTempUnit(c);
   }  // @deprecated, use setTempUnit()
-  bool isTempFormatC() {
+  bool isTempFormatC() const {
     return isTempUnitC();
   }  // @deprecated, use isTempUnitC()
-  bool isTempFormatF() {
+  bool isTempFormatF() const {
     return isTempUnitF();
   }  // @deprecated, use isTempUnitF()
 
-  char getTempUnit() { return _tempUnit; }
+  char getTempUnit() const { return _tempUnit; }
   void setTempUnit(char c) {
     if (c == 'C' || c == 'F') {
       _tempUnit = c;
       _saveNeeded = true;
     }
   }
-  bool isTempUnitC() { return _tempUnit == 'C' ? true : false; }
-  bool isTempUnitF() { return _tempUnit == 'F' ? true : false; }
+  bool isTempUnitC() const { return _tempUnit == 'C' ? true : false; }
+  bool isTempUnitF() const { return _tempUnit == 'F' ? true : false; }
 
-  bool getDarkMode() { return _darkMode; }
+  bool getDarkMode() const { return _darkMode; }
   void setDarkMode(bool b) {
     _darkMode = b;
     _saveNeeded = true;
@@ -332,14 +338,14 @@ class BaseConfig : public WifiConfig,
 #endif
 
   // Functions
-  virtual void createJson(JsonObject& doc) {}
+  virtual void createJson(JsonObject& doc) const {}
   virtual void parseJson(JsonObject& doc) {}
 
   bool saveFile();
   bool loadFile();
   bool saveFileWifiOnly();
-  void checkFileSystem();
-  bool isSaveNeeded() { return _saveNeeded; }
+  void checkFileSystem() const;
+  bool isSaveNeeded() const { return _saveNeeded; }
   void setSaveNeeded() { _saveNeeded = true; }
 };
 

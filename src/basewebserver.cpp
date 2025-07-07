@@ -49,7 +49,9 @@ INCBIN(AppCss, "html/app.css.gz");
 INCBIN(FaviconIco, "html/favicon.ico.gz");
 #endif
 
-BaseWebServer::BaseWebServer(WebConfig *config) { _webConfig = config; }
+BaseWebServer::BaseWebServer(WebConfigInterface *config) {
+  _webConfig = config;
+}
 
 bool BaseWebServer::isAuthenticated(AsyncWebServerRequest *request) {
   resetWifiPortalTimer();
@@ -88,7 +90,7 @@ void BaseWebServer::loop() {
   }
 
   if (_rebootTask) {
-    if (abs(static_cast<int32_t>((millis() - _rebootTimer))) > 1000) {
+    if (abs(static_cast<int32_t>(millis() - _rebootTimer)) > 1000) {
       Log.notice(F("WEB : Rebooting..." CR));
       delay(500);
       ESP_RESET();
@@ -227,7 +229,8 @@ void BaseWebServer::webHandleUploadFile(AsyncWebServerRequest *request,
   }
 }
 
-void BaseWebServer::webHandlePageNotFound(AsyncWebServerRequest *request) {
+void BaseWebServer::webHandlePageNotFound(
+    AsyncWebServerRequest *request) const {
   if (_wifiSetup) {
     request->redirect("http://192.168.4.1");
     return;
@@ -274,7 +277,7 @@ void BaseWebServer::webHandlePageNotFound(AsyncWebServerRequest *request) {
   request->redirect("/");
 }
 
-void BaseWebServer::webHandleAuth(AsyncWebServerRequest *request) {
+void BaseWebServer::webHandleAuth(AsyncWebServerRequest *request) const {
   Log.notice(F("WEB : webServer callback for /api/auth." CR));
   AsyncJsonResponse *response = new AsyncJsonResponse(false);
   JsonObject obj = response->getRoot().as<JsonObject>();
@@ -425,7 +428,7 @@ void BaseWebServer::webHandleRestart(AsyncWebServerRequest *request) {
   _rebootTask = true;
 }
 
-void BaseWebServer::webHandlePing(AsyncWebServerRequest *request) {
+void BaseWebServer::webHandlePing(AsyncWebServerRequest *request) const {
   Log.notice(F("WEB : webServer callback for /api/ping." CR));
   AsyncJsonResponse *response = new AsyncJsonResponse(false);
   JsonObject obj = response->getRoot().as<JsonObject>();

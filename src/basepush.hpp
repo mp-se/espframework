@@ -44,7 +44,7 @@ class BasePush {
   std::unique_ptr<HTTPClient> _http;
   int _lastResponseCode = 0;
   bool _lastSuccess = false;
-  PushConfig* _config;
+  PushConfigInterface* _config;
 
   void probeMFLN(String serverPath);
   void addHttpHeader(String header);
@@ -54,18 +54,20 @@ class BasePush {
     if (_wifiSecure == nullptr) _wifiSecure.reset(new WiFiClientSecure());
   }
 
+  String sendTcp(String& payload, const char* target);
+
  public:
-  explicit BasePush(PushConfig* config) {
+  explicit BasePush(PushConfigInterface* config) {
     _config = config;
     _wifi.reset(new WiFiClient());
     _http.reset(new HTTPClient());
   }
 
-  int getLastResponseCode() { return _lastResponseCode; }
-  bool wasLastSuccessful() { return _lastSuccess; }
+  int getLastResponseCode() const { return _lastResponseCode; }
+  bool wasLastSuccessful() const { return _lastSuccess; }
 
   String sendHttpPost(String& payload, const char* target, const char* header1,
-                      const char* header2);
+                      const char* header2, bool sendTcpFlag = false);
   String sendHttpPost2(String& payload, const char* target, const char* header1,
                        const char* header2);
   String sendHttpGet(String& payload, const char* target, const char* header1,

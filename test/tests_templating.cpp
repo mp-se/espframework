@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2024 Magnus
+Copyright (c) 2025 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -21,39 +21,30 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-#ifndef SRC_LOOPTIMER_HPP_
-#define SRC_LOOPTIMER_HPP_
+#include <AUnit.h>
+#include <templating.hpp>
 
-#include <Arduino.h>
+test(TemplatingEngine_SimpleReplace) {
+  TemplatingEngine tpl;
+  tpl.setVal("${name}", "World");
+  const char* result = tpl.create("Hello, ${name}!");
+  assertEqual(String(result), String("Hello, World!"));
+}
 
-class LoopTimer {
- private:
-  uint64_t _startMillis = 0;
-  uint64_t _interval = 0;
-  uint64_t _loopCounter = 0;
+test(TemplatingEngine_MultipleReplace) {
+  TemplatingEngine tpl;
+  tpl.setVal("${adj}", "awesome");
+  tpl.setVal("${noun}", "framework");
+  const char* result = tpl.create("This is an ${adj} ${noun}.");
+  assertEqual(String(result), String("This is an awesome framework."));
+}
 
- public:
-  explicit LoopTimer(uint64_t interval) {
-    _interval = interval;
-    reset();
-  }
-
-  bool hasExpired() {
-    if (abs(static_cast<int32_t>((millis() - _startMillis))) > _interval) {
-      _loopCounter++;
-      return true;
-    }
-    return false;
-  }
-
-  void reset() { _startMillis = millis(); }
-  uint64_t getLoopCounter() const { return _loopCounter; }
-  int32_t getTimePassed() const {
-    return abs(static_cast<int32_t>(millis() - _startMillis));
-  }
-  void setInterval(uint64_t interval) { _interval = interval; }
-};
-
-#endif  // SRC_LOOPTIMER_HPP_
+test(TemplatingEngine_IntAndFloat) {
+  TemplatingEngine tpl;
+  tpl.setVal("${int}", 42);
+  tpl.setVal("${float}", 3.14f, 2);
+  const char* result = tpl.create("Int: ${int}, Float: ${float}");
+  assertTrue(String(result).startsWith("Int: 42, Float: 3.14"));
+}
 
 // EOF

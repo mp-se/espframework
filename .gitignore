@@ -2,15 +2,10 @@
 .pio/*
 .vscode/*
 __pycache__
-# These files are under examples and should not be checked in.
 script/
 src/demo*.*
 platformio*.ini
 html/*
-test/*
-/diagram.json
-/wokwi.toml
 /partitions.csv
 /output.map
 .DS_Store
-development/*

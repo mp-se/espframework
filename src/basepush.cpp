@@ -130,12 +130,63 @@ void BasePush::addHttpHeader(String header) {
   }
 }
 
+String BasePush::sendTcp(String& payload, const char* target) {
+  Log.notice(F("PUSH: Sending values via TCP" CR));
+  _lastResponseCode = 0;
+  _lastSuccess = false;
+  String response;
+
+#if LOG_LEVEL == 6
+  Log.verbose(F("PUSH: url %s." CR), target);
+  Log.verbose(F("PUSH: json %s." CR), payload.c_str());
+#endif
+
+  String input(target), host;
+  int port = 80;
+
+  int idx = input.indexOf(':');
+  if (idx > 0) {
+    host = input.substring(0, idx);
+    port = input.substring(idx + 1).toInt();
+  }
+
+  Log.notice(F("PUSH: server %s, port %d" CR), host.c_str(), port);
+
+  if (_wifi->connect(host.c_str(), port)) {
+    _lastSuccess = true;
+    _wifi->print(payload.c_str());
+
+    int t = 2000;  // 2 seconds timeout
+
+    while (!_wifi->available() && t--) {
+      delay(1);
+    }
+
+    while (_wifi->available()) {
+      response += static_cast<char>(_wifi->read());
+    }
+
+    _wifi->stop();
+  } else {
+    Log.error(F("PUSH: tcp send failed" CR));
+    _lastResponseCode = -1;
+  }
+
+  tcp_cleanup();
+  return response;
+}
+
 String BasePush::sendHttpPost(String& payload, const char* target,
-                              const char* header1, const char* header2) {
+                              const char* header1, const char* header2,
+                              bool sendTcpFlag) {
+  if (sendTcpFlag) {
+    return sendTcp(payload, target);
+  }
+
   Log.notice(F("PUSH: Sending values to HTTP post" CR));
   _lastResponseCode = 0;
   _lastSuccess = false;
-  String _response = "{}";
+  String response = "{}";
 
 #if LOG_LEVEL == 6
   Log.verbose(F("PUSH: url %s." CR), target);
@@ -163,9 +214,9 @@ String BasePush::sendHttpPost(String& payload, const char* target,
     Log.notice(F("PUSH: HTTP post successful, response=%d" CR),
                _lastResponseCode);
     if (isSecure(target)) {
-      _response = _http->getString();
+      response = _http->getString();
     } else {
-      _response = _http->getString();
+      response = _http->getString();
     }
   } else {
     Log.error(F("PUSH: HTTP post failed, response=%d" CR), _lastResponseCode);
@@ -180,7 +231,7 @@ String BasePush::sendHttpPost(String& payload, const char* target,
   }
 
   tcp_cleanup();
-  return _response;
+  return response;
 }
 
 String BasePush::sendHttpGet(String& payload, const char* target,
@@ -188,7 +239,7 @@ String BasePush::sendHttpGet(String& payload, const char* target,
   Log.notice(F("PUSH: Sending values via HTTP get" CR));
   _lastResponseCode = 0;
   _lastSuccess = false;
-  String _response = "{}";
+  String response = "{}";
 
   String url = String(target) + payload;
 
@@ -216,7 +267,7 @@ String BasePush::sendHttpGet(String& payload, const char* target,
     _lastSuccess = true;
     Log.notice(F("PUSH: HTTP get successful, response=%d" CR),
                _lastResponseCode);
-    _response = _http->getString();
+    response = _http->getString();
   } else {
     Log.error(F("PUSH: HTTP get failed, response=%d" CR), _lastResponseCode);
   }
@@ -230,7 +281,7 @@ String BasePush::sendHttpGet(String& payload, const char* target,
   }
 
   tcp_cleanup();
-  return _response;
+  return response;
 }
 
 void BasePush::sendMqtt(String& payload, const char* target, int port,
@@ -317,7 +368,8 @@ void BasePush::sendMqtt(String& payload, const char* target, int port,
 
 bool BasePush::sendHttpPost(String& payload) {
   sendHttpPost(payload, _config->getTargetHttpPost(),
-               _config->getHeader1HttpPost(), _config->getHeader2HttpPost());
+               _config->getHeader1HttpPost(), _config->getHeader2HttpPost(),
+               _config->getTcpHttpPost());
   return _lastSuccess;
 }
 

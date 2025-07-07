@@ -81,6 +81,7 @@ constexpr auto PARAM_OTA_URL = "ota_url";
 constexpr auto PARAM_TEMP_FORMAT = "temp_format";  // Alias is temp_unit
 constexpr auto PARAM_TEMP_UNIT = "temp_unit";
 constexpr auto PARAM_HTTP_POST_TARGET = "http_post_target";
+constexpr auto PARAM_HTTP_POST_TCP = "http_post_tcp";
 constexpr auto PARAM_HTTP_POST_HEADER1 = "http_post_header1";
 constexpr auto PARAM_HTTP_POST_HEADER2 = "http_post_header2";
 constexpr auto PARAM_HTTP_POST2_TARGET = "http_post2_target";

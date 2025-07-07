@@ -52,7 +52,7 @@ BaseConfig::BaseConfig(String baseMDNS, String fileName) {
 #endif
 }
 
-void BaseConfig::createJsonWifi(JsonObject& doc) {
+void BaseConfig::createJsonWifi(JsonObject& doc) const {
 #if LOG_LEVEL == 6
   Log.verbose(F("CFG : Create json (wifi)." CR));
 #endif
@@ -91,7 +91,7 @@ void BaseConfig::parseJsonWifi(JsonObject& doc) {
   _saveNeeded = true;
 }
 
-void BaseConfig::createJsonOta(JsonObject& doc) {
+void BaseConfig::createJsonOta(JsonObject& doc) const {
 #if LOG_LEVEL == 6
   Log.verbose(F("CFG : Create json (ota)." CR));
 #endif
@@ -107,13 +107,14 @@ void BaseConfig::parseJsonOta(JsonObject& doc) {
   _saveNeeded = true;
 }
 
-void BaseConfig::createJsonPush(JsonObject& doc) {
+void BaseConfig::createJsonPush(JsonObject& doc) const {
 #if LOG_LEVEL == 6
   Log.verbose(F("CFG : Create json (push)." CR));
 #endif
   JsonArray headers;
 
   doc[PARAM_HTTP_POST_TARGET] = getTargetHttpPost();
+  doc[PARAM_HTTP_POST_TCP] = getTcpHttpPost();
   doc[PARAM_HTTP_POST_HEADER1] = getHeader1HttpPost();
   doc[PARAM_HTTP_POST_HEADER2] = getHeader2HttpPost();
   doc[PARAM_HTTP_POST2_TARGET] = getTargetHttpPost2();
@@ -139,6 +140,8 @@ void BaseConfig::parseJsonPush(JsonObject& doc) {
 #endif
   if (!doc[PARAM_HTTP_POST_TARGET].isNull())
     setTargetHttpPost(doc[PARAM_HTTP_POST_TARGET]);
+  if (!doc[PARAM_HTTP_POST_TCP].isNull())
+    setTcpHttpPost(doc[PARAM_HTTP_POST_TCP].as<bool>());
   if (!doc[PARAM_HTTP_POST_HEADER1].isNull())
     setHeader1HttpPost(doc[PARAM_HTTP_POST_HEADER1]);
   if (!doc[PARAM_HTTP_POST_HEADER2].isNull())
@@ -179,7 +182,7 @@ void BaseConfig::parseJsonPush(JsonObject& doc) {
   _saveNeeded = true;
 }
 
-void BaseConfig::createJsonBase(JsonObject& doc) {
+void BaseConfig::createJsonBase(JsonObject& doc) const {
 #if LOG_LEVEL == 6
   Log.verbose(F("CFG : Create json (base)." CR));
 #endif
@@ -323,7 +326,7 @@ void BaseConfig::formatFileSystem() {
   LittleFS.format();
 }
 
-void BaseConfig::checkFileSystem() {
+void BaseConfig::checkFileSystem() const {
 #if LOG_LEVEL == 6
   Log.verbose(F("CFG : Checking if filesystem is valid." CR));
 #endif

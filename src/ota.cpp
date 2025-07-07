@@ -39,7 +39,7 @@ SOFTWARE.
 #include <log.hpp>
 #include <ota.hpp>
 
-OtaUpdate::OtaUpdate(OtaConfig *cfg, String ver, String fileName) {
+OtaUpdate::OtaUpdate(OtaConfigInterface *cfg, String ver, String fileName) {
   _otaConfig = cfg;
   _curVer = ver;
   _fileName = fileName;

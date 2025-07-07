@@ -66,12 +66,13 @@ void dumpErrorLog1() { dumpErrorLog(ERR_FILENAME); }
 
 void dumpErrorLog2() { dumpErrorLog(ERR_FILENAME2); }
 
-SerialDebug::SerialDebug(const uint32_t serialSpeed, bool autoBegin, uint8_t tx, uint8_t rx) {
+SerialDebug::SerialDebug(const uint32_t serialSpeed, bool autoBegin, uint8_t tx,
+                         uint8_t rx) {
   setup(serialSpeed, tx, rx);
 
   EspSerial.println("Serial console activated.");
 
-  if(autoBegin) {
+  if (autoBegin) {
     begin(&EspSerial);
   }
 }
@@ -80,8 +81,7 @@ void SerialDebug::setup(const uint32_t serialSpeed, uint8_t tx, uint8_t rx) {
   _serialSpeed = serialSpeed;
 
 #if defined(ESPFWK_USE_SERIAL_PINS) && !defined(ESP8266)
-  if(tx == -1)
-    tx = TX;
+  if (tx == -1) tx = TX;
 
   if (rx == -1) rx = RX;
 

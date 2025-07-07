@@ -39,10 +39,10 @@ class Uptime {
 
   void calculate();
 
-  int getSeconds() { return _seconds; }
-  int getMinutes() { return _minutes; }
-  int getHours() { return _hours; }
-  int getDays() { return _days; }
+  int getSeconds() const { return _seconds; }
+  int getMinutes() const { return _minutes; }
+  int getHours() const { return _hours; }
+  int getDays() const { return _days; }
 };
 
 extern Uptime myUptime;

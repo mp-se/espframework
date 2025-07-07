@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2024 Magnus
+Copyright (c) 2022-2024 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -21,39 +21,36 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-#ifndef SRC_LOOPTIMER_HPP_
-#define SRC_LOOPTIMER_HPP_
-
 #include <Arduino.h>
+#include <AUnit.h>
 
-class LoopTimer {
- private:
-  uint64_t _startMillis = 0;
-  uint64_t _interval = 0;
-  uint64_t _loopCounter = 0;
+using aunit::Printer;
+using aunit::TestRunner;
+using aunit::Verbosity;
 
- public:
-  explicit LoopTimer(uint64_t interval) {
-    _interval = interval;
-    reset();
-  }
+void setup() {
+  Serial.begin(115200);
+  Serial.println("ESP framework - Unit Test Build");
 
-  bool hasExpired() {
-    if (abs(static_cast<int32_t>((millis() - _startMillis))) > _interval) {
-      _loopCounter++;
-      return true;
-    }
-    return false;
-  }
+  delay(2000);
+  Printer::setPrinter(&Serial);
+  // TestRunner::setVerbosity(Verbosity::kAll);
 
-  void reset() { _startMillis = millis(); }
-  uint64_t getLoopCounter() const { return _loopCounter; }
-  int32_t getTimePassed() const {
-    return abs(static_cast<int32_t>(millis() - _startMillis));
-  }
-  void setInterval(uint64_t interval) { _interval = interval; }
-};
+  // TestRunner::exclude("WifiConnection_*");
+  // TestRunner::exclude("BaseConfig_*");
+  // TestRunner::exclude("TemplatingEngine_*");
+  // TestRunner::exclude("Uptime_*");
+  // TestRunner::exclude("Utils_*");
+  // TestRunner::exclude("LoopTimer_*");
+  // TestRunner::exclude("JsonFS_*");
+  // TestRunner::exclude("Led_*");
 
-#endif  // SRC_LOOPTIMER_HPP_
+  // TestRunner::exclude("wifi_*");
+}
+
+void loop() {
+  TestRunner::run();
+  delay(10);
+}
 
 // EOF
