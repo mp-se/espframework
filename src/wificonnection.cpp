@@ -162,7 +162,7 @@ void WifiConnection::startAP(wifi_mode_t _mode) {
     return;
   }
 
-#if defined(ESP32C3)
+#if defined(ESPFWK_REDUCE_WIFI_POWER)
   Log.notice(F("WIFI: Reducing wifi power for c3 chip." CR));
   WiFi.setTxPower(WIFI_POWER_8_5dBm);  // Required for ESP32C3 Mini
 #endif
@@ -238,7 +238,7 @@ void WifiConnection::connectAsync(String ssid, String pass, wifi_mode_t mode) {
   WiFi.persistent(true);
   WiFi.mode(mode);
 
-#if defined(ESP32C3)
+#if defined(ESPFWK_REDUCE_WIFI_POWER)
   Log.notice(F("WIFI: Reducing wifi power for c3 chip." CR));
   WiFi.setTxPower(WIFI_POWER_8_5dBm);  // Required for ESP32C3 Mini
 #endif
