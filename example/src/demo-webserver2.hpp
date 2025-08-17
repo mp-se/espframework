@@ -39,7 +39,7 @@ class DemoWebServer : public BaseWebServer {
   esp_err_t webHandleConfigWrite(PsychicRequest *request, JsonVariant &json);
 
  public:
-  explicit DemoWebServer(WebConfig *config, DemoPush *push);
+  explicit DemoWebServer(WebConfigInterface *config, DemoPush *push);
 };
 
 #endif  // ESPFWK_PSYCHIC_HTTP

@@ -41,7 +41,7 @@ constexpr auto PARAM_WIFI_SETUP = "wifi_setup";
 constexpr auto PARAM_APP_VER = "app_ver";
 constexpr auto PARAM_APP_BUILD = "app_build";
 
-DemoWebServer::DemoWebServer(WebConfig *config, DemoPush *push)
+DemoWebServer::DemoWebServer(WebConfigInterface *config, DemoPush *push)
     : BaseWebServer(config) {
   _push = push;
 }

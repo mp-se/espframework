@@ -59,7 +59,7 @@ class BaseWebServer {
 #endif
   File _uploadFile;
   File _tempFile;
-  WebConfig *_webConfig;
+  WebConfigInterface *_webConfig;
   String _wifiScanData;
 
   int _uploadReturn = 200;
@@ -152,7 +152,7 @@ class BaseWebServer {
   virtual void setupWebHandlers();
 
  public:
-  explicit BaseWebServer(WebConfig *config);
+  explicit BaseWebServer(WebConfigInterface *config);
 
   virtual bool setupWebServer();
   virtual PsychicHttpServer *getWebServer() { return _server.get(); }

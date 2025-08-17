@@ -45,6 +45,9 @@ class WebConfigInterface {
   virtual const char* getMDNS() const;
   virtual int getWifiPortalTimeout() const;
 
+  virtual const char* getAdminUser() const;
+  virtual const char* getAdminPass() const;
+
   virtual bool isCorsAllowed() const;
 };
 

@@ -33,7 +33,7 @@ SOFTWARE.
 #warning "MAX_SKETCH_SPACE is not defined, using default value of 0x1c0000"
 #endif
 
-BaseWebServer::BaseWebServer(WebConfig *config) { _webConfig = config; }
+BaseWebServer::BaseWebServer(WebConfigInterface*config) { _webConfig = config; }
 
 bool BaseWebServer::isAuthenticated(PsychicRequest *request) {
   resetWifiPortalTimer();
