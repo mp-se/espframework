@@ -111,6 +111,17 @@ class BaseConfig : public WifiConfigInterface,
   bool isCorsAllowed() const { return getCorsAllowed(); }
 
   // WifiConfig
+  const char* getAdminUser() const { return _adminUser.c_str(); }
+  void setAdminUser(String s) {
+    _adminUser = s;
+    _saveNeeded = true;
+  }
+  const char* getAdminPass() const { return _adminPass.c_str(); }
+  void setAdminPass(String s) {
+    _adminPass = s;
+    _saveNeeded = true;
+  }
+
   const char* getMDNS() const { return _mDNS.c_str(); }
   void setMDNS(String s) {
     _mDNS = s;
