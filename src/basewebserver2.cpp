@@ -265,10 +265,10 @@ esp_err_t BaseWebServer::webHandleFileSystem(PsychicRequest *request,
   }
 
   Log.notice(F("WEB : webServer callback for /api/filesystem." CR));
-  JsonObject obj = json.as<JsonObject>();
+  JsonObject obj = json.as<JsonObject>();  
 
   if (!obj[PARAM_COMMAND].isNull()) {
-    if (obj[PARAM_COMMAND] == String("dir")) {
+    if (obj[PARAM_COMMAND].as<String>() == String("dir")) {
       Log.notice(F("WEB : File system listing requested." CR));
       PsychicJsonResponse response(request);
       JsonObject obj = response.getRoot().as<JsonObject>();
@@ -291,20 +291,28 @@ esp_err_t BaseWebServer::webHandleFileSystem(PsychicRequest *request,
       f.close();
       root.close();
       return response.send();
-    } else if (obj[PARAM_COMMAND] == String("del")) {
+    } else if (obj[PARAM_COMMAND].as<String>() == String("del")) {
       Log.notice(F("WEB : File system delete requested." CR));
 
       if (!obj[PARAM_FILE].isNull()) {
         String f = obj[PARAM_FILE];
+        if (f.length() > 96) {
+          Log.warning(F("WEB : Filename to long." CR));
+          return request->reply(400);
+        }
         LittleFS.remove(f);
         return request->reply(200);
       } else {
         return request->reply(400);
       }
-    } else if (obj[PARAM_COMMAND] == String("get")) {
+    } else if (obj[PARAM_COMMAND].as<String>() == String("get")) {
       Log.notice(F("WEB : File system get requested." CR));
       if (!obj[PARAM_FILE].isNull()) {
         String f = obj[PARAM_FILE];
+        if (f.length() > 96) {
+          Log.warning(F("WEB : Filename to long." CR));
+          return request->reply(400);
+        }
 
         if (LittleFS.exists(obj[PARAM_FILE].as<String>())) {
           File file = LittleFS.open(f, "r");
@@ -316,11 +324,14 @@ esp_err_t BaseWebServer::webHandleFileSystem(PsychicRequest *request,
             response.setContentLength(file.size());
             response.sendHeaders();
 
-            uint8_t buffer[1024];
+            static uint8_t fs_chunk_buf[512];
             size_t len = 0;
             while (file.available()) {
-              len = file.read(buffer, sizeof(buffer));
-              response.sendChunk(buffer, len);
+              len = file.read(fs_chunk_buf, sizeof(fs_chunk_buf));
+              response.sendChunk(fs_chunk_buf, len);
+              if ((len & 0x3F) == 0) {
+                delay(0);
+              }
             }
             file.close();
             response.finishChunking();
