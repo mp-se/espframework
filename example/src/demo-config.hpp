@@ -31,8 +31,8 @@ class DemoConfig : public BaseConfig {
  public:
   DemoConfig(String baseMDNS, String fileName);
 
-  void createJson(JsonObject& doc);
-  void parseJson(JsonObject& doc);
+  void createJson(JsonObject& doc) const override;
+  void parseJson(JsonObject& doc) override;
 };
 
 #endif  // SRC_DEMO_CONFIG_HPP_

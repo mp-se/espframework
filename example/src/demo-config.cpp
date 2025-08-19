@@ -29,7 +29,7 @@ SOFTWARE.
 DemoConfig::DemoConfig(String baseMDNS, String fileName)
     : BaseConfig(baseMDNS, fileName) {}
 
-void DemoConfig::createJson(JsonObject& doc) {
+void DemoConfig::createJson(JsonObject& doc) const {
   // Call base class functions
   createJsonBase(doc);
   createJsonWifi(doc);
