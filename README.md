@@ -72,6 +72,7 @@ when using asyncwebserver its also recommended to add
 - ESPFWK_ENABLE_RGB_LED, can be used to force the use of RGB led (Required for some C3 boards which use a different API)
 - ESPFWK_USE_SERIAL_PINS, Use the RX/TX Pins for serial output
 - ESPFWK_REDUCE_WIFI_POWER, Reduce WIFI power (Some c3 boards might need this to work properly)
+- ESPFWK_DISABLE_LOG_TIMESTAMP, Dont print timestamp if NTP is synced
 
 Note! When using TX/RX pins for serial output then ARDUINO_USB_CDC_ON_BOOT=0 must be disabled for this to work. On some boards 
 this is set by default and others it needs to be defined. This applies to boards with an USBC port.

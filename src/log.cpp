@@ -24,6 +24,8 @@ SOFTWARE.
 #include <HardwareSerial.h>
 
 #include <cstdio>
+#include <ctime>
+#include <sys/time.h>
 #include <log.hpp>
 
 void writeErrorLog(const char *format, ...) {
@@ -102,7 +104,33 @@ void SerialDebug::begin(Print *p) {
 }
 
 void printTimestamp(Print *_logOutput, int _logLevel) {
-  char c[12];
+#if !defined(ESPFWK_DISABLE_LOG_TIMESTAMP)
+  // Prefer human-readable local date/time once RTC/NTP has set the clock.
+  // Simple rule: if calendar year >= 2000, assume valid time.
+  struct timeval tv;
+  gettimeofday(&tv, nullptr);
+  struct tm t;
+  if (localtime_r(&tv.tv_sec, &t) && (t.tm_year + 1900) >= 2000) {
+    char ts[24];  // "YYYY-MM-DD HH:MM:SS:mmm"
+    if (strftime(ts, sizeof(ts), "%Y-%m-%d %H:%M:%S", &t)) {
+      _logOutput->print(ts);
+      _logOutput->print('.');
+
+      unsigned int msec = static_cast<unsigned int>(tv.tv_usec / 1000UL);
+      char ms[4];
+      ms[0] = '0' + (msec / 100);
+      ms[1] = '0' + ((msec / 10) % 10);
+      ms[2] = '0' + (msec % 10);
+      ms[3] = '\0';
+      _logOutput->print(ms);
+      _logOutput->print(' ');
+      return;
+    }
+  }
+#endif // !ESPFWK_DISABLE_LOG_TIMESTAMP
+
+  // Fallback: print uptime millis when real time is not available.
+  char c[16];
   snprintf(c, sizeof(c), "%10lu ", millis());
   _logOutput->print(c);
 }
