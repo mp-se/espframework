@@ -79,6 +79,7 @@ when using asyncwebserver its also recommended to add
 - ESPFWK_ENABLE_RGB_LED, can be used to force the use of RGB led (Required for some C3 boards which use a different API)
 - ESPFWK_USE_SERIAL_PINS, Use the RX/TX Pins for serial output
 - ESPFWK_REDUCE_WIFI_POWER, Reduce WIFI power (Some c3 boards might need this to work properly)
+- ESPFWK_DISABLE_LOG_TIMESTAMP, Dont print timestamp if NTP is synced
 - ESPFWK_PSYCHIC_HTTP, use alternative webserver with SSL support (does not work on ESP8266)
 - ESPFWK_PSYCHIC_SSL, use SSL if cert and key is in filesystem (does not work on ESP8266)
 
