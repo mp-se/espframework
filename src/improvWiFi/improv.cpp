@@ -386,6 +386,8 @@ std::vector<uint8_t> build_rpc_response(Command command,
   return out;
 }
 
+}  // namespace improv
+
 #endif  // ESPFWK_DISABLE_WIFI
 
-}  // namespace improv
+// EOF
