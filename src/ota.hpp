@@ -24,7 +24,10 @@ SOFTWARE.
 #ifndef SRC_OTA_HPP_
 #define SRC_OTA_HPP_
 
-#if !defined(ESPFWK_DISABLE_OTA)
+#ifndef ESPFWK_DISABLE_WIFI
+
+#ifndef ESPFWK_DISABLE_OTA
+
 #if defined(ESP8266)
 #include <ESP8266HTTPClient.h>
 #else
@@ -51,6 +54,9 @@ class OtaUpdate {
 };
 
 #endif  // ESPFWK_DISABLE_OTA
+
+#endif  // ESPFWK_DISABLE_WIFI
+
 #endif  // SRC_OTA_HPP_
 
 // EOF

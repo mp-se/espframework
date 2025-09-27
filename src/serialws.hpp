@@ -24,7 +24,9 @@ SOFTWARE.
 #ifndef SRC_SERIALWS_HPP_
 #define SRC_SERIALWS_HPP_
 
-#if defined(ESPFWK_PSYCHIC_HTTP)
+#ifdef ESPFWK_DISABLE_WEBSERVER
+
+#ifdef ESPFWK_PSYCHIC_HTTP
 
 #include <serialws.hpp>
 
@@ -34,11 +36,11 @@ SOFTWARE.
 
 #include <espframework.hpp>
 
-#if defined(ESP32)
+#ifdef ESP32
 #include <freertos/FreeRTOS.h>
 #endif
 
-#if defined(ESP8266)
+#ifdef ESP8266
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #else
@@ -67,6 +69,8 @@ class SerialWebSocket : public Print {
 };
 
 #endif  // !ESPFWK_PSYCHIC_HTTP
+
+#endif  // ESPFWK_DISABLE_WEBSERVER
 
 #endif  // SRC_SERIALWS_HPP_
 

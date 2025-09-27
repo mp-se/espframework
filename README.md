@@ -82,6 +82,8 @@ when using asyncwebserver its also recommended to add
 - ESPFWK_DISABLE_LOG_TIMESTAMP, Dont print timestamp if NTP is synced
 - ESPFWK_PSYCHIC_HTTP, use alternative webserver with SSL support (does not work on ESP8266)
 - ESPFWK_PSYCHIC_SSL, use SSL if cert and key is in filesystem (does not work on ESP8266)
+- ESPFWK_DISABLE_WEBSERVER, exclude webserver from build
+- ESPFWK_DISABLE_WIFI, exclude wifi classes from build
 
 Note! When using TX/RX pins for serial output then ARDUINO_USB_CDC_ON_BOOT=0 must be disabled for this to work. On some boards 
 this is set by default and others it needs to be defined. This applies to boards with an USBC port.

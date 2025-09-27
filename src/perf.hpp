@@ -24,7 +24,7 @@ SOFTWARE.
 #ifndef SRC_PERF_HPP_
 #define SRC_PERF_HPP_
 
-#if defined(PERF_ENABLE)
+#ifdef PERF_ENABLE
 
 #include <baseconfig.hpp>
 

@@ -21,24 +21,26 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-#if !defined(ESPFWK_PSYCHIC_HTTP)
+#ifndef ESPFWK_DISABLE_WEBSERVER
+
+#ifndef ESPFWK_PSYCHIC_HTTP
 
 #include <baseconfig.hpp>
 #include <basewebserver.hpp>
 #include <espframework.hpp>
 
-#if defined(ESP8266)
+#ifdef ESP8266
 #undef MAX_SKETCH_SPACE
 #define MAX_SKETCH_SPACE 1044464
 #else
 #include <HTTPUpdate.h>
-#if !defined(MAX_SKETCH_SPACE)
+#ifndef MAX_SKETCH_SPACE
 #define MAX_SKETCH_SPACE 0x1c0000
 #warning "MAX_SKETCH_SPACE is not defined, using default value of 0x1c0000"
 #endif
 #endif
 
-#if defined(ESP8266)
+#ifdef ESP8266
 #define INCBIN_OUTPUT_SECTION ".irom.text"
 #include <incbin.hpp>
 // These are used in the webhandler class and needs to be defined when using
@@ -76,7 +78,7 @@ bool BaseWebServer::isAuthenticated(AsyncWebServerRequest *request) {
 void BaseWebServer::loop() {
   if (!_server) return;
 
-#if defined(ESP8266)
+#ifdef ESP8266
   MDNS.update();
 #endif
 
@@ -113,7 +115,7 @@ void BaseWebServer::loop() {
       networks[i][PARAM_SSID] = WiFi.SSID(i);
       networks[i][PARAM_RSSI] = WiFi.RSSI(i);
       networks[i][PARAM_CHANNEL] = WiFi.channel(i);
-#if defined(ESP8266)
+#ifdef ESP8266
       networks[i][PARAM_ENCRYPTION] = WiFi.encryptionType(i);
 #else
       networks[i][PARAM_ENCRYPTION] = WiFi.encryptionType(i);
@@ -139,7 +141,7 @@ void BaseWebServer::webHandleUploadFirmware(AsyncWebServerRequest *request,
 
   if (!index) {
     _uploadedSize = 0;
-#if defined(ESP8266)
+#ifdef ESP8266
     Update.runAsync(true);
 #endif
     if (!Update.begin(request->contentLength(), U_FLASH, LED_BUILTIN)) {
@@ -193,7 +195,7 @@ void BaseWebServer::webHandleUploadFile(AsyncWebServerRequest *request,
     return;
   }
 
-#if defined(ESP8266)
+#ifdef ESP8266
   FSInfo info;
   LittleFS.info(info);
   uint32_t maxFileSize = info.totalBytes - info.usedBytes - 4096;
@@ -301,7 +303,7 @@ void BaseWebServer::webHandleFileSystem(AsyncWebServerRequest *request,
       AsyncJsonResponse *response = new AsyncJsonResponse(false);
       JsonObject obj = response->getRoot().as<JsonObject>();
 
-#if defined(ESP8266)
+#ifdef ESP8266
       FSInfo info;
       LittleFS.info(info);
 
@@ -500,7 +502,7 @@ bool BaseWebServer::setupWebServer() {
   MDNS.begin(_webConfig->getMDNS());
   MDNS.addService("http", "tcp", 80);
 
-#if defined(ESP8266)
+#ifdef ESP8266
   FSInfo fs;
   LittleFS.info(fs);
   Log.notice(F("WEB : File system Total=%d, Used=%d." CR), fs.totalBytes,
@@ -541,5 +543,7 @@ bool BaseWebServer::setupWebServer() {
 }
 
 #endif  // !ESPFWK_PSYCHIC_HTTP
+
+#endif  // !ESPFWK_DISABLE_WEBSERVER
 
 // EOF

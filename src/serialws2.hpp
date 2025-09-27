@@ -24,7 +24,9 @@ SOFTWARE.
 #ifndef SRC_SERIALWS2_HPP_
 #define SRC_SERIALWS2_HPP_
 
-#if defined(ESPFWK_PSYCHIC_HTTP)
+#ifdef ESPFWK_DISABLE_WEBSERVER
+
+#ifdef ESPFWK_PSYCHIC_HTTP
 
 #include <Print.h>
 #include <PsychicHttp.h>
@@ -50,6 +52,8 @@ class SerialWebSocket : public Print {
 };
 
 #endif  // ESPFWK_PSYCHIC_HTTP
+
+#endif  // ESPFWK_DISABLE_WEBSERVER
 
 #endif  // SRC_SERIALWS2_HPP_
 

@@ -21,7 +21,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-#if !defined(ESPFWK_DISABLE_OTA)
+#ifndef ESPFWK_DISABLE_WIFI
+
+#ifndef ESPFWK_DISABLE_OTA
 
 #if defined(ESP8266)
 #include <ESP8266WiFi.h>
@@ -235,5 +237,7 @@ bool OtaUpdate::parseFirmwareVersionString(int (&num)[3], const char *version) {
 }
 
 #endif  // ESPFWK_DISABLE_OTA
+
+#endif  // ESPFWK_DISABLE_WIFI
 
 // EOF

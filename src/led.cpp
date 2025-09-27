@@ -27,14 +27,14 @@ SOFTWARE.
 #include <led.hpp>
 #include <log.hpp>
 
-#if defined(ESPFWK_DISABLE_LED)
+#ifdef ESPFWK_DISABLE_LED
 
 void ledOn(LedColor l) {}
 void ledOff() {}
 
 #else
 
-#if defined(RGB_BUILTIN)
+#ifdef RGB_BUILTIN
 void ledOn(LedColor l) {
   uint8_t r, g, b, pin;
 

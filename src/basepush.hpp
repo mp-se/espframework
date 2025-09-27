@@ -24,6 +24,8 @@ SOFTWARE.
 #ifndef SRC_BASEPUSH_HPP_
 #define SRC_BASEPUSH_HPP_
 
+#ifndef ESPFWK_DISABLE_WIFI
+
 #include <memory>
 
 #if defined(ESP8266)
@@ -83,6 +85,8 @@ class BasePush {
   bool sendInfluxDb2(String& payload);
   bool sendMqtt(String& payload);
 };
+
+#endif  // !ESPFWK_DISABLE_WIFI
 
 #endif  // SRC_BASEPUSH_HPP_
 

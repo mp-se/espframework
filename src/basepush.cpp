@@ -21,6 +21,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
+#ifndef ESPFWK_DISABLE_WIFI
+
 #if defined(ESP8266)
 #include <ESP8266mDNS.h>
 #else
@@ -397,5 +399,7 @@ bool BasePush::sendMqtt(String& payload) {
            _config->getUserMqtt(), _config->getPassMqtt());
   return _lastSuccess;
 }
+
+#endif  // !ESPFWK_DISABLE_WIFI
 
 // EOF

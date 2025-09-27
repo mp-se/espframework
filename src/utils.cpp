@@ -97,7 +97,7 @@ void deepSleep(int t) {
 }
 
 void printHeap(String prefix) {
-#if defined(ESP8266)
+#ifdef ESP8266
   Log.notice(
       F("%s: Free-heap %d kb, Heap-rag %d %%, Max-block %d kb Stack=%d b." CR),
       prefix.c_str(), ESP.getFreeHeap() / 1024, ESP.getHeapFragmentation(),
@@ -134,13 +134,13 @@ void forcedReset() {
 }
 
 void espReset() {
-#if defined(ESP8266)
+#ifdef ESP8266
   ledOff();
   ESP.reset();
 #endif
 }
 
-#if defined(ESP8266)
+#ifdef ESP8266
 void detectChipRevision() {}
 bool isEsp32c3() { return false; }
 #else
@@ -181,7 +181,7 @@ void detectChipRevision() {
 #endif
 
 void checkResetReason() {
-#if defined(ESP8266)
+#ifdef ESP8266
   rst_info* _rinfo;
   _rinfo = ESP.getResetInfoPtr();
 

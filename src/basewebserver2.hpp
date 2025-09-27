@@ -24,7 +24,9 @@ SOFTWARE.
 #ifndef SRC_BASEWEBSERVER2_HPP_
 #define SRC_BASEWEBSERVER2_HPP_
 
-#if defined(ESPFWK_PSYCHIC_HTTP)
+#ifndef ESPFWK_DISABLE_WEBSERVER
+
+#ifdef ESPFWK_PSYCHIC_HTTP
 
 #include <ArduinoJson.h>
 #include <ESPmDNS.h>
@@ -161,6 +163,8 @@ class BaseWebServer {
 };
 
 #endif  // ESPFWK_PSYCHIC_HTTP
+
+#endif  // !ESPFWK_DISABLE_WEBSERVER
 
 #endif  // SRC_BASEWEBSERVER2_HPP_
 

@@ -24,7 +24,9 @@ SOFTWARE.
 #ifndef SRC_BASEWEBSERVER_HPP_
 #define SRC_BASEWEBSERVER_HPP_
 
-#if defined(ESPFWK_PSYCHIC_HTTP)
+#ifndef ESPFWK_DISABLE_WEBSERVER
+
+#ifdef ESPFWK_PSYCHIC_HTTP
 
 #include <basewebserver2.hpp>
 
@@ -32,11 +34,11 @@ SOFTWARE.
 
 #include <memory>
 
-#if defined(ESP32)
+#ifdef ESP32
 #include <freertos/FreeRTOS.h>
 #endif
 
-#if defined(ESP8266)
+#ifdef ESP8266
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
 #include <ESPAsyncTCP.h>
@@ -55,7 +57,7 @@ SOFTWARE.
 #include <interface.hpp>
 #include <log.hpp>
 
-#if defined(ESP8266)
+#ifdef ESP8266
 #include <incbin.hpp>
 INCBIN_EXTERN(IndexHtml);
 INCBIN_EXTERN(AppJs);
@@ -96,7 +98,7 @@ class BaseWebServer {
   void webReturnOK(AsyncWebServerRequest *request) const {
     request->send(_uploadReturn);
   }
-#if defined(ESP8266)
+#ifdef ESP8266
   void webReturnIndexHtml(AsyncWebServerRequest *request) const {
     Log.notice(F("WEB : webServer callback for /index.html (Memory)." CR));
     request->send(200, "text/html", (const uint8_t *)gIndexHtmlData,
@@ -202,6 +204,8 @@ class BaseWebServer {
 };
 
 #endif  // !ESPFWK_PSYCHIC_HTTP
+
+#endif  // !ESPFWK_DISABLE_WEBSERVER
 
 #endif  // SRC_BASEWEBSERVER_HPP_
 

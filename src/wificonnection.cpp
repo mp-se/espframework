@@ -21,7 +21,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-#if defined(ESP8266)
+#ifndef ESPFWK_DISABLE_WIFI
+
+#ifdef ESP8266
 #include <ESP8266WiFi.h>
 #else
 #include <WiFi.h>
@@ -95,7 +97,7 @@ void WifiConnection::writeReset() {
 bool WifiConnection::hasConfig() {
   if (_userSSID.length()) return true;
   if (strlen(_wifiConfig->getWifiSSID(0))) return true;
-#if defined(ESP8266)
+#ifdef ESP8266
   String ssid = WiFi.SSID();
   String pwd = WiFi.psk();
   if (ssid.length()) {
@@ -107,7 +109,6 @@ bool WifiConnection::hasConfig() {
     _wifiConfig->saveFile();
     return true;
   }
-#else
 #endif
   return false;
 }
@@ -162,7 +163,7 @@ void WifiConnection::startAP(wifi_mode_t _mode) {
     return;
   }
 
-#if defined(ESPFWK_REDUCE_WIFI_POWER)
+#ifdef ESPFWK_REDUCE_WIFI_POWER
   Log.notice(F("WIFI: Reducing wifi power for c3 chip." CR));
   WiFi.setTxPower(WIFI_POWER_8_5dBm);  // Required for ESP32C3 Mini
 #endif
@@ -208,7 +209,7 @@ void WifiConnection::loop() {
 }
 
 const uint8_t *WifiConnection::findStrongestAP(String &ssid) {
-#if defined(ESP8266)
+#ifdef ESP8266
   uint8 *ptr = (unsigned char *)ssid.c_str();
   int noNetwork = WiFi.scanNetworks(false, false, 0, ptr);
 #else
@@ -238,7 +239,7 @@ void WifiConnection::connectAsync(String ssid, String pass, wifi_mode_t mode) {
   WiFi.persistent(true);
   WiFi.mode(mode);
 
-#if defined(ESPFWK_REDUCE_WIFI_POWER)
+#ifdef ESPFWK_REDUCE_WIFI_POWER
   Log.notice(F("WIFI: Reducing wifi power for c3 chip." CR));
   WiFi.setTxPower(WIFI_POWER_8_5dBm);  // Required for ESP32C3 Mini
 #endif
@@ -369,5 +370,7 @@ void WifiConnection::improveSetWifiCredentials(const char *ssid,
 void WifiConnection::improveInfo(const char *info) {}
 
 void WifiConnection::improveDebug(const char *debug) {}
+
+#endif  // ESPFWK_DISABLE_WIFI
 
 // EOF

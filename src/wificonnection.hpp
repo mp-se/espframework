@@ -24,7 +24,9 @@ SOFTWARE.
 #ifndef SRC_WIFICONNECTION_HPP_
 #define SRC_WIFICONNECTION_HPP_
 
-#if defined(ESP8266)
+#ifndef ESPFWK_DISABLE_WIFI
+
+#ifdef ESP8266
 #include <ESP8266HTTPClient.h>
 #include <ESP8266WiFi.h>
 #else
@@ -37,7 +39,7 @@ SOFTWARE.
 
 #include <interface.hpp>
 
-#if defined(ESP8266)
+#ifdef ESP8266
 #define wifi_mode_t WiFiMode_t
 #endif
 
@@ -94,6 +96,8 @@ class WifiConnection {
 
   void loop();
 };
+
+#endif  // ESPFWK_DISABLE_WIFI
 
 #endif  // SRC_WIFICONNECTION_HPP_
 
