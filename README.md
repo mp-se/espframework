@@ -14,11 +14,11 @@ The master branch dones not contain any code. There are a number of version of t
 
 - This version is no longer maintained and its no longer the primary version for my projects.
 
-### Branch 1.1 (Primary branch)
+### Branch 1.1 (Deprecated)
 
 - Updated with newer version of the dependant libraries like Arduino Json 7 and Async Webserver
 - ArduinoLog and incbin has now been merged into the library for easier maintenance since they are no longer maintained by their authors.
 
-### Branch 2.0 (Experimental)
+### Branch 1.2 (Main branch)
 
-- Based on 1.1 this is migreted to work with Arduino 3.x
+- Based on 1.1 this is migreted to work with Arduino 2.x and 3.x
