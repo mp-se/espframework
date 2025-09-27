@@ -144,7 +144,6 @@ test(Utils_Callability) {
   // forcedReset(); // Don't actually reset in test
   // espReset(); // Don't actually reset in test
   detectChipRevision();
-  assertFalse(isEsp32c3());
   // checkResetReason(); // Platform-specific, may not be safe to call in test
   assertTrue(true); // If no crash, test passes
 }

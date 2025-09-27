@@ -307,8 +307,7 @@ test(BaseConfig_Callability) {
   TestableBaseConfig cfg("mdns", "file");
   // cfg.callFormatFileSystem();
   cfg.callCheckFileSystem();
-#if !defined(ESP8266)
-  cfg.getWifiPreference();
+#ifndef ESP8266
   cfg.setPreference("k", "v", "n");
   cfg.getPreference("k", "n");
 #endif

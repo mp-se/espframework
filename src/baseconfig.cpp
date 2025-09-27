@@ -375,7 +375,7 @@ bool BaseConfig::saveFileWifiOnly() {
   return true;
 }
 
-#if !defined(ESP8266)
+#ifndef ESP8266
 void BaseConfig::setPreference(const char* key, const char* value,
                                const char* nameSpace) {
   Preferences p;
