@@ -203,6 +203,8 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
+#ifndef ESPFWK_DISABLE_WIFI
+
 #include <improvWiFi/improv.h>
 #include <cstring>
 
@@ -383,5 +385,7 @@ std::vector<uint8_t> build_rpc_response(Command command,
   }
   return out;
 }
+
+#endif  // ESPFWK_DISABLE_WIFI
 
 }  // namespace improv

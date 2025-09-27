@@ -24,6 +24,8 @@ SOFTWARE.
 #ifndef SRC_IMPROVWIFI_H_
 #define SRC_IMPROVWIFI_H_
 
+#ifndef ESPFWK_DISABLE_WIFI
+
 #include <improvWiFi/improv.h>
 
 #include <vector>
@@ -68,5 +70,7 @@ class ImprovWiFi {
   std::function<void(const char *)> debugCallback;
   std::function<void(const char *, const char *)> wifiCallback;
 };
+
+#endif  // ESPFWK_DISABLE_WIFI
 
 #endif  // SRC_IMPROVWIFI_H_

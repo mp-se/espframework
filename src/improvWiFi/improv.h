@@ -207,6 +207,8 @@
 #ifndef SRC_IMPROV_H_
 #define SRC_IMPROV_H_
 
+#ifndef ESPFWK_DISABLE_WIFI
+
 #include <Arduino.h>
 
 #include <cstdint>
@@ -287,5 +289,7 @@ std::vector<uint8_t> build_rpc_response(Command command,
                                         bool add_checksum = true);
 
 }  // namespace improv
+
+#endif  // ESPFWK_DISABLE_WIFI
 
 #endif // SRC_IMPROV_H_
