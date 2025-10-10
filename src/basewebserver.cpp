@@ -62,7 +62,7 @@ bool BaseWebServer::isAuthenticated(AsyncWebServerRequest *request) {
     String token("Bearer ");
     token += _webConfig->getID();
 
-    if (request->getHeader("Authorization")->value() == token) {
+    if (request->getHeader("Authorization")->value().equalsIgnoreCase(token)) {
       return true;
     }
   }
