@@ -49,7 +49,7 @@ bool BaseWebServer::isAuthenticated(PsychicRequest *request) {
     String token("Bearer ");
     token += _webConfig->getAdminPass();
 
-    if (request->header("authorization").equalsIgnoreCase(token) || (strlen(_webConfig->getAdminPass()) == 0 && request->header("authorization") == "Bearer")) {
+    if (request->header("authorization").equalsIgnoreCase(token) || (strlen(_webConfig->getAdminPass()) == 0 && request->header("authorization").equalsIgnoreCase("Bearer"))) {
       Log.info(F("WEB : Authorized." CR));
       return true;
     }
