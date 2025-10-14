@@ -30,6 +30,7 @@ SOFTWARE.
 #include <baseconfig.hpp>
 #include <basewebserver2.hpp>
 #include <espframework.hpp>
+#include <base64.h>
 #if !defined(MAX_SKETCH_SPACE)
 #define MAX_SKETCH_SPACE 0x1c0000
 #warning "MAX_SKETCH_SPACE is not defined, using default value of 0x1c0000"
@@ -40,40 +41,15 @@ BaseWebServer::BaseWebServer(WebConfigInterface*config) { _webConfig = config; }
 bool BaseWebServer::isAuthenticated(PsychicRequest *request) {
   resetWifiPortalTimer();
 
-  // Authentication using password is only done when ssl is enabled and not
-  // using wifi setup mode Authentication using device id in other cases
-
-  if (!_wifiSetup && request->hasHeader("authorization") && isSslEnabled()) {
-    Log.info(F("WEB : Authentication, checking for admin password." CR));
-
-    String token("Bearer ");
-    token += _webConfig->getAdminPass();
-
-    if (request->header("authorization").equalsIgnoreCase(token) || (strlen(_webConfig->getAdminPass()) == 0 && request->header("authorization").equalsIgnoreCase("Bearer"))) {
-      Log.info(F("WEB : Authorized." CR));
+  if (request->hasHeader("Authorization")) {
+    String authHeader = request->header("Authorization");
+    if (authHeader == "Bearer " + _authToken) {
+      Log.info(F("WEB : Authorized with token." CR));
       return true;
     }
-
-    Log.info(F("WEB : %s." CR), request->header("authorization").c_str());
-
-  } else if (request->hasHeader("authorization")) {
-    Log.info(F("WEB : Authentication, checking for device id." CR));
-
-    String token("Bearer ");
-    token += _webConfig->getID();
-
-    if (request->header("Authorization").equalsIgnoreCase(token)) {
-      Log.info(F("WEB : Authorized." CR));
-      return true;
-    }
-
-    Log.info(F("WEB : NOT Authorized." CR));
-    return false;
   }
 
-  Log.info(F("WEB : No valid authorization header found, returning error 401. "
-             "Url %s" CR),
-           request->url().c_str());
+  Log.info(F("WEB : NOT Authorized." CR));
   return request->reply(401);
 }
 
@@ -246,17 +222,25 @@ esp_err_t BaseWebServer::webHandlePageNotFound(PsychicRequest *request) {
 
 esp_err_t BaseWebServer::webHandleAuth(PsychicRequest *request) {
   Log.notice(F("WEB : webServer callback for /api/auth." CR));
+  Log.notice(F("WEB : user: %s, pass: %s." CR), _webConfig->getAdminUser(), _webConfig->getAdminPass());
 
   if(isSslEnabled() && !_wifiSetup) {
+    Log.notice(F("WEB : Performing basic authentication." CR));
+
     if( !request->authenticate(_webConfig->getAdminUser(), _webConfig->getAdminPass()) ) {
       return request->reply(401);
     }
   } 
 
+  // Generate unique auth token
+  uint8_t buf[16];
+  for(int i = 0; i < 16; i++) buf[i] = random(256);
+  _authToken = base64::encode(buf, 16);
+
   PsychicJsonResponse response(request);
   JsonObject obj = response.getRoot().as<JsonObject>();
 
-  obj[PARAM_TOKEN] = _webConfig->getID();
+  obj[PARAM_TOKEN] = _authToken;
   return response.send();
 }
 
@@ -500,7 +484,7 @@ void BaseWebServer::setupWebHandlers() {
                                 std::placeholders::_1));
 }
 
-bool BaseWebServer::setupWebServer() {
+bool BaseWebServer::setupWebServer(bool skipSSL) {
   Log.notice(F("WEB : Configuring web server." CR));
 
   // Create the correct server wrappers
@@ -516,7 +500,7 @@ bool BaseWebServer::setupWebServer() {
 
 #if defined(ESPFWK_PSYCHIC_SSL)
   File fCert = LittleFS.open("/server.crt");
-  if (fCert) {
+  if (fCert && !skipSSL) {
     Log.notice(F("WEB : Found server certificate /server.crt." CR));
     _sslCert = fCert.readString();
     fCert.close();
@@ -529,7 +513,7 @@ bool BaseWebServer::setupWebServer() {
     }
   }
 
-  if (_sslCert.length() && _sslKey.length()) {
+  if (_sslCert.length() && _sslKey.length() && !skipSSL) {
     Log.notice(F("WEB : Starting web server using SSL." CR));
     _server->listen(443, _sslCert.c_str(), _sslKey.c_str());
 
@@ -542,7 +526,7 @@ bool BaseWebServer::setupWebServer() {
     });
   } else {
     Log.notice(
-        F("WEB : Starting web server without SSL, cert/key not found." CR));
+        F("WEB : Starting web server without SSL." CR));
     _server->listen(80);
   }
 

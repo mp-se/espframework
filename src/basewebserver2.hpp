@@ -72,6 +72,7 @@ class BaseWebServer {
   bool _wifiSetup = false;
   volatile bool _wifiScanTask = false;
   volatile bool _rebootTask = false;
+  String _authToken;
 
   void resetWifiPortalTimer() { _wifiPortalTimer = millis(); }
   bool isAuthenticated(PsychicRequest *request);
@@ -156,7 +157,7 @@ class BaseWebServer {
  public:
   explicit BaseWebServer(WebConfigInterface *config);
 
-  virtual bool setupWebServer();
+  virtual bool setupWebServer(bool skipSSL = false);
   virtual PsychicHttpServer *getWebServer() { return _server.get(); }
   virtual void setWifiSetup(bool wifiSetup) { _wifiSetup = wifiSetup; }
   virtual void loop();
