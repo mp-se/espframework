@@ -499,21 +499,23 @@ bool BaseWebServer::setupWebServer(bool skipSSL) {
 #endif
 
 #if defined(ESPFWK_PSYCHIC_SSL)
-  File fCert = LittleFS.open("/server.crt");
-  if (fCert && !skipSSL) {
-    Log.notice(F("WEB : Found server certificate /server.crt." CR));
-    _sslCert = fCert.readString();
-    fCert.close();
+  if(!skipSSL) {
+    File fCert = LittleFS.open("/server.crt");
+    if (fCert) {
+      Log.notice(F("WEB : Found server certificate /server.crt." CR));
+      _sslCert = fCert.readString();
+      fCert.close();
 
-    File fKey = LittleFS.open("/server.key");
-    if (fKey) {
-      Log.notice(F("WEB : Found server certificate /server.key." CR));
-      _sslKey = fKey.readString();
-      fKey.close();
+      File fKey = LittleFS.open("/server.key");
+      if (fKey) {
+        Log.notice(F("WEB : Found server certificate /server.key." CR));
+        _sslKey = fKey.readString();
+        fKey.close();
+      } 
     }
   }
 
-  if (_sslCert.length() && _sslKey.length() && !skipSSL) {
+  if (_sslCert.length() && _sslKey.length()) {
     Log.notice(F("WEB : Starting web server using SSL." CR));
     _server->listen(443, _sslCert.c_str(), _sslKey.c_str());
 
