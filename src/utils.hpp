@@ -46,6 +46,7 @@ void printHeap(String prefix);
 void forcedReset();
 
 void checkResetReason();
+void checkCrashReason();
 
 String urldecode(String str);
 String urlencode(String str);

@@ -30,9 +30,11 @@ SOFTWARE.
 #if !defined(ESP8266) && ARDUINO >= 300
 #include <esp_chip_info.h>
 #include <esp_task_wdt.h>
+#include <esp_core_dump.h>
 #elif !defined(ESP8266) && ARDUINO >= 200 && ARDUINO < 300
 #include <esp_int_wdt.h>
 #include <esp_task_wdt.h>
+#include <esp_core_dump.h>
 #else
 #include <user_interface.h>
 #endif
@@ -179,6 +181,37 @@ void detectChipRevision() {
              chip_info.revision, chip_info.features);
 }
 #endif
+
+void checkCrashReason() {
+#if defined(ESP8266)
+  // Not supported 
+#else
+  esp_err_t err = esp_core_dump_image_check();
+  if (err == ESP_OK) {
+    Log.notice(F("Main: Crash dump found." CR));
+    esp_core_dump_summary_t summary;
+    err = esp_core_dump_get_summary(&summary);
+    if (err == ESP_OK) {
+      char backtrace_str[300] = "";
+      size_t offset = 0;
+#if !defined(ESP32C3)
+      // Dump on ESP32C3 does not support backtrace info
+      for (int i = 0; i < summary.exc_bt_info.depth && i < 10 && offset < sizeof(backtrace_str); i++) {
+        offset += snprintf(backtrace_str + offset, sizeof(backtrace_str) - offset, " 0x%08X", summary.exc_bt_info.bt[i]);
+      }
+#endif
+      writeErrorLogLarge("Exception task: %s, PC: 0x%08X, Backtrace:%s, %s,%s", summary.exc_task,
+                    summary.exc_pc, backtrace_str, CFG_APPVER, CFG_GITREV);
+      Log.notice(F("Main: Exception task: %s, PC: 0x%08X" CR), summary.exc_task,
+                 summary.exc_pc);
+    } else {
+      Log.notice(F("Main: Failed to get crash summary." CR));
+    }
+  } else {
+    Log.notice(F("Main: No crash dump found." CR));
+  }
+#endif
+}
 
 void checkResetReason() {
 #ifdef ESP8266

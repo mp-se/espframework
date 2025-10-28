@@ -49,7 +49,8 @@ class SerialDebug {
 void printTimestamp(Print* _logOutput, int _logLevel);
 void printNewline(Print* _logOutput);
 
-void writeErrorLog(const char* format, ...);
+void writeErrorLog(const char* format, ...); // 80 char buffer
+void writeErrorLogLarge(const char* format, ...); // 400 char buffer
 void dumpErrorLog1();
 void dumpErrorLog2();
 

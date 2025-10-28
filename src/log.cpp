@@ -50,6 +50,28 @@ void writeErrorLog(const char *format, ...) {
   }
 }
 
+void writeErrorLogLarge(const char *format, ...) {
+  File f = LittleFS.open(ERR_FILENAME, "a");
+
+  if (f && f.size() > ERR_FILEMAXSIZE) {
+    f.close();
+    LittleFS.remove(ERR_FILENAME2);
+    LittleFS.rename(ERR_FILENAME, ERR_FILENAME2);
+    f = LittleFS.open(ERR_FILENAME, "a");
+  }
+
+  if (f) {
+    va_list arg;
+    va_start(arg, format);
+    char buf[400];
+    vsnprintf(&buf[0], sizeof(buf), format, arg);
+    f.write(reinterpret_cast<unsigned char *>(&buf[0]), strlen(&buf[0]));
+    va_end(arg);
+    f.println();
+    f.close();
+  }
+}
+
 void dumpErrorLog(const char *fname) {
   File f = LittleFS.open(fname, "r");
 
