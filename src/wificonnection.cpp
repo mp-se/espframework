@@ -317,7 +317,7 @@ bool WifiConnection::connect(bool wifiDirect, wifi_mode_t mode) {
     }
   }
 
-  return true;
+  return false;
 }
 
 bool WifiConnection::disconnect() {
