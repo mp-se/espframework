@@ -82,12 +82,16 @@ char* convertFloatToString(float f, char* buffer, int dec) {
   return buffer;
 }
 
+#if defined(ESP8266)
 struct tcp_pcb;
 extern struct tcp_pcb* tcp_tw_pcbs;
 extern "C" void tcp_abort(struct tcp_pcb* pcb);
 void tcp_cleanup() {  // tcp cleanup, to avoid memory crash.
   while (tcp_tw_pcbs) tcp_abort(tcp_tw_pcbs);
 }
+#else
+void tcp_cleanup() {}
+#endif
 
 void deepSleep(int t) {
 #if LOG_LEVEL == 6
