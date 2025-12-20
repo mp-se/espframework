@@ -499,6 +499,9 @@ bool BaseWebServer::setupWebServer() {
 
   MDNS.begin(_webConfig->getMDNS());
   MDNS.addService("http", "tcp", 80);
+  MDNS.addServiceTxt("http", "tcp", "ver", CFG_APPVER);
+  MDNS.addServiceTxt("http", "tcp", "app", CFG_APPNAME);
+  MDNS.addServiceTxt("http", "tcp", "id", _webConfig->getID());
 
 #ifdef ESP8266
   FSInfo fs;
