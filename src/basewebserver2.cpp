@@ -38,19 +38,19 @@ SOFTWARE.
 
 BaseWebServer::BaseWebServer(WebConfigInterface*config) { _webConfig = config; }
 
-bool BaseWebServer::isAuthenticated(PsychicRequest *request) {
+esp_err_t BaseWebServer::isAuthenticated(PsychicRequest *request) {
   resetWifiPortalTimer();
 
   if (request->hasHeader("Authorization")) {
     String authHeader = request->header("Authorization");
     if (authHeader == "Bearer " + _authToken) {
       Log.info(F("WEB : Authorized with token." CR));
-      return true;
+      return ESP_OK;
     }
   }
 
   Log.info(F("WEB : NOT Authorized." CR));
-  return request->reply(401);
+  return request->response()->send(401);
 }
 
 void BaseWebServer::loop() {
@@ -139,7 +139,7 @@ esp_err_t BaseWebServer::webHandleUploadFirmware(PsychicRequest *request,
   if (final) {
     EspSerial.print("\n");
     Log.notice(F("WEB : Finished firmware upload." CR));
-    request->reply(200);
+    request->response()->send(200);
 
     if (Update.end(true)) {
       // Calling reset here will not wait for all the data to be sent, lets wait
@@ -175,7 +175,7 @@ esp_err_t BaseWebServer::webHandleUploadFile(PsychicRequest *request,
 
     if (len > maxFileSize) {
       Log.error(F("WEB : File is to large to fit in file system." CR));
-      return request->reply(500);
+      return request->response()->send(500);
     }
 
     _tempFile = LittleFS.open("/" + filename, "w");
@@ -190,7 +190,7 @@ esp_err_t BaseWebServer::webHandleUploadFile(PsychicRequest *request,
   if (final) {
     Log.notice(F("WEB : Finished file upload." CR));
     _tempFile.close();
-    return request->reply(200);
+    return request->response()->send(200);
   }
 
   return ESP_OK;
@@ -198,7 +198,7 @@ esp_err_t BaseWebServer::webHandleUploadFile(PsychicRequest *request,
 
 esp_err_t BaseWebServer::webHandlePageNotFound(PsychicRequest *request) {
   if (_wifiSetup) {
-    return request->redirect("http://192.168.4.1");
+    return request->response()->redirect("http://192.168.4.1");
   }
 
   if (request->method() == HTTP_GET)
@@ -217,10 +217,12 @@ esp_err_t BaseWebServer::webHandlePageNotFound(PsychicRequest *request) {
     Log.warning(F("WEB : Unknown on %s not recognized." CR),
                 request->url().c_str());
 
-  return request->redirect("/");
+  return request->response()->redirect("/");
 }
 
-esp_err_t BaseWebServer::webHandleAuth(PsychicRequest *request) {
+esp_err_t BaseWebServer::webHandleAuth(PsychicRequest *request,
+                                        PsychicResponse *response,
+                                        JsonVariant &json) {
   Log.notice(F("WEB : webServer callback for /api/auth." CR));
   Log.notice(F("WEB : user: %s, pass: %s." CR), _webConfig->getAdminUser(), _webConfig->getAdminPass());
 
@@ -228,7 +230,7 @@ esp_err_t BaseWebServer::webHandleAuth(PsychicRequest *request) {
     Log.notice(F("WEB : Performing basic authentication." CR));
 
     if( !request->authenticate(_webConfig->getAdminUser(), _webConfig->getAdminPass()) ) {
-      return request->reply(401);
+      return response->send(401);
     }
   } 
 
@@ -237,14 +239,15 @@ esp_err_t BaseWebServer::webHandleAuth(PsychicRequest *request) {
   for(int i = 0; i < 16; i++) buf[i] = random(256);
   _authToken = base64::encode(buf, 16);
 
-  PsychicJsonResponse response(request);
-  JsonObject obj = response.getRoot().as<JsonObject>();
+  PsychicJsonResponse jsonResponse(response);
+  JsonObject obj = jsonResponse.getRoot().as<JsonObject>();
 
   obj[PARAM_TOKEN] = _authToken;
-  return response.send();
+  return jsonResponse.send();
 }
 
 esp_err_t BaseWebServer::webHandleFileSystem(PsychicRequest *request,
+                                             PsychicResponse *response,
                                              JsonVariant &json) {
   if (!isAuthenticated(request)) {
     return ESP_FAIL;
@@ -256,18 +259,18 @@ esp_err_t BaseWebServer::webHandleFileSystem(PsychicRequest *request,
   if (!obj[PARAM_COMMAND].isNull()) {
     if (obj[PARAM_COMMAND].as<String>() == String("dir")) {
       Log.notice(F("WEB : File system listing requested." CR));
-      PsychicJsonResponse response(request);
-      JsonObject obj = response.getRoot().as<JsonObject>();
+      PsychicJsonResponse jsonResponse(response);
+      JsonObject respObj = jsonResponse.getRoot().as<JsonObject>();
 
-      obj[PARAM_TOTAL] = LittleFS.totalBytes();
-      obj[PARAM_USED] = LittleFS.usedBytes();
-      obj[PARAM_FREE] = LittleFS.totalBytes() - LittleFS.usedBytes();
+      respObj[PARAM_TOTAL] = LittleFS.totalBytes();
+      respObj[PARAM_USED] = LittleFS.usedBytes();
+      respObj[PARAM_FREE] = LittleFS.totalBytes() - LittleFS.usedBytes();
 
       File root = LittleFS.open("/");
       File f = root.openNextFile();
       int i = 0;
 
-      JsonArray arr = obj[PARAM_FILES].to<JsonArray>();
+      JsonArray arr = respObj[PARAM_FILES].to<JsonArray>();
       while (f) {
         arr[i][PARAM_FILE] = "/" + String(f.name());
         arr[i][PARAM_SIZE] = static_cast<int>(f.size());
@@ -276,7 +279,7 @@ esp_err_t BaseWebServer::webHandleFileSystem(PsychicRequest *request,
       }
       f.close();
       root.close();
-      return response.send();
+      return jsonResponse.send();
     } else if (obj[PARAM_COMMAND].as<String>() == String("del")) {
       Log.notice(F("WEB : File system delete requested." CR));
 
@@ -284,12 +287,12 @@ esp_err_t BaseWebServer::webHandleFileSystem(PsychicRequest *request,
         String f = obj[PARAM_FILE];
         if (f.length() > 96) {
           Log.warning(F("WEB : Filename to long." CR));
-          return request->reply(400);
+          return response->send(400);
         }
         LittleFS.remove(f);
-        return request->reply(200);
+        return response->send(200);
       } else {
-        return request->reply(400);
+        return response->send(400);
       }
     } else if (obj[PARAM_COMMAND].as<String>() == String("get")) {
       Log.notice(F("WEB : File system get requested." CR));
@@ -297,53 +300,53 @@ esp_err_t BaseWebServer::webHandleFileSystem(PsychicRequest *request,
         String f = obj[PARAM_FILE];
         if (f.length() > 96) {
           Log.warning(F("WEB : Filename to long." CR));
-          return request->reply(400);
+          return response->send(400);
         }
 
         if (LittleFS.exists(obj[PARAM_FILE].as<String>())) {
           File file = LittleFS.open(f, "r");
 
           if (file) {
-            PsychicResponse response(request);
-
-            response.setContentType("application/octet-stream");
-            response.setContentLength(file.size());
-            response.sendHeaders();
+            response->setContentType("application/octet-stream");
+            response->setContentLength(file.size());
+            response->sendHeaders();
 
             static uint8_t fs_chunk_buf[512];
             size_t len = 0;
             while (file.available()) {
               len = file.read(fs_chunk_buf, sizeof(fs_chunk_buf));
-              response.sendChunk(fs_chunk_buf, len);
+              response->sendChunk(fs_chunk_buf, len);
               if ((len & 0x3F) == 0) {
                 delay(0);
               }
             }
             file.close();
-            response.finishChunking();
+            response->finishChunking();
           } else {
-            request->reply(404);
+            response->send(404);
             return ESP_FAIL;
           }
         } else {
-          request->reply(404);
+          response->send(404);
           return ESP_FAIL;
         }
       } else {
-        return request->reply(400);
+        return response->send(400);
       }
     } else {
       Log.warning(F("WEB : Unknown file system command." CR));
-      return request->reply(400);
+      return response->send(400);
     }
   } else {
     Log.warning(F("WEB : Unknown file system command." CR));
-    return request->reply(400);
+    return response->send(400);
   }
   return ESP_OK;
 }
 
-esp_err_t BaseWebServer::webHandleWifiScan(PsychicRequest *request) {
+esp_err_t BaseWebServer::webHandleWifiScan(PsychicRequest *request,
+                                            PsychicResponse *response,
+                                            JsonVariant &json) {
   if (!isAuthenticated(request)) {
     return ESP_FAIL;
   }
@@ -352,15 +355,17 @@ esp_err_t BaseWebServer::webHandleWifiScan(PsychicRequest *request) {
   _wifiScanTask = true;
   _wifiScanData = "";
 
-  PsychicJsonResponse response(request);
-  JsonObject obj = response.getRoot().as<JsonObject>();
+  PsychicJsonResponse jsonResponse(response);
+  JsonObject obj = jsonResponse.getRoot().as<JsonObject>();
 
   obj[PARAM_SUCCESS] = true;
   obj[PARAM_MESSAGE] = "Scheduled wifi scanning";
-  return response.send();
+  return jsonResponse.send();
 }
 
-esp_err_t BaseWebServer::webHandleWifiScanStatus(PsychicRequest *request) {
+esp_err_t BaseWebServer::webHandleWifiScanStatus(PsychicRequest *request,
+                                                 PsychicResponse *response,
+                                                 JsonVariant &json) {
   if (!isAuthenticated(request)) {
     return ESP_FAIL;
   }
@@ -368,50 +373,52 @@ esp_err_t BaseWebServer::webHandleWifiScanStatus(PsychicRequest *request) {
   Log.notice(F("WEB : webServer callback for /api/wifi/scan/status." CR));
 
   if (_wifiScanTask || !_wifiScanData.length()) {
-    PsychicJsonResponse response(request);
-    JsonObject obj = response.getRoot().as<JsonObject>();
+    PsychicJsonResponse jsonResponse(response);
+    JsonObject obj = jsonResponse.getRoot().as<JsonObject>();
 
     obj[PARAM_STATUS] = static_cast<bool>(_wifiScanTask);
     obj[PARAM_SUCCESS] = false;
     obj[PARAM_MESSAGE] =
         _wifiScanTask ? "Wifi scanning running" : "No scanning running";
-    return response.send();
+    return jsonResponse.send();
   } else {
-    PsychicResponse response(request);
-
-    response.setContent(_wifiScanData.c_str());
-    response.setCode(200);
-    return response.send();
+    response->setContent(_wifiScanData.c_str());
+    response->setCode(200);
+    return response->send();
   }
 
   return ESP_OK;
 }
 
-esp_err_t BaseWebServer::webHandleRestart(PsychicRequest *request) {
+esp_err_t BaseWebServer::webHandleRestart(PsychicRequest *request,
+                                           PsychicResponse *response,
+                                           JsonVariant &json) {
   if (!isAuthenticated(request)) {
     return ESP_FAIL;
   }
 
   Log.notice(F("WEB : webServer callback for /api/restart." CR));
-  PsychicJsonResponse response(request);
-  JsonObject obj = response.getRoot().as<JsonObject>();
+  PsychicJsonResponse jsonResponse(response);
+  JsonObject obj = jsonResponse.getRoot().as<JsonObject>();
 
   obj[PARAM_STATUS] = true;
   obj[PARAM_SUCCESS] = true;
   obj[PARAM_MESSAGE] = "Restarting...";
-  response.send();
+  jsonResponse.send();
   _rebootTimer = millis();
   _rebootTask = true;
   return ESP_OK;
 }
 
-esp_err_t BaseWebServer::webHandlePing(PsychicRequest *request) {
+esp_err_t BaseWebServer::webHandlePing(PsychicRequest *request,
+                                        PsychicResponse *response,
+                                        JsonVariant &json) {
   Log.notice(F("WEB : webServer callback for /api/ping." CR));
-  PsychicJsonResponse response(request);
-  JsonObject obj = response.getRoot().as<JsonObject>();
+  PsychicJsonResponse jsonResponse(response);
+  JsonObject obj = jsonResponse.getRoot().as<JsonObject>();
 
   obj[PARAM_STATUS] = true;
-  return response.send();
+  return jsonResponse.send();
 }
 
 void BaseWebServer::setupWebHandlers() {
@@ -439,23 +446,30 @@ void BaseWebServer::setupWebHandlers() {
       (PsychicHttpRequestCallback)std::bind(&BaseWebServer::webReturnFavicon,
                                             this, std::placeholders::_1));
   _server->on("/api/auth", HTTP_GET,
-              (PsychicHttpRequestCallback)std::bind(
-                  &BaseWebServer::webHandleAuth, this, std::placeholders::_1));
+              (PsychicJsonRequestCallback)std::bind(
+                  &BaseWebServer::webHandleAuth, this, std::placeholders::_1,
+                  std::placeholders::_2, std::placeholders::_3));
   _server->on("/api/wifi/status", HTTP_GET,
-              (PsychicHttpRequestCallback)std::bind(
+              (PsychicJsonRequestCallback)std::bind(
                   &BaseWebServer::webHandleWifiScanStatus, this,
-                  std::placeholders::_1));
+                  std::placeholders::_1, std::placeholders::_2,
+                  std::placeholders::_3));
   _server->on(
       "/api/wifi", HTTP_GET,
-      (PsychicHttpRequestCallback)std::bind(&BaseWebServer::webHandleWifiScan,
-                                            this, std::placeholders::_1));
+      (PsychicJsonRequestCallback)std::bind(&BaseWebServer::webHandleWifiScan,
+                                            this, std::placeholders::_1,
+                                            std::placeholders::_2,
+                                            std::placeholders::_3));
   _server->on(
       "/api/restart", HTTP_GET,
-      (PsychicHttpRequestCallback)std::bind(&BaseWebServer::webHandleRestart,
-                                            this, std::placeholders::_1));
+      (PsychicJsonRequestCallback)std::bind(&BaseWebServer::webHandleRestart,
+                                            this, std::placeholders::_1,
+                                            std::placeholders::_2,
+                                            std::placeholders::_3));
   _server->on("/api/ping", HTTP_GET,
-              (PsychicHttpRequestCallback)std::bind(
-                  &BaseWebServer::webHandlePing, this, std::placeholders::_1));
+              (PsychicJsonRequestCallback)std::bind(
+                  &BaseWebServer::webHandlePing, this, std::placeholders::_1,
+                  std::placeholders::_2, std::placeholders::_3));
 
   PsychicUploadHandler *fileUploadHandler = new PsychicUploadHandler();
   fileUploadHandler->onUpload((PsychicUploadCallback)std::bind(
@@ -466,7 +480,8 @@ void BaseWebServer::setupWebHandlers() {
   _server->on("/api/filesystem", HTTP_POST,
               (PsychicJsonRequestCallback)std::bind(
                   &BaseWebServer::webHandleFileSystem, this,
-                  std::placeholders::_1, std::placeholders::_2));
+                  std::placeholders::_1, std::placeholders::_2,
+                  std::placeholders::_3));
 
   PsychicUploadHandler *firmwareUploadHandler = new PsychicUploadHandler();
 
@@ -475,10 +490,10 @@ void BaseWebServer::setupWebHandlers() {
       std::placeholders::_2, std::placeholders::_3, std::placeholders::_4,
       std::placeholders::_5, std::placeholders::_6));
   _server->on("/api/firmware", HTTP_POST, firmwareUploadHandler);
-  _server->on("*", HTTP_OPTIONS, [](PsychicRequest *request) {
+  _server->on("*", HTTP_OPTIONS, [](PsychicRequest *request, PsychicResponse *response) {
     Log.notice(F("WEB : Got OPTIONS request url=%s." CR),
                request->url().c_str());
-    return request->reply(200);
+    return response->send(200);
   });
   _server->onNotFound(std::bind(&BaseWebServer::webHandlePageNotFound, this,
                                 std::placeholders::_1));
@@ -517,24 +532,29 @@ bool BaseWebServer::setupWebServer(bool skipSSL) {
 
   if (_sslCert.length() && _sslKey.length()) {
     Log.notice(F("WEB : Starting web server using SSL." CR));
-    _server->listen(443, _sslCert.c_str(), _sslKey.c_str());
+    _server->setCertificate(_sslCert.c_str(), _sslKey.c_str());
+    _server->setPort(443);
+    _server->start();
 
     _redirectServer->config.ctrl_port =
         20424;  // just a random port different from the default one
-    _redirectServer->listen(80);
-    _redirectServer->onNotFound([](PsychicRequest *request) {
+    _redirectServer->setPort(80);
+    _redirectServer->start();
+    _redirectServer->onNotFound([](PsychicRequest *request, PsychicResponse *response) {
       String url = "https://" + request->host() + request->url();
-      return request->redirect(url.c_str());
+      return response->redirect(url.c_str());
     });
   } else {
     Log.notice(
         F("WEB : Starting web server without SSL." CR));
-    _server->listen(80);
+    _server->setPort(80);
+    _server->start();
   }
 
 #else
   Log.notice(F("WEB : Starting web server." CR));
-  _server->listen(80);
+  _server->setPort(80);
+  _server->start();
 #endif
 
   MDNS.begin(_webConfig->getMDNS());

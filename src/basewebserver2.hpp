@@ -75,7 +75,7 @@ class BaseWebServer {
   String _authToken;
 
   void resetWifiPortalTimer() { _wifiPortalTimer = millis(); }
-  bool isAuthenticated(PsychicRequest *request);
+  esp_err_t isAuthenticated(PsychicRequest *request);
 
   bool isSslEnabled() {
 #if defined(ESPFWK_PSYCHIC_SSL)
@@ -137,9 +137,9 @@ class BaseWebServer {
     return ESP_OK;
   }
 
-  esp_err_t webHandleAuth(PsychicRequest *request);
-  esp_err_t webHandleWifiScan(PsychicRequest *request);
-  esp_err_t webHandleWifiScanStatus(PsychicRequest *request);
+  esp_err_t webHandleAuth(PsychicRequest *request, PsychicResponse *response, JsonVariant &json);
+  esp_err_t webHandleWifiScan(PsychicRequest *request, PsychicResponse *response, JsonVariant &json);
+  esp_err_t webHandleWifiScanStatus(PsychicRequest *request, PsychicResponse *response, JsonVariant &json);
   esp_err_t webHandleWifiClear(PsychicRequest *request);
   esp_err_t webHandlePageNotFound(PsychicRequest *request);
   esp_err_t webHandleUploadFirmware(PsychicRequest *request, String filename,
@@ -148,9 +148,9 @@ class BaseWebServer {
   esp_err_t webHandleUploadFile(PsychicRequest *request, String filename,
                                 size_t index, uint8_t *data, size_t len,
                                 bool final);
-  esp_err_t webHandleRestart(PsychicRequest *request);
-  esp_err_t webHandlePing(PsychicRequest *request);
-  esp_err_t webHandleFileSystem(PsychicRequest *request, JsonVariant &json);
+  esp_err_t webHandleRestart(PsychicRequest *request, PsychicResponse *response, JsonVariant &json);
+  esp_err_t webHandlePing(PsychicRequest *request, PsychicResponse *response, JsonVariant &json);
+  esp_err_t webHandleFileSystem(PsychicRequest *request, PsychicResponse *response, JsonVariant &json);
 
   virtual void setupWebHandlers();
 
