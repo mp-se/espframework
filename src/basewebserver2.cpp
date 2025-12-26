@@ -109,7 +109,6 @@ void BaseWebServer::loop() {
 }
 
 esp_err_t BaseWebServer::webHandleUploadFirmware(PsychicRequest *request,
-                                                 PsychicResponse *response,
                                                  String filename,
                                                  uint64_t index, uint8_t *data,
                                                  size_t len, bool final) {
@@ -169,7 +168,6 @@ esp_err_t BaseWebServer::webHandleUploadFirmware(PsychicRequest *request,
 }
 
 esp_err_t BaseWebServer::webHandleUploadFile(PsychicRequest *request,
-                                             PsychicResponse *response,
                                              String filename, size_t index,
                                              uint8_t *data, size_t len,
                                              bool final) {
@@ -410,6 +408,30 @@ esp_err_t BaseWebServer::webHandleWifiScanStatus(PsychicRequest *request,
   return ESP_OK;
 }
 
+esp_err_t BaseWebServer::webHandleWifiClear(PsychicRequest *request,
+                                             PsychicResponse *response) {
+  if (!isAuthenticated(request)) {
+    return ESP_FAIL;
+  }
+
+  Log.notice(F("WEB : webServer callback for /api/wifi/clear." CR));
+  
+  JsonDocument doc;
+  doc[PARAM_STATUS] = true;
+  doc[PARAM_SUCCESS] = true;
+  doc[PARAM_MESSAGE] = "WiFi credentials cleared";
+  
+  response->addHeader("Content-Type", "application/json");
+  String jsonStr;
+  serializeJson(doc, jsonStr);
+  response->send(200, "application/json", jsonStr.c_str());
+  
+  // Schedule actual WiFi clear in a moment
+  _rebootTimer = millis();
+  _wifiSetup = true;  // Return to WiFi setup mode
+  return ESP_OK;
+}
+
 esp_err_t BaseWebServer::webHandleRestart(PsychicRequest *request,
                                            PsychicResponse *response) {
   if (!isAuthenticated(request)) {
@@ -495,7 +517,7 @@ void BaseWebServer::setupWebHandlers() {
   fileUploadHandler->onUpload((PsychicUploadCallback)std::bind(
       &BaseWebServer::webHandleUploadFile, this, std::placeholders::_1,
       std::placeholders::_2, std::placeholders::_3, std::placeholders::_4,
-      std::placeholders::_5, std::placeholders::_6, std::placeholders::_7));
+      std::placeholders::_5, std::placeholders::_6));
   _server->on("/api/filesystem/upload", HTTP_POST, fileUploadHandler);
   _server->on("/api/filesystem", HTTP_POST,
               (PsychicJsonRequestCallback)std::bind(
@@ -508,7 +530,7 @@ void BaseWebServer::setupWebHandlers() {
   firmwareUploadHandler->onUpload((PsychicUploadCallback)std::bind(
       &BaseWebServer::webHandleUploadFirmware, this, std::placeholders::_1,
       std::placeholders::_2, std::placeholders::_3, std::placeholders::_4,
-      std::placeholders::_5, std::placeholders::_6, std::placeholders::_7));
+      std::placeholders::_5, std::placeholders::_6));
   _server->on("/api/firmware", HTTP_POST, firmwareUploadHandler);
   _server->on("*", HTTP_OPTIONS, [](PsychicRequest *request, PsychicResponse *response) {
     Log.notice(F("WEB : Got OPTIONS request url=%s." CR),
