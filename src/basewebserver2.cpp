@@ -517,17 +517,7 @@ void BaseWebServer::setupWebHandlers() {
 bool BaseWebServer::setupWebServer(bool skipSSL) {
   Log.notice(F("WEB : Configuring web server." CR));
 
-  // Create the correct server wrappers
-#if defined(ESPFWK_PSYCHIC_SSL)
-  _server.reset(new PsychicHttpsServer());
-  _redirectServer.reset(new PsychicHttpServer());
-  _server->config.max_uri_handlers = 30;
-  _server->ssl_config.httpd.max_uri_handlers = 20;
-#else
-  _server.reset(new PsychicHttpServer());
-  _server->config.max_uri_handlers = 30;
-#endif
-
+  // Check for SSL certificates first
 #if defined(ESPFWK_PSYCHIC_SSL)
   if(!skipSSL) {
     File fCert = LittleFS.open("/server.crt");
@@ -545,31 +535,55 @@ bool BaseWebServer::setupWebServer(bool skipSSL) {
     }
   }
 
-  if (_sslCert.length() && _sslKey.length()) {
+  if (isSslEnabled()) {
+    // SSL certificates available - use HTTPS server
+    PsychicHttpsServer *httpsServer = new PsychicHttpsServer();
+    httpsServer->ssl_config.httpd.max_uri_handlers = 10;
+    _server.reset(httpsServer);
+    _server->config.max_uri_handlers = 15;
+    _redirectServer.reset(new PsychicHttpServer());
+  } else {
+    // No SSL certificates - use plain HTTP
+    _server.reset(new PsychicHttpServer());
+    _server->config.max_uri_handlers = 15;
+  }
+#else
+  _server.reset(new PsychicHttpServer());
+  _server->config.max_uri_handlers = 15;
+#endif
+
+  // Start the server
+#if defined(ESPFWK_PSYCHIC_SSL)
+  if (isSslEnabled()) {
     Log.notice(F("WEB : Starting web server using SSL." CR));
-    _server->setCertificate(_sslCert.c_str(), _sslKey.c_str());
+    PsychicHttpsServer *httpsServer = static_cast<PsychicHttpsServer*>(_server.get());
+    httpsServer->setCertificate(_sslCert.c_str(), _sslKey.c_str());
     _server->setPort(443);
     _server->start();
+
+    setupWebHandlers();
 
     _redirectServer->config.ctrl_port =
         20424;  // just a random port different from the default one
     _redirectServer->setPort(80);
-    _redirectServer->start();
     _redirectServer->onNotFound([](PsychicRequest *request, PsychicResponse *response) {
+      Log.notice(F("WEB : Redirecting HTTP to HTTPS for %s." CR), request->url().c_str());
       String url = "https://" + request->host() + request->url();
+      response->setCode(301);
       return response->redirect(url.c_str());
     });
+    _redirectServer->start();
   } else {
-    Log.notice(
-        F("WEB : Starting web server without SSL." CR));
+    Log.notice(F("WEB : Starting web server without SSL." CR));
     _server->setPort(80);
     _server->start();
+    setupWebHandlers();
   }
-
 #else
   Log.notice(F("WEB : Starting web server." CR));
   _server->setPort(80);
   _server->start();
+  setupWebHandlers();
 #endif
 
   MDNS.begin(_webConfig->getMDNS());
@@ -592,7 +606,6 @@ bool BaseWebServer::setupWebServer(bool skipSSL) {
   f.close();
   root.close();
 
-  setupWebHandlers();
   if (_webConfig->isCorsAllowed()) {
     DefaultHeaders::Instance().addHeader("Access-Control-Allow-Origin", "*");
     DefaultHeaders::Instance().addHeader("Access-Control-Allow-Methods",

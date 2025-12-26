@@ -51,14 +51,10 @@ extern const uint8_t faviconIcoEnd[] asm("_binary_html_favicon_ico_gz_end");
 
 class BaseWebServer {
  protected:
-#if defined(ESPFWK_PSYCHIC_SSL)
-  std::unique_ptr<PsychicHttpsServer> _server;
+  std::unique_ptr<PsychicHttpServer> _server;
   std::unique_ptr<PsychicHttpServer> _redirectServer;
   String _sslCert;
   String _sslKey;
-#else
-  std::unique_ptr<PsychicHttpServer> _server;
-#endif
   File _uploadFile;
   File _tempFile;
   WebConfigInterface *_webConfig;
