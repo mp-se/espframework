@@ -55,31 +55,35 @@ void DemoWebServer::setupWebHandlers() {
   _server->on(
       "/api/status", HTTP_GET,
       (PsychicHttpRequestCallback)std::bind(&DemoWebServer::webHandleStatus,
-                                            this, std::placeholders::_1));
+                                            this, std::placeholders::_1, std::placeholders::_2));
   _server->on(
       "/api/config", HTTP_GET,
       (PsychicHttpRequestCallback)std::bind(&DemoWebServer::webHandleConfigRead,
-                                            this, std::placeholders::_1));
+                                            this, std::placeholders::_1, std::placeholders::_2));
   _server->on("/api/config", HTTP_POST,
               (PsychicJsonRequestCallback)std::bind(
                   &DemoWebServer::webHandleConfigWrite, this,
-                  std::placeholders::_1, std::placeholders::_2));
+                  std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 }
 
-esp_err_t DemoWebServer::webHandleConfigRead(PsychicRequest *request) {
+esp_err_t DemoWebServer::webHandleConfigRead(PsychicRequest *request, PsychicResponse *response) {
   if (!isAuthenticated(request)) {
     return ESP_FAIL;
   }
 
   Log.notice(F("WEB : webServer callback for /api/config(read)." CR));
-  PsychicJsonResponse response(request);
-  JsonObject obj = response.getRoot().as<JsonObject>();
-
+  
+  JsonDocument doc;
+  JsonObject obj = doc.to<JsonObject>();
   _webConfig->createJson(obj);
-  return response.send();
+  
+  response->addHeader("Content-Type", "application/json");
+  String jsonStr;
+  serializeJson(doc, jsonStr);
+  return response->send(200, "application/json", jsonStr.c_str());
 }
 
-esp_err_t DemoWebServer::webHandleConfigWrite(PsychicRequest *request,
+esp_err_t DemoWebServer::webHandleConfigWrite(PsychicRequest *request, PsychicResponse *response,
                                               JsonVariant &json) {
   if (!isAuthenticated(request)) {
     return ESP_FAIL;
@@ -89,42 +93,46 @@ esp_err_t DemoWebServer::webHandleConfigWrite(PsychicRequest *request,
   JsonObject obj = json.as<JsonObject>();
 
   _webConfig->parseJson(obj);
-  obj.clear();
   _webConfig->saveFile();
 
-  PsychicJsonResponse response(request);
-
-  obj = response.getRoot().as<JsonObject>();
-  obj[PARAM_SUCCESS] = true;
-  obj[PARAM_MESSAGE] = "Configuration updated";
-  return response.send();
+  JsonDocument doc;
+  doc[PARAM_SUCCESS] = true;
+  doc[PARAM_MESSAGE] = "Configuration updated";
+  
+  response->addHeader("Content-Type", "application/json");
+  String jsonStr;
+  serializeJson(doc, jsonStr);
+  return response->send(200, "application/json", jsonStr.c_str());
 }
 
-esp_err_t DemoWebServer::webHandleStatus(PsychicRequest *request) {
+esp_err_t DemoWebServer::webHandleStatus(PsychicRequest *request, PsychicResponse *response) {
   Log.notice(F("WEB : webServer callback for /api/status." CR));
-  PsychicJsonResponse response(request);
-  JsonObject obj = response.getRoot().as<JsonObject>();
+  JsonDocument doc;
 
-  obj[PARAM_ID] = _webConfig->getID();
-  obj[PARAM_MDNS] = _webConfig->getMDNS();
+  doc[PARAM_ID] = _webConfig->getID();
+  doc[PARAM_MDNS] = _webConfig->getMDNS();
 #if defined(ESP32C3)
-  obj[PARAM_PLATFORM] = "esp32c3";
+  doc[PARAM_PLATFORM] = "esp32c3";
 #elif defined(ESP32S2)
-  obj[PARAM_PLATFORM] = "esp32s2";
+  doc[PARAM_PLATFORM] = "esp32s2";
 #elif defined(ESP32S3)
-  obj[PARAM_PLATFORM] = "esp32s3";
+  doc[PARAM_PLATFORM] = "esp32s3";
 #else  // esp32 mini
-  obj[PARAM_PLATFORM] = "esp32";
+  doc[PARAM_PLATFORM] = "esp32";
 #endif
-  obj[PARAM_RSSI] = WiFi.RSSI();
-  obj[PARAM_SSID] = WiFi.SSID();
-  obj[PARAM_APP_VER] = CFG_APPVER;
-  obj[PARAM_APP_BUILD] = CFG_GITREV;
-  obj[PARAM_TOTAL_HEAP] = ESP.getHeapSize();
-  obj[PARAM_FREE_HEAP] = ESP.getFreeHeap();
-  obj[PARAM_IP] = WiFi.localIP().toString();
-  obj[PARAM_WIFI_SETUP] = _wifiSetup;
-  return response.send();
+  doc[PARAM_RSSI] = WiFi.RSSI();
+  doc[PARAM_SSID] = WiFi.SSID();
+  doc[PARAM_APP_VER] = CFG_APPVER;
+  doc[PARAM_APP_BUILD] = CFG_GITREV;
+  doc[PARAM_TOTAL_HEAP] = ESP.getHeapSize();
+  doc[PARAM_FREE_HEAP] = ESP.getFreeHeap();
+  doc[PARAM_IP] = WiFi.localIP().toString();
+  doc[PARAM_WIFI_SETUP] = _wifiSetup;
+  
+  response->addHeader("Content-Type", "application/json");
+  String jsonStr;
+  serializeJson(doc, jsonStr);
+  return response->send(200, "application/json", jsonStr.c_str());
 }
 
 #endif  // ESPFWK_PSYCHIC_HTTP

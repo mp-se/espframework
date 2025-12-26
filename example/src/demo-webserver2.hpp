@@ -34,9 +34,9 @@ class DemoWebServer : public BaseWebServer {
   DemoPush *_push;
 
   void setupWebHandlers();
-  esp_err_t webHandleStatus(PsychicRequest *request);
-  esp_err_t webHandleConfigRead(PsychicRequest *request);
-  esp_err_t webHandleConfigWrite(PsychicRequest *request, JsonVariant &json);
+  esp_err_t webHandleStatus(PsychicRequest *request, PsychicResponse *response);
+  esp_err_t webHandleConfigRead(PsychicRequest *request, PsychicResponse *response);
+  esp_err_t webHandleConfigWrite(PsychicRequest *request, PsychicResponse *response, JsonVariant &json);
 
  public:
   explicit DemoWebServer(WebConfigInterface *config, DemoPush *push);
