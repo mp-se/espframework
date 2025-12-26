@@ -109,6 +109,7 @@ void BaseWebServer::loop() {
 }
 
 esp_err_t BaseWebServer::webHandleUploadFirmware(PsychicRequest *request,
+                                                 PsychicResponse *response,
                                                  String filename,
                                                  uint64_t index, uint8_t *data,
                                                  size_t len, bool final) {
@@ -168,6 +169,7 @@ esp_err_t BaseWebServer::webHandleUploadFirmware(PsychicRequest *request,
 }
 
 esp_err_t BaseWebServer::webHandleUploadFile(PsychicRequest *request,
+                                             PsychicResponse *response,
                                              String filename, size_t index,
                                              uint8_t *data, size_t len,
                                              bool final) {
@@ -206,9 +208,11 @@ esp_err_t BaseWebServer::webHandleUploadFile(PsychicRequest *request,
   return ESP_OK;
 }
 
-esp_err_t BaseWebServer::webHandlePageNotFound(PsychicRequest *request) {
+esp_err_t BaseWebServer::webHandlePageNotFound(PsychicRequest *request,
+                                                 PsychicResponse *response) {
   if (_wifiSetup) {
-    return request->response()->redirect("http://192.168.4.1");
+    response->setCode(301);
+    return response->redirect("http://192.168.4.1");
   }
 
   if (request->method() == HTTP_GET)
@@ -227,7 +231,8 @@ esp_err_t BaseWebServer::webHandlePageNotFound(PsychicRequest *request) {
     Log.warning(F("WEB : Unknown on %s not recognized." CR),
                 request->url().c_str());
 
-  return request->response()->redirect("/");
+  response->setCode(301);
+  return response->redirect("/");
 }
 
 esp_err_t BaseWebServer::webHandleAuth(PsychicRequest *request,
@@ -490,7 +495,7 @@ void BaseWebServer::setupWebHandlers() {
   fileUploadHandler->onUpload((PsychicUploadCallback)std::bind(
       &BaseWebServer::webHandleUploadFile, this, std::placeholders::_1,
       std::placeholders::_2, std::placeholders::_3, std::placeholders::_4,
-      std::placeholders::_5, std::placeholders::_6));
+      std::placeholders::_5, std::placeholders::_6, std::placeholders::_7));
   _server->on("/api/filesystem/upload", HTTP_POST, fileUploadHandler);
   _server->on("/api/filesystem", HTTP_POST,
               (PsychicJsonRequestCallback)std::bind(
@@ -503,7 +508,7 @@ void BaseWebServer::setupWebHandlers() {
   firmwareUploadHandler->onUpload((PsychicUploadCallback)std::bind(
       &BaseWebServer::webHandleUploadFirmware, this, std::placeholders::_1,
       std::placeholders::_2, std::placeholders::_3, std::placeholders::_4,
-      std::placeholders::_5, std::placeholders::_6));
+      std::placeholders::_5, std::placeholders::_6, std::placeholders::_7));
   _server->on("/api/firmware", HTTP_POST, firmwareUploadHandler);
   _server->on("*", HTTP_OPTIONS, [](PsychicRequest *request, PsychicResponse *response) {
     Log.notice(F("WEB : Got OPTIONS request url=%s." CR),
@@ -511,7 +516,7 @@ void BaseWebServer::setupWebHandlers() {
     return response->send(200);
   });
   _server->onNotFound(std::bind(&BaseWebServer::webHandlePageNotFound, this,
-                                std::placeholders::_1));
+                                std::placeholders::_1, std::placeholders::_2));
 }
 
 bool BaseWebServer::setupWebServer(bool skipSSL) {

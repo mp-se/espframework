@@ -128,12 +128,12 @@ class BaseWebServer {
   esp_err_t webHandleAuth(PsychicRequest *request, PsychicResponse *response);
   esp_err_t webHandleWifiScan(PsychicRequest *request, PsychicResponse *response);
   esp_err_t webHandleWifiScanStatus(PsychicRequest *request, PsychicResponse *response);
-  esp_err_t webHandleWifiClear(PsychicRequest *request);
-  esp_err_t webHandlePageNotFound(PsychicRequest *request);
-  esp_err_t webHandleUploadFirmware(PsychicRequest *request, String filename,
+  esp_err_t webHandleWifiClear(PsychicRequest *request, PsychicResponse *response);
+  esp_err_t webHandlePageNotFound(PsychicRequest *request, PsychicResponse *response);
+  esp_err_t webHandleUploadFirmware(PsychicRequest *request, PsychicResponse *response, String filename,
                                     uint64_t index, uint8_t *data, size_t len,
                                     bool final);
-  esp_err_t webHandleUploadFile(PsychicRequest *request, String filename,
+  esp_err_t webHandleUploadFile(PsychicRequest *request, PsychicResponse *response, String filename,
                                 size_t index, uint8_t *data, size_t len,
                                 bool final);
   esp_err_t webHandleRestart(PsychicRequest *request, PsychicResponse *response);
