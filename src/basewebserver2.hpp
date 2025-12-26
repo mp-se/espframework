@@ -77,14 +77,6 @@ class BaseWebServer {
   void resetWifiPortalTimer() { _wifiPortalTimer = millis(); }
   bool isAuthenticated(PsychicRequest *request);
 
-  bool isSslEnabled() {
-#if defined(ESPFWK_PSYCHIC_SSL)
-    return _sslCert.length() && _sslKey.length();
-#else
-    return false;
-#endif
-  }
-
   esp_err_t webReturnIndexHtml(PsychicRequest *request) {
     Log.notice(F("WEB : webServer callback for /index.html (Memory)." CR));
     PsychicResponse response(request);
@@ -161,6 +153,14 @@ class BaseWebServer {
   virtual PsychicHttpServer *getWebServer() { return _server.get(); }
   virtual void setWifiSetup(bool wifiSetup) { _wifiSetup = wifiSetup; }
   virtual void loop();
+
+  bool isSslEnabled() {
+#if defined(ESPFWK_PSYCHIC_SSL)
+    return _sslCert.length() && _sslKey.length();
+#else
+    return false;
+#endif
+  }
 };
 
 #endif  // ESPFWK_PSYCHIC_HTTP
