@@ -206,11 +206,11 @@ esp_err_t BaseWebServer::webHandleUploadFile(PsychicRequest *request,
   return ESP_OK;
 }
 
-esp_err_t BaseWebServer::webHandlePageNotFound(PsychicRequest *request,
-                                                 PsychicResponse *response) {
+esp_err_t BaseWebServer::webHandlePageNotFound(PsychicRequest *request) {
+  PsychicResponse response(request);
   if (_wifiSetup) {
-    response->setCode(301);
-    return response->redirect("http://192.168.4.1");
+    response.setCode(301);
+    return response.redirect("http://192.168.4.1");
   }
 
   if (request->method() == HTTP_GET)
@@ -229,12 +229,12 @@ esp_err_t BaseWebServer::webHandlePageNotFound(PsychicRequest *request,
     Log.warning(F("WEB : Unknown on %s not recognized." CR),
                 request->url().c_str());
 
-  response->setCode(301);
-  return response->redirect("/");
+  response.setCode(301);
+  return response.redirect("/");
 }
 
-esp_err_t BaseWebServer::webHandleAuth(PsychicRequest *request,
-                                        PsychicResponse *response) {
+esp_err_t BaseWebServer::webHandleAuth(PsychicRequest *request) {
+  PsychicResponse response(request);
   Log.notice(F("WEB : webServer callback for /api/auth." CR));
   Log.notice(F("WEB : user: %s, pass: %s." CR), _webConfig->getAdminUser(), _webConfig->getAdminPass());
 
@@ -242,7 +242,7 @@ esp_err_t BaseWebServer::webHandleAuth(PsychicRequest *request,
     Log.notice(F("WEB : Performing basic authentication." CR));
 
     if( !request->authenticate(_webConfig->getAdminUser(), _webConfig->getAdminPass()) ) {
-      return response->send(401);
+      return response.send(401);
     }
   } 
 
@@ -255,10 +255,10 @@ esp_err_t BaseWebServer::webHandleAuth(PsychicRequest *request,
   JsonDocument doc;
   doc[PARAM_TOKEN] = _authToken;
   
-  response->addHeader("Content-Type", "application/json");
+  response.addHeader("Content-Type", "application/json");
   String jsonStr;
   serializeJson(doc, jsonStr);
-  return response->send(200, "application/json", jsonStr.c_str());
+  return response.send(200, "application/json", jsonStr.c_str());
 }
 
 esp_err_t BaseWebServer::webHandleFileSystem(PsychicRequest *request,
@@ -360,8 +360,8 @@ esp_err_t BaseWebServer::webHandleFileSystem(PsychicRequest *request,
   return ESP_OK;
 }
 
-esp_err_t BaseWebServer::webHandleWifiScan(PsychicRequest *request,
-                                            PsychicResponse *response) {
+esp_err_t BaseWebServer::webHandleWifiScan(PsychicRequest *request) {
+  PsychicResponse response(request);
   if (!isAuthenticated(request)) {
     return ESP_FAIL;
   }
@@ -374,14 +374,14 @@ esp_err_t BaseWebServer::webHandleWifiScan(PsychicRequest *request,
   doc[PARAM_SUCCESS] = true;
   doc[PARAM_MESSAGE] = "Scheduled wifi scanning";
   
-  response->addHeader("Content-Type", "application/json");
+  response.addHeader("Content-Type", "application/json");
   String jsonStr;
   serializeJson(doc, jsonStr);
-  return response->send(200, "application/json", jsonStr.c_str());
+  return response.send(200, "application/json", jsonStr.c_str());
 }
 
-esp_err_t BaseWebServer::webHandleWifiScanStatus(PsychicRequest *request,
-                                                 PsychicResponse *response) {
+esp_err_t BaseWebServer::webHandleWifiScanStatus(PsychicRequest *request) {
+  PsychicResponse response(request);
   if (!isAuthenticated(request)) {
     return ESP_FAIL;
   }
@@ -395,21 +395,21 @@ esp_err_t BaseWebServer::webHandleWifiScanStatus(PsychicRequest *request,
     doc[PARAM_MESSAGE] =
         _wifiScanTask ? "Wifi scanning running" : "No scanning running";
     
-    response->addHeader("Content-Type", "application/json");
+    response.addHeader("Content-Type", "application/json");
     String jsonStr;
     serializeJson(doc, jsonStr);
-    return response->send(200, "application/json", jsonStr.c_str());
+    return response.send(200, "application/json", jsonStr.c_str());
   } else {
-    response->setContent(_wifiScanData.c_str());
-    response->setCode(200);
-    return response->send();
+    response.setContent(_wifiScanData.c_str());
+    response.setCode(200);
+    return response.send();
   }
 
   return ESP_OK;
 }
 
-esp_err_t BaseWebServer::webHandleWifiClear(PsychicRequest *request,
-                                             PsychicResponse *response) {
+esp_err_t BaseWebServer::webHandleWifiClear(PsychicRequest *request) {
+  PsychicResponse response(request);
   if (!isAuthenticated(request)) {
     return ESP_FAIL;
   }
@@ -421,10 +421,10 @@ esp_err_t BaseWebServer::webHandleWifiClear(PsychicRequest *request,
   doc[PARAM_SUCCESS] = true;
   doc[PARAM_MESSAGE] = "WiFi credentials cleared";
   
-  response->addHeader("Content-Type", "application/json");
+  response.addHeader("Content-Type", "application/json");
   String jsonStr;
   serializeJson(doc, jsonStr);
-  response->send(200, "application/json", jsonStr.c_str());
+  response.send(200, "application/json", jsonStr.c_str());
   
   // Schedule actual WiFi clear in a moment
   _rebootTimer = millis();
@@ -432,8 +432,8 @@ esp_err_t BaseWebServer::webHandleWifiClear(PsychicRequest *request,
   return ESP_OK;
 }
 
-esp_err_t BaseWebServer::webHandleRestart(PsychicRequest *request,
-                                           PsychicResponse *response) {
+esp_err_t BaseWebServer::webHandleRestart(PsychicRequest *request) {
+  PsychicResponse response(request);
   if (!isAuthenticated(request)) {
     return ESP_FAIL;
   }
@@ -444,26 +444,26 @@ esp_err_t BaseWebServer::webHandleRestart(PsychicRequest *request,
   doc[PARAM_SUCCESS] = true;
   doc[PARAM_MESSAGE] = "Restarting...";
   
-  response->addHeader("Content-Type", "application/json");
+  response.addHeader("Content-Type", "application/json");
   String jsonStr;
   serializeJson(doc, jsonStr);
-  response->send(200, "application/json", jsonStr.c_str());
+  response.send(200, "application/json", jsonStr.c_str());
   _rebootTimer = millis();
   _rebootTask = true;
   return ESP_OK;
 }
 
-esp_err_t BaseWebServer::webHandlePing(PsychicRequest *request,
-                                        PsychicResponse *response) {
+esp_err_t BaseWebServer::webHandlePing(PsychicRequest *request) {
+  PsychicResponse response(request);
   Log.notice(F("WEB : webServer callback for /api/ping." CR));
   
   JsonDocument doc;
   doc[PARAM_STATUS] = true;
   
-  response->addHeader("Content-Type", "application/json");
+  response.addHeader("Content-Type", "application/json");
   String jsonStr;
   serializeJson(doc, jsonStr);
-  return response->send(200, "application/json", jsonStr.c_str());
+  return response.send(200, "application/json", jsonStr.c_str());
 }
 
 void BaseWebServer::setupWebHandlers() {
@@ -492,26 +492,22 @@ void BaseWebServer::setupWebHandlers() {
                                             this, std::placeholders::_1));
   _server->on("/api/auth", HTTP_GET,
               (PsychicHttpRequestCallback)std::bind(
-                  &BaseWebServer::webHandleAuth, this, std::placeholders::_1,
-                  std::placeholders::_2));
+                  &BaseWebServer::webHandleAuth, this, std::placeholders::_1));
   _server->on("/api/wifi/status", HTTP_GET,
               (PsychicHttpRequestCallback)std::bind(
                   &BaseWebServer::webHandleWifiScanStatus, this,
-                  std::placeholders::_1, std::placeholders::_2));
+                  std::placeholders::_1));
   _server->on(
       "/api/wifi", HTTP_GET,
       (PsychicHttpRequestCallback)std::bind(&BaseWebServer::webHandleWifiScan,
-                                            this, std::placeholders::_1,
-                                            std::placeholders::_2));
+                                            this, std::placeholders::_1));
   _server->on(
       "/api/restart", HTTP_GET,
       (PsychicHttpRequestCallback)std::bind(&BaseWebServer::webHandleRestart,
-                                            this, std::placeholders::_1,
-                                            std::placeholders::_2));
+                                            this, std::placeholders::_1));
   _server->on("/api/ping", HTTP_GET,
               (PsychicHttpRequestCallback)std::bind(
-                  &BaseWebServer::webHandlePing, this, std::placeholders::_1,
-                  std::placeholders::_2));
+                  &BaseWebServer::webHandlePing, this, std::placeholders::_1));
 
   PsychicUploadHandler *fileUploadHandler = new PsychicUploadHandler();
   fileUploadHandler->onUpload((PsychicUploadCallback)std::bind(
@@ -537,8 +533,9 @@ void BaseWebServer::setupWebHandlers() {
                request->url().c_str());
     return response->send(200);
   });
-  _server->onNotFound(std::bind(&BaseWebServer::webHandlePageNotFound, this,
-                                std::placeholders::_1, std::placeholders::_2));
+  _server->onNotFound([this](PsychicRequest *request, PsychicResponse *response) {
+    return webHandlePageNotFound(request);
+  });
 }
 
 bool BaseWebServer::setupWebServer(bool skipSSL) {
