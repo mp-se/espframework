@@ -36,6 +36,7 @@ SOFTWARE.
 #include <freertos/FreeRTOS.h>
 
 #include <espframework.hpp>
+#include <serialws2.hpp>
 #include <interface.hpp>
 #include <log.hpp>
 #include <memory>
@@ -141,12 +142,12 @@ class BaseWebServer {
   esp_err_t webHandleFileSystem(PsychicRequest *request, PsychicResponse *response, JsonVariant &json);
 
   virtual void setupWebHandlers();
+  virtual PsychicHttpServer *getWebServer() { return _server.get(); }
 
  public:
   explicit BaseWebServer(WebConfigInterface *config);
 
-  virtual bool setupWebServer(bool skipSSL = false);
-  virtual PsychicHttpServer *getWebServer() { return _server.get(); }
+  virtual bool setupWebServer(bool skipSSL = false, SerialWebSocket* serialWs = nullptr, Print* secondary = nullptr);
   virtual void setWifiSetup(bool wifiSetup) { _wifiSetup = wifiSetup; }
   virtual void loop();
 

@@ -32,8 +32,9 @@ void SerialWebSocket::begin(PsychicHttpServer *server, Print *secondary) {
   Log.notice(F("WS  : Starting serial websocket" CR));
   _server = server;
   _secondayLog = secondary;
-  _webSocket = new PsychicWebSocketHandler();
+  _webSocket = new PsychicWebSocketHandler();  
   _server->on("/serialws", _webSocket);
+ 
 }
 
 size_t SerialWebSocket::write(uint8_t c) {
@@ -49,9 +50,8 @@ size_t SerialWebSocket::write(uint8_t c) {
 void SerialWebSocket::flush() {
   if (_secondayLog) _secondayLog->write(_buf, _bufSize);
 
-  if (_webSocket->count()) {
-    // Only send data to socket if there are connected clients
-    _webSocket->sendAll(reinterpret_cast<const char *>(_buf));
+  if (_webSocket && _webSocket->count()) {
+    _webSocket->sendAll(HTTPD_WS_TYPE_TEXT, _buf, _bufSize);
   }
 
   memset(_buf, 0, sizeof(_buf));

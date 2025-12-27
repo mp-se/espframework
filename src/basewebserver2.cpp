@@ -47,7 +47,7 @@ bool BaseWebServer::isAuthenticated(PsychicRequest *request) {
       Log.info(F("WEB : Authorized with token." CR));
       return true;
     }
-
+  
     if(!isSslEnabled()) {
       String altToken("Bearer ");
       altToken += _webConfig->getID();
@@ -125,6 +125,7 @@ esp_err_t BaseWebServer::webHandleUploadFirmware(PsychicRequest *request,
       _uploadReturn = 500;
       Log.error(F("WEB : Not enough space to store for this firmware (%d)." CR),
                 request->contentLength());
+      return ESP_FAIL;  // Abort upload immediately on init failure
     } else {
       _uploadReturn = 200;
       Log.notice(F("WEB : Start firmware upload, max sketch size %d kb, size "
@@ -137,11 +138,14 @@ esp_err_t BaseWebServer::webHandleUploadFirmware(PsychicRequest *request,
 
   if (_uploadedSize > maxSketchSpace) {
     _uploadReturn = 500;
-    Log.error(F("WEB : Firmware file is to large." CR));
+    Log.error(F("WEB : Firmware file is too large." CR));
+    Update.abort();  // Cleanup on size error
+    return ESP_FAIL;
   } else if (Update.write(data, len) != len) {
     _uploadReturn = 500;
-    Log.notice(F("WEB : Writing firmware upload %d (%d)." CR), len,
-               maxSketchSpace);
+    Log.error(F("WEB : Failed writing firmware chunk, bytes: %d." CR), len);
+    Update.abort();  // Cleanup on write error
+    return ESP_FAIL;
   } else {
     EspSerial.print(".");
   }
@@ -149,17 +153,18 @@ esp_err_t BaseWebServer::webHandleUploadFirmware(PsychicRequest *request,
   if (final) {
     EspSerial.print("\n");
     Log.notice(F("WEB : Finished firmware upload." CR));
-    request->response()->send(200);
 
     if (Update.end(true)) {
-      // Calling reset here will not wait for all the data to be sent, lets wait
-      // a second before rebooting in loop.
-      Log.notice(F("WEB : Scheduling reboot." CR));
+      Log.notice(F("WEB : Firmware verified and scheduled for reboot." CR));
+      request->response()->send(200);
+      
+      // Schedule reboot after response is sent
       _rebootTimer = millis();
       _rebootTask = true;
     } else {
-      Log.error(F("WEB : Failed to finish firmware flashing, error %d" CR),
+      Log.error(F("WEB : Failed to finish firmware flashing, error %d." CR),
                 Update.getError());
+      request->response()->send(500);
       _uploadReturn = 500;
     }
   }
@@ -183,24 +188,38 @@ esp_err_t BaseWebServer::webHandleUploadFile(PsychicRequest *request,
     Log.notice(F("WEB : Start file upload, free space %d kb, size %d." CR),
                maxFileSize / 1024, request->contentLength());
 
-    if (len > maxFileSize) {
-      Log.error(F("WEB : File is to large to fit in file system." CR));
-      return request->response()->send(500);
+    if (request->contentLength() > maxFileSize) {
+      Log.error(F("WEB : File is too large to fit in file system." CR));
+      return ESP_FAIL;  // Abort upload immediately
     }
 
     _tempFile = LittleFS.open("/" + filename, "w");
+    if (!_tempFile) {
+      Log.error(F("WEB : Failed to create file for upload: %s." CR), filename.c_str());
+      return ESP_FAIL;
+    }
     _uploadReturn = 200;
   }
 
   if (len) {
-    _tempFile.write(data, len);
+    if (_tempFile.write(data, len) != len) {
+      Log.error(F("WEB : Failed writing file data, requested %d bytes." CR), len);
+      _tempFile.close();
+      LittleFS.remove("/" + filename);  // Cleanup incomplete file
+      _uploadReturn = 500;
+      return ESP_FAIL;
+    }
     EspSerial.print(".");
   }
 
   if (final) {
     Log.notice(F("WEB : Finished file upload." CR));
     _tempFile.close();
-    return request->response()->send(200);
+    if (_uploadReturn == 200) {
+      return request->response()->send(200);
+    } else {
+      return request->response()->send(500);
+    }
   }
 
   return ESP_OK;
@@ -537,7 +556,7 @@ void BaseWebServer::setupWebHandlers() {
   });
 }
 
-bool BaseWebServer::setupWebServer(bool skipSSL) {
+bool BaseWebServer::setupWebServer(bool skipSSL, SerialWebSocket* serialWs, Print* secondary) {
   Log.notice(F("WEB : Configuring web server." CR));
 
   // Check for SSL certificates first
@@ -582,9 +601,14 @@ bool BaseWebServer::setupWebServer(bool skipSSL) {
     PsychicHttpsServer *httpsServer = static_cast<PsychicHttpsServer*>(_server.get());
     httpsServer->setCertificate(_sslCert.c_str(), _sslKey.c_str());
     _server->setPort(443);
-    _server->start();
-
+    
+    // Register WebSocket handler BEFORE starting server (required in v2.1.1)
+    if (serialWs) {
+      serialWs->begin(_server.get(), secondary);
+    }
+    
     setupWebHandlers();
+    _server->start();
 
     _redirectServer->config.ctrl_port =
         20424;  // just a random port different from the default one
@@ -599,8 +623,14 @@ bool BaseWebServer::setupWebServer(bool skipSSL) {
   } else {
     Log.notice(F("WEB : Starting web server without SSL." CR));
     _server->setPort(80);
-    _server->start();
+    
+    // Register WebSocket handler BEFORE starting server (required in v2.1.1)
+    if (serialWs) {
+      serialWs->begin(_server.get(), secondary);
+    }
+    
     setupWebHandlers();
+    _server->start();
   }
 #else
   Log.notice(F("WEB : Starting web server." CR));
