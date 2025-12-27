@@ -294,7 +294,6 @@ esp_err_t BaseWebServer::webHandleFileSystem(PsychicRequest *request,
       f.close();
       root.close();
       
-      response->addHeader("Content-Type", "application/json");
       String jsonStr;
       serializeJson(doc, jsonStr);
       return response->send(200, "application/json", jsonStr.c_str());
