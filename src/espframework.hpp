@@ -109,6 +109,7 @@ constexpr auto PARAM_STATUS = "status";
 constexpr auto PARAM_MESSAGE = "message";
 constexpr auto PARAM_TOKEN = "token";
 constexpr auto PARAM_COMMAND = "command";
+constexpr auto PARAM_AUTHENTICATED = "authenticated";
 
 // File system
 constexpr auto PARAM_FILE = "file";

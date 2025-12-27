@@ -477,6 +477,7 @@ esp_err_t BaseWebServer::webHandlePing(PsychicRequest *request) {
   
   JsonDocument doc;
   doc[PARAM_STATUS] = true;
+  doc[PARAM_AUTHENTICATED] = isAuthenticated(request);
   
   response.addHeader("Content-Type", "application/json");
   String jsonStr;
