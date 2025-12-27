@@ -474,10 +474,28 @@ esp_err_t BaseWebServer::webHandleRestart(PsychicRequest *request) {
 esp_err_t BaseWebServer::webHandlePing(PsychicRequest *request) {
   PsychicResponse response(request);
   Log.notice(F("WEB : webServer callback for /api/ping." CR));
+  bool auth = false;
+
+  if (request->hasHeader("Authorization")) {
+    String authHeader = request->header("Authorization");
+    if (authHeader == "Bearer " + _authToken) {
+      Log.info(F("WEB : Authorized with token." CR));
+      auth = true;
+    }
   
+    if(!isSslEnabled()) {
+      String altToken("Bearer ");
+      altToken += _webConfig->getID();
+      if (authHeader == altToken) {
+        Log.info(F("WEB : Authorized with device id." CR));
+        auth = true;
+      }
+    }
+  }
+
   JsonDocument doc;
   doc[PARAM_STATUS] = true;
-  doc[PARAM_AUTHENTICATED] = isAuthenticated(request);
+  doc[PARAM_AUTHENTICATED] = auth;
   
   response.addHeader("Content-Type", "application/json");
   String jsonStr;
