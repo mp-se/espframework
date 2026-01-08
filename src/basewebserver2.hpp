@@ -30,16 +30,17 @@ SOFTWARE.
 
 #include <ArduinoJson.h>
 #include <ESPmDNS.h>
+#include <LittleFS.h>
 #include <PsychicHttp.h>
 #include <PsychicHttpsServer.h>
 #include <WiFi.h>
 #include <freertos/FreeRTOS.h>
 
 #include <espframework.hpp>
-#include <serialws2.hpp>
 #include <interface.hpp>
 #include <log.hpp>
 #include <memory>
+#include <serialws2.hpp>
 
 extern const uint8_t indexHtmlStart[] asm("_binary_html_index_html_start");
 extern const uint8_t indexHtmlEnd[] asm("_binary_html_index_html_end");
@@ -139,7 +140,8 @@ class BaseWebServer {
                                 bool final);
   esp_err_t webHandleRestart(PsychicRequest *request);
   esp_err_t webHandlePing(PsychicRequest *request);
-  esp_err_t webHandleFileSystem(PsychicRequest *request, PsychicResponse *response, JsonVariant &json);
+  esp_err_t webHandleFileSystem(PsychicRequest *request,
+                                PsychicResponse *response, JsonVariant &json);
 
   virtual void setupWebHandlers();
   virtual PsychicHttpServer *getWebServer() { return _server.get(); }
@@ -147,7 +149,9 @@ class BaseWebServer {
  public:
   explicit BaseWebServer(WebConfigInterface *config);
 
-  virtual bool setupWebServer(bool skipSSL = false, SerialWebSocket* serialWs = nullptr, Print* secondary = nullptr);
+  virtual bool setupWebServer(bool skipSSL = false,
+                              SerialWebSocket *serialWs = nullptr,
+                              Print *secondary = nullptr);
   virtual void setWifiSetup(bool wifiSetup) { _wifiSetup = wifiSetup; }
   virtual void loop();
 

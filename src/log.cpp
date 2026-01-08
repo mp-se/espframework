@@ -22,10 +22,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
 #include <HardwareSerial.h>
+#include <sys/time.h>
 
 #include <cstdio>
 #include <ctime>
-#include <sys/time.h>
 #include <log.hpp>
 
 void writeErrorLog(const char *format, ...) {
@@ -149,7 +149,7 @@ void printTimestamp(Print *_logOutput, int _logLevel) {
       return;
     }
   }
-#endif // !ESPFWK_DISABLE_LOG_TIMESTAMP
+#endif  // !ESPFWK_DISABLE_LOG_TIMESTAMP
 
   // Fallback: print uptime millis when real time is not available.
   char c[16];

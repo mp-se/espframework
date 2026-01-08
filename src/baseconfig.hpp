@@ -101,6 +101,7 @@ class BaseConfig : public WifiConfigInterface,
 
  public:
   BaseConfig(String baseMDNS, String fileName);
+  virtual ~BaseConfig() = default;
 
   // WebServer
   bool getCorsAllowed() const { return _corsAllowed; }

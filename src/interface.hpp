@@ -28,56 +28,68 @@ SOFTWARE.
 
 class OtaConfigInterface {
  public:
+  OtaConfigInterface() = default;
+  virtual ~OtaConfigInterface() = default;
+
   virtual const char* getOtaURL() const = 0;
-  virtual void setOtaURL(String s);
-  virtual bool isOtaActive() const;
-  virtual bool isOtaSSL() const;
+  virtual void setOtaURL(String s) = 0;
+  virtual bool isOtaActive() const = 0;
+  virtual bool isOtaSSL() const = 0;
 };
 
 class WebConfigInterface {
  public:
-  virtual void createJson(JsonObject& doc) const;
-  virtual void parseJson(JsonObject& doc);
+  WebConfigInterface() = default;
+  virtual ~WebConfigInterface() {}
 
-  virtual bool saveFile();
+  virtual void createJson(JsonObject& doc) const = 0;
+  virtual void parseJson(JsonObject& doc) = 0;
 
-  virtual const char* getID() const;
-  virtual const char* getMDNS() const;
-  virtual int getWifiPortalTimeout() const;
+  virtual bool saveFile() = 0;
 
-  virtual const char* getAdminUser() const;
-  virtual const char* getAdminPass() const;
+  virtual const char* getID() const = 0;
+  virtual const char* getMDNS() const = 0;
+  virtual int getWifiPortalTimeout() const = 0;
 
-  virtual bool isCorsAllowed() const;
+  virtual const char* getAdminUser() const = 0;
+  virtual const char* getAdminPass() const = 0;
+
+  virtual bool isCorsAllowed() const = 0;
 };
 
 class WifiConfigInterface {
  public:
+  WifiConfigInterface() = default;
+  virtual ~WifiConfigInterface() {}
+
   virtual int getWifiConnectionTimeout() const = 0;
-  virtual void setWifiConnectionTimeout(int t);
-  virtual int getWifiPortalTimeout() const;
-  virtual void setWifiPortalTimeout(int t);
+  virtual void setWifiConnectionTimeout(int t) = 0;
+  virtual int getWifiPortalTimeout() const = 0;
+  virtual void setWifiPortalTimeout(int t) = 0;
 
-  virtual bool getWifiScanAP() const;
-  virtual void setWifiScanAP(bool b);
+  virtual bool getWifiScanAP() const = 0;
+  virtual void setWifiScanAP(bool b) = 0;
 
-  virtual const char* getMDNS() const;
-  virtual void setMDNS(String s);
-  virtual const char* getWifiSSID(int idx) const;
-  virtual void setWifiSSID(String s, int idx);
-  virtual const char* getWifiPass(int idx) const;
-  virtual void setWifiPass(String s, int idx);
+  virtual const char* getMDNS() const = 0;
+  virtual void setMDNS(String s) = 0;
+  virtual const char* getWifiSSID(int idx) const = 0;
+  virtual void setWifiSSID(String s, int idx) = 0;
+  virtual const char* getWifiPass(int idx) const = 0;
+  virtual void setWifiPass(String s, int idx) = 0;
 
-  virtual const char* getWifiDirectSSID() const;
-  virtual void setWifiDirectSSID(String s);
-  virtual const char* getWifiDirectPass() const;
-  virtual void setWifiDirectPass(String s);
+  virtual const char* getWifiDirectSSID() const = 0;
+  virtual void setWifiDirectSSID(String s) = 0;
+  virtual const char* getWifiDirectPass() const = 0;
+  virtual void setWifiDirectPass(String s) = 0;
 
-  virtual bool saveFile();
+  virtual bool saveFile() = 0;
 };
 
 class PushConfigInterface {
  public:
+  PushConfigInterface() = default;
+  virtual ~PushConfigInterface() {}
+
   virtual const char* getID() const = 0;
   virtual const char* getMDNS() const = 0;
 

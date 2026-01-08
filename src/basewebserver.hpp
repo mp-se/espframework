@@ -52,6 +52,7 @@ SOFTWARE.
 
 #include <ArduinoJson.h>
 #include <AsyncJson.h>
+#include <LittleFS.h>
 
 #include <espframework.hpp>
 #include <interface.hpp>
@@ -64,6 +65,8 @@ INCBIN_EXTERN(AppJs);
 INCBIN_EXTERN(AppCss);
 INCBIN_EXTERN(FaviconIco);
 #else
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wattributes"
 extern const uint8_t indexHtmlStart[] asm("_binary_html_index_html_start");
 extern const uint8_t indexHtmlEnd[] asm("_binary_html_index_html_end");
 extern const uint8_t appJsStart[] asm("_binary_html_app_js_gz_start");
@@ -72,6 +75,7 @@ extern const uint8_t appCssStart[] asm("_binary_html_app_css_gz_start");
 extern const uint8_t appCssEnd[] asm("_binary_html_app_css_gz_end");
 extern const uint8_t faviconIcoStart[] asm("_binary_html_favicon_ico_gz_start");
 extern const uint8_t faviconIcoEnd[] asm("_binary_html_favicon_ico_gz_end");
+#pragma GCC diagnostic pop
 #endif
 
 class BaseWebServer {

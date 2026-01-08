@@ -32,9 +32,8 @@ void SerialWebSocket::begin(PsychicHttpServer *server, Print *secondary) {
   Log.notice(F("WS  : Starting serial websocket" CR));
   _server = server;
   _secondayLog = secondary;
-  _webSocket = new PsychicWebSocketHandler();  
+  _webSocket = new PsychicWebSocketHandler();
   _server->on("/serialws", _webSocket);
- 
 }
 
 size_t SerialWebSocket::write(uint8_t c) {

@@ -26,17 +26,19 @@ SOFTWARE.
 #ifdef ESPFWK_PSYCHIC_HTTP
 
 #include <HTTPUpdate.h>
+#include <base64.h>
 
 #include <baseconfig.hpp>
 #include <basewebserver2.hpp>
 #include <espframework.hpp>
-#include <base64.h>
 #if !defined(MAX_SKETCH_SPACE)
 #define MAX_SKETCH_SPACE 0x1c0000
 #warning "MAX_SKETCH_SPACE is not defined, using default value of 0x1c0000"
 #endif
 
-BaseWebServer::BaseWebServer(WebConfigInterface*config) { _webConfig = config; }
+BaseWebServer::BaseWebServer(WebConfigInterface *config) {
+  _webConfig = config;
+}
 
 bool BaseWebServer::isAuthenticated(PsychicRequest *request) {
   resetWifiPortalTimer();
@@ -47,8 +49,8 @@ bool BaseWebServer::isAuthenticated(PsychicRequest *request) {
       Log.info(F("WEB : Authorized with token." CR));
       return true;
     }
-  
-    if(!isSslEnabled()) {
+
+    if (!isSslEnabled()) {
       String altToken("Bearer ");
       altToken += _webConfig->getID();
       if (authHeader == altToken) {
@@ -157,7 +159,7 @@ esp_err_t BaseWebServer::webHandleUploadFirmware(PsychicRequest *request,
     if (Update.end(true)) {
       Log.notice(F("WEB : Firmware verified and scheduled for reboot." CR));
       request->response()->send(200);
-      
+
       // Schedule reboot after response is sent
       _rebootTimer = millis();
       _rebootTask = true;
@@ -195,7 +197,8 @@ esp_err_t BaseWebServer::webHandleUploadFile(PsychicRequest *request,
 
     _tempFile = LittleFS.open("/" + filename, "w");
     if (!_tempFile) {
-      Log.error(F("WEB : Failed to create file for upload: %s." CR), filename.c_str());
+      Log.error(F("WEB : Failed to create file for upload: %s." CR),
+                filename.c_str());
       return ESP_FAIL;
     }
     _uploadReturn = 200;
@@ -203,7 +206,8 @@ esp_err_t BaseWebServer::webHandleUploadFile(PsychicRequest *request,
 
   if (len) {
     if (_tempFile.write(data, len) != len) {
-      Log.error(F("WEB : Failed writing file data, requested %d bytes." CR), len);
+      Log.error(F("WEB : Failed writing file data, requested %d bytes." CR),
+                len);
       _tempFile.close();
       LittleFS.remove("/" + filename);  // Cleanup incomplete file
       _uploadReturn = 500;
@@ -255,25 +259,27 @@ esp_err_t BaseWebServer::webHandlePageNotFound(PsychicRequest *request) {
 esp_err_t BaseWebServer::webHandleAuth(PsychicRequest *request) {
   PsychicResponse response(request);
   Log.notice(F("WEB : webServer callback for /api/auth." CR));
-  Log.notice(F("WEB : user: %s, pass: %s." CR), _webConfig->getAdminUser(), _webConfig->getAdminPass());
+  Log.notice(F("WEB : user: %s, pass: %s." CR), _webConfig->getAdminUser(),
+             _webConfig->getAdminPass());
 
-  if(isSslEnabled() && !_wifiSetup) {
+  if (isSslEnabled() && !_wifiSetup) {
     Log.notice(F("WEB : Performing basic authentication." CR));
 
-    if( !request->authenticate(_webConfig->getAdminUser(), _webConfig->getAdminPass()) ) {
+    if (!request->authenticate(_webConfig->getAdminUser(),
+                               _webConfig->getAdminPass())) {
       return response.send(401);
     }
-  } 
+  }
 
   // Generate unique auth token
   uint8_t buf[16];
-  for(int i = 0; i < 16; i++) buf[i] = random(256);
+  for (int i = 0; i < 16; i++) buf[i] = random(256);
   _authToken = base64::encode(buf, 16);
 
   // Use a small JsonDocument to avoid stack overflow on ESP32C3
   JsonDocument doc;
   doc[PARAM_TOKEN] = _authToken;
-  
+
   response.addHeader("Content-Type", "application/json");
   String jsonStr;
   serializeJson(doc, jsonStr);
@@ -288,7 +294,7 @@ esp_err_t BaseWebServer::webHandleFileSystem(PsychicRequest *request,
   }
 
   Log.notice(F("WEB : webServer callback for /api/filesystem." CR));
-  JsonObject obj = json.as<JsonObject>();  
+  JsonObject obj = json.as<JsonObject>();
 
   if (!obj[PARAM_COMMAND].isNull()) {
     if (obj[PARAM_COMMAND].as<String>() == String("dir")) {
@@ -312,7 +318,7 @@ esp_err_t BaseWebServer::webHandleFileSystem(PsychicRequest *request,
       }
       f.close();
       root.close();
-      
+
       String jsonStr;
       serializeJson(doc, jsonStr);
       return response->send(200, "application/json", jsonStr.c_str());
@@ -391,7 +397,7 @@ esp_err_t BaseWebServer::webHandleWifiScan(PsychicRequest *request) {
   JsonDocument doc;
   doc[PARAM_SUCCESS] = true;
   doc[PARAM_MESSAGE] = "Scheduled wifi scanning";
-  
+
   response.addHeader("Content-Type", "application/json");
   String jsonStr;
   serializeJson(doc, jsonStr);
@@ -412,7 +418,7 @@ esp_err_t BaseWebServer::webHandleWifiScanStatus(PsychicRequest *request) {
     doc[PARAM_SUCCESS] = false;
     doc[PARAM_MESSAGE] =
         _wifiScanTask ? "Wifi scanning running" : "No scanning running";
-    
+
     response.addHeader("Content-Type", "application/json");
     String jsonStr;
     serializeJson(doc, jsonStr);
@@ -433,17 +439,17 @@ esp_err_t BaseWebServer::webHandleWifiClear(PsychicRequest *request) {
   }
 
   Log.notice(F("WEB : webServer callback for /api/wifi/clear." CR));
-  
+
   JsonDocument doc;
   doc[PARAM_STATUS] = true;
   doc[PARAM_SUCCESS] = true;
   doc[PARAM_MESSAGE] = "WiFi credentials cleared";
-  
+
   response.addHeader("Content-Type", "application/json");
   String jsonStr;
   serializeJson(doc, jsonStr);
   response.send(200, "application/json", jsonStr.c_str());
-  
+
   // Schedule actual WiFi clear in a moment
   _rebootTimer = millis();
   _wifiSetup = true;  // Return to WiFi setup mode
@@ -461,7 +467,7 @@ esp_err_t BaseWebServer::webHandleRestart(PsychicRequest *request) {
   doc[PARAM_STATUS] = true;
   doc[PARAM_SUCCESS] = true;
   doc[PARAM_MESSAGE] = "Restarting...";
-  
+
   response.addHeader("Content-Type", "application/json");
   String jsonStr;
   serializeJson(doc, jsonStr);
@@ -482,8 +488,8 @@ esp_err_t BaseWebServer::webHandlePing(PsychicRequest *request) {
       Log.info(F("WEB : Authorized with token." CR));
       auth = true;
     }
-  
-    if(!isSslEnabled()) {
+
+    if (!isSslEnabled()) {
       String altToken("Bearer ");
       altToken += _webConfig->getID();
       if (authHeader == altToken) {
@@ -496,7 +502,7 @@ esp_err_t BaseWebServer::webHandlePing(PsychicRequest *request) {
   JsonDocument doc;
   doc[PARAM_STATUS] = true;
   doc[PARAM_AUTHENTICATED] = auth;
-  
+
   response.addHeader("Content-Type", "application/json");
   String jsonStr;
   serializeJson(doc, jsonStr);
@@ -552,11 +558,11 @@ void BaseWebServer::setupWebHandlers() {
       std::placeholders::_2, std::placeholders::_3, std::placeholders::_4,
       std::placeholders::_5, std::placeholders::_6));
   _server->on("/api/filesystem/upload", HTTP_POST, fileUploadHandler);
-  _server->on("/api/filesystem", HTTP_POST,
-              (PsychicJsonRequestCallback)std::bind(
-                  &BaseWebServer::webHandleFileSystem, this,
-                  std::placeholders::_1, std::placeholders::_2,
-                  std::placeholders::_3));
+  _server->on(
+      "/api/filesystem", HTTP_POST,
+      (PsychicJsonRequestCallback)std::bind(
+          &BaseWebServer::webHandleFileSystem, this, std::placeholders::_1,
+          std::placeholders::_2, std::placeholders::_3));
 
   PsychicUploadHandler *firmwareUploadHandler = new PsychicUploadHandler();
 
@@ -565,22 +571,25 @@ void BaseWebServer::setupWebHandlers() {
       std::placeholders::_2, std::placeholders::_3, std::placeholders::_4,
       std::placeholders::_5, std::placeholders::_6));
   _server->on("/api/firmware", HTTP_POST, firmwareUploadHandler);
-  _server->on("*", HTTP_OPTIONS, [](PsychicRequest *request, PsychicResponse *response) {
-    Log.notice(F("WEB : Got OPTIONS request url=%s." CR),
-               request->url().c_str());
-    return response->send(200);
-  });
-  _server->onNotFound([this](PsychicRequest *request, PsychicResponse *response) {
-    return webHandlePageNotFound(request);
-  });
+  _server->on("*", HTTP_OPTIONS,
+              [](PsychicRequest *request, PsychicResponse *response) {
+                Log.notice(F("WEB : Got OPTIONS request url=%s." CR),
+                           request->url().c_str());
+                return response->send(200);
+              });
+  _server->onNotFound(
+      [this](PsychicRequest *request, PsychicResponse *response) {
+        return webHandlePageNotFound(request);
+      });
 }
 
-bool BaseWebServer::setupWebServer(bool skipSSL, SerialWebSocket* serialWs, Print* secondary) {
+bool BaseWebServer::setupWebServer(bool skipSSL, SerialWebSocket *serialWs,
+                                   Print *secondary) {
   Log.notice(F("WEB : Configuring web server." CR));
 
   // Check for SSL certificates first
 #if defined(ESPFWK_PSYCHIC_SSL)
-  if(!skipSSL) {
+  if (!skipSSL) {
     File fCert = LittleFS.open("/server.crt");
     if (fCert) {
       Log.notice(F("WEB : Found server certificate /server.crt." CR));
@@ -592,7 +601,7 @@ bool BaseWebServer::setupWebServer(bool skipSSL, SerialWebSocket* serialWs, Prin
         Log.notice(F("WEB : Found server certificate /server.key." CR));
         _sslKey = fKey.readString();
         fKey.close();
-      } 
+      }
     }
   }
 
@@ -617,37 +626,40 @@ bool BaseWebServer::setupWebServer(bool skipSSL, SerialWebSocket* serialWs, Prin
 #if defined(ESPFWK_PSYCHIC_SSL)
   if (isSslEnabled()) {
     Log.notice(F("WEB : Starting web server using SSL." CR));
-    PsychicHttpsServer *httpsServer = static_cast<PsychicHttpsServer*>(_server.get());
+    PsychicHttpsServer *httpsServer =
+        static_cast<PsychicHttpsServer *>(_server.get());
     httpsServer->setCertificate(_sslCert.c_str(), _sslKey.c_str());
     _server->setPort(443);
-    
+
     // Register WebSocket handler BEFORE starting server (required in v2.1.1)
     if (serialWs) {
       serialWs->begin(_server.get(), secondary);
     }
-    
+
     setupWebHandlers();
     _server->start();
 
     _redirectServer->config.ctrl_port =
         20424;  // just a random port different from the default one
     _redirectServer->setPort(80);
-    _redirectServer->onNotFound([](PsychicRequest *request, PsychicResponse *response) {
-      Log.notice(F("WEB : Redirecting HTTP to HTTPS for %s." CR), request->url().c_str());
-      String url = "https://" + request->host() + request->url();
-      response->setCode(301);
-      return response->redirect(url.c_str());
-    });
+    _redirectServer->onNotFound(
+        [](PsychicRequest *request, PsychicResponse *response) {
+          Log.notice(F("WEB : Redirecting HTTP to HTTPS for %s." CR),
+                     request->url().c_str());
+          String url = "https://" + request->host() + request->url();
+          response->setCode(301);
+          return response->redirect(url.c_str());
+        });
     _redirectServer->start();
   } else {
     Log.notice(F("WEB : Starting web server without SSL." CR));
     _server->setPort(80);
-    
+
     // Register WebSocket handler BEFORE starting server (required in v2.1.1)
     if (serialWs) {
       serialWs->begin(_server.get(), secondary);
     }
-    
+
     setupWebHandlers();
     _server->start();
   }

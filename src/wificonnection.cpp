@@ -77,8 +77,7 @@ void WifiConnection::readReset() {
 }
 
 void WifiConnection::writeReset() {
-  if(_initialResetCounter == _resetCounter)
-    return;
+  if (_initialResetCounter == _resetCounter) return;
 
   File file = LittleFS.open(resetFilename, "w");
 

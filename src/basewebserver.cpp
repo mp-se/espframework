@@ -456,19 +456,22 @@ void BaseWebServer::setupWebHandlers() {
 
   AsyncCallbackJsonWebHandler *handler;
 
-  _server->on(
-      "/api/auth", HTTP_GET,
-      [this](AsyncWebServerRequest *request) { this->webHandleAuth(request); });
+  _server->on("/api/auth", HTTP_GET, [this](AsyncWebServerRequest *request) {
+    this->webHandleAuth(request);
+  });
   _server->on("/api/wifi/status", HTTP_GET,
-              [this](AsyncWebServerRequest *request) { this->webHandleWifiScanStatus(request); });
-  _server->on("/api/wifi", HTTP_GET,
-              [this](AsyncWebServerRequest *request) { this->webHandleWifiScan(request); });
-  _server->on(
-      "/api/restart", HTTP_GET,
-      [this](AsyncWebServerRequest *request) { this->webHandleRestart(request); });
-  _server->on(
-      "/api/ping", HTTP_GET,
-      [this](AsyncWebServerRequest *request) { this->webHandlePing(request); });
+              [this](AsyncWebServerRequest *request) {
+                this->webHandleWifiScanStatus(request);
+              });
+  _server->on("/api/wifi", HTTP_GET, [this](AsyncWebServerRequest *request) {
+    this->webHandleWifiScan(request);
+  });
+  _server->on("/api/restart", HTTP_GET, [this](AsyncWebServerRequest *request) {
+    this->webHandleRestart(request);
+  });
+  _server->on("/api/ping", HTTP_GET, [this](AsyncWebServerRequest *request) {
+    this->webHandlePing(request);
+  });
   _server->on(
       "/api/filesystem/upload", HTTP_POST,
       std::bind(&BaseWebServer::webReturnOK, this, std::placeholders::_1),
