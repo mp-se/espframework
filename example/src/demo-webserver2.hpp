@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2025 Magnus
+Copyright (c) 2025-2026 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,8 +35,10 @@ class DemoWebServer : public BaseWebServer {
 
   void setupWebHandlers();
   esp_err_t webHandleStatus(PsychicRequest *request, PsychicResponse *response);
-  esp_err_t webHandleConfigRead(PsychicRequest *request, PsychicResponse *response);
-  esp_err_t webHandleConfigWrite(PsychicRequest *request, PsychicResponse *response, JsonVariant &json);
+  esp_err_t webHandleConfigRead(PsychicRequest *request,
+                                PsychicResponse *response);
+  esp_err_t webHandleConfigWrite(PsychicRequest *request,
+                                 PsychicResponse *response, JsonVariant &json);
 
  public:
   explicit DemoWebServer(WebConfigInterface *config, DemoPush *push);

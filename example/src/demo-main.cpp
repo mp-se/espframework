@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2021-2025 Magnus
+Copyright (c) 2021-2026 Magnus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -58,6 +58,7 @@ void setup() {
 #endif
   myConfig.checkFileSystem();
   myConfig.loadFile();
+  myConfig.setWifiScanAP(true);
 
   myWifi.init();
   if (!myWifi.hasConfig() || myWifi.isDoubleResetDetected()) {
@@ -96,8 +97,8 @@ void setup() {
 LoopTimer intLoop(3000);
 
 void loop() {
-  if(intLoop.hasExpired()) {
-    Log.notice(F("Loop: loop timer expired." CR));
+  if (intLoop.hasExpired()) {
+    // Log.notice(F("Loop: loop timer expired." CR));
     intLoop.reset();
   }
 
