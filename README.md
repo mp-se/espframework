@@ -21,4 +21,8 @@ The master branch dones not contain any code. There are a number of version of t
 
 ### Branch 1.2 (Main branch)
 
-- Based on 1.1 this is migreted to work with Arduino 2.x and 3.x
+- Based on 1.1 this is migrated to work with Arduino 2.x and 3.x
+
+### Branch 2.0 (Development - IDF branch)
+
+- Based on 1.2 this is being refactored to work with ESP-IDF and as framework
