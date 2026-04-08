@@ -14,13 +14,15 @@ The master branch dones not contain any code. There are a number of version of t
 
 - This version is no longer maintained and its no longer the primary version for my projects.
 
-### Branch 1.1 (Primary branch)
+### Branch 1.1 (Deprecated)
 
 - Updated with newer version of the dependant libraries like Arduino Json 7 and Async Webserver
 - ArduinoLog and incbin has now been merged into the library for easier maintenance since they are no longer maintained by their authors.
 
-### Branch 1.2 (Work in progress)
+### Branch 1.2 (Main branch)
 
-- Merged changes related to Arduino 3.x into this version so it supports both Arduino 3.x and 2.x
-- Added 16Mb partitions example
+- Based on 1.1 this is migrated to work with Arduino 2.x and 3.x
 
+### Branch 2.0 (Development - IDF branch)
+
+- Based on 1.2 this is being refactored to work with ESP-IDF and as framework
