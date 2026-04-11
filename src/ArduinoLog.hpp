@@ -1,16 +1,21 @@
 /*
-    _   ___ ___  _   _ ___ _  _  ___  _    ___   ___
-   /_\ | _ \   \| | | |_ _| \| |/ _ \| |  / _ \ / __|
-  / _ \|   / |) | |_| || || .` | (_) | |_| (_) | (_ |
- /_/ \_\_|_\___/ \___/|___|_|\_|\___/|____\___/ \___|
-
-Log library for Arduino
-version 1.1.1
-Copyright (c) 2018 thijse
-https://github.com/thijse/Arduino-Log
-
-Licensed under the MIT License <http://opensource.org/licenses/MIT>.
-*/
+ * ESPFramework
+ * Copyright (c) 2025-2026 Magnus
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
 #ifndef SRC_ARDUINOLOG_HPP_
 #define SRC_ARDUINOLOG_HPP_
 #include <inttypes.h>
