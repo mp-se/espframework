@@ -22,6 +22,7 @@
 #include <ArduinoJson.h>
 
 #define ESPFWK_VER "1.2"
+#define ESPFWK_WEB_ERR(s) s
 
 void forcedReset();
 void espReset();
@@ -101,6 +102,7 @@ constexpr auto PARAM_DARK_MODE = "dark_mode";
 constexpr auto PARAM_SUCCESS = "success";
 constexpr auto PARAM_STATUS = "status";
 constexpr auto PARAM_MESSAGE = "message";
+constexpr auto PARAM_MESSAGE_CODE = "message_code";
 constexpr auto PARAM_TOKEN = "token";
 constexpr auto PARAM_COMMAND = "command";
 constexpr auto PARAM_AUTHENTICATED = "authenticated";

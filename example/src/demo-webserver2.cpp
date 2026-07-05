@@ -95,6 +95,7 @@ esp_err_t DemoWebServer::webHandleConfigWrite(PsychicRequest *request,
   JsonDocument doc;
   doc[PARAM_SUCCESS] = true;
   doc[PARAM_MESSAGE] = "Configuration updated";
+  doc[PARAM_MESSAGE_CODE] = ESPFWK_WEB_ERR("CONFIG_UPDATED");
 
   response->addHeader("Content-Type", "application/json");
   String jsonStr;

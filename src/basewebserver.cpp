@@ -382,6 +382,7 @@ void BaseWebServer::webHandleWifiScan(AsyncWebServerRequest *request) {
   JsonObject obj = response->getRoot().as<JsonObject>();
   obj[PARAM_SUCCESS] = true;
   obj[PARAM_MESSAGE] = "Scheduled wifi scanning";
+  obj[PARAM_MESSAGE_CODE] = ESPFWK_WEB_ERR("WIFI_SCAN_SCHEDULED");
   response->setLength();
   request->send(response);
 }
@@ -400,6 +401,9 @@ void BaseWebServer::webHandleWifiScanStatus(AsyncWebServerRequest *request) {
     obj[PARAM_SUCCESS] = false;
     obj[PARAM_MESSAGE] =
         _wifiScanTask ? "Wifi scanning running" : "No scanning running";
+    obj[PARAM_MESSAGE_CODE] =
+        _wifiScanTask ? ESPFWK_WEB_ERR("WIFI_SCAN_RUNNING") : ESPFWK_WEB_ERR("WIFI_SCAN_NOT_RUNNING");
+        
     response->setLength();
     request->send(response);
   } else {
@@ -418,6 +422,7 @@ void BaseWebServer::webHandleRestart(AsyncWebServerRequest *request) {
   obj[PARAM_STATUS] = true;
   obj[PARAM_SUCCESS] = true;
   obj[PARAM_MESSAGE] = "Restarting...";
+  obj[PARAM_MESSAGE_CODE] = ESPFWK_WEB_ERR("RESTARTING");
   response->setLength();
   request->send(response);
   _rebootTimer = millis();

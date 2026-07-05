@@ -46,14 +46,16 @@ void DemoWebServer::setupWebHandlers() {
 
   MDNS.addService("espfwk", "tcp", 80);
 
-  _server->on(
-      "/api/status", HTTP_GET,
-      std::bind(&DemoWebServer::webHandleStatus, this, std::placeholders::_1));
+  _server->on("/api/status", HTTP_GET,
+              (ArRequestHandlerFunction)std::bind(
+                  &DemoWebServer::webHandleStatus, this,
+                  std::placeholders::_1));
 
   AsyncCallbackJsonWebHandler *handler;
   _server->on("/api/config", HTTP_GET,
-              std::bind(&DemoWebServer::webHandleConfigRead, this,
-                        std::placeholders::_1));
+              (ArRequestHandlerFunction)std::bind(
+                  &DemoWebServer::webHandleConfigRead, this,
+                  std::placeholders::_1));
   handler = new AsyncCallbackJsonWebHandler(
       "/api/config", std::bind(&DemoWebServer::webHandleConfigWrite, this,
                                std::placeholders::_1, std::placeholders::_2));
@@ -89,6 +91,7 @@ void DemoWebServer::webHandleConfigWrite(AsyncWebServerRequest *request,
   obj = response->getRoot().as<JsonObject>();
   obj[PARAM_SUCCESS] = true;
   obj[PARAM_MESSAGE] = "Configuration updated";
+  obj[PARAM_MESSAGE_CODE] = ESPFWK_WEB_ERR("CONFIG_UPDATED");
   response->setLength();
   request->send(response);
 }

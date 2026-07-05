@@ -391,6 +391,7 @@ esp_err_t BaseWebServer::webHandleWifiScan(PsychicRequest *request) {
   JsonDocument doc;
   doc[PARAM_SUCCESS] = true;
   doc[PARAM_MESSAGE] = "Scheduled wifi scanning";
+  doc[PARAM_MESSAGE_CODE] = ESPFWK_WEB_ERR("WIFI_SCAN_SCHEDULED");
 
   response.addHeader("Content-Type", "application/json");
   String jsonStr;
@@ -412,6 +413,8 @@ esp_err_t BaseWebServer::webHandleWifiScanStatus(PsychicRequest *request) {
     doc[PARAM_SUCCESS] = false;
     doc[PARAM_MESSAGE] =
         _wifiScanTask ? "Wifi scanning running" : "No scanning running";
+    doc[PARAM_MESSAGE_CODE] =
+        _wifiScanTask ? ESPFWK_WEB_ERR("WIFI_SCAN_RUNNING") : ESPFWK_WEB_ERR("WIFI_SCAN_NOT_RUNNING");
 
     response.addHeader("Content-Type", "application/json");
     String jsonStr;
@@ -438,6 +441,7 @@ esp_err_t BaseWebServer::webHandleWifiClear(PsychicRequest *request) {
   doc[PARAM_STATUS] = true;
   doc[PARAM_SUCCESS] = true;
   doc[PARAM_MESSAGE] = "WiFi credentials cleared";
+  doc[PARAM_MESSAGE_CODE] = ESPFWK_WEB_ERR("WIFI_CLEARED");
 
   response.addHeader("Content-Type", "application/json");
   String jsonStr;
@@ -461,6 +465,7 @@ esp_err_t BaseWebServer::webHandleRestart(PsychicRequest *request) {
   doc[PARAM_STATUS] = true;
   doc[PARAM_SUCCESS] = true;
   doc[PARAM_MESSAGE] = "Restarting...";
+  doc[PARAM_MESSAGE_CODE] = ESPFWK_WEB_ERR("RESTARTING");
 
   response.addHeader("Content-Type", "application/json");
   String jsonStr;
