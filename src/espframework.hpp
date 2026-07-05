@@ -103,6 +103,7 @@ constexpr auto PARAM_SUCCESS = "success";
 constexpr auto PARAM_STATUS = "status";
 constexpr auto PARAM_MESSAGE = "message";
 constexpr auto PARAM_MESSAGE_CODE = "message_code";
+constexpr auto PARAM_MESSAGE_CODE_ARG = "message_code_arg";
 constexpr auto PARAM_TOKEN = "token";
 constexpr auto PARAM_COMMAND = "command";
 constexpr auto PARAM_AUTHENTICATED = "authenticated";
