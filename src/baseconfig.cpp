@@ -187,6 +187,7 @@ void BaseConfig::createJsonBase(JsonObject& doc) const {
   doc[PARAM_CORS_ALLOWED] = getCorsAllowed();
   // doc[PARAM_ADMIN_USER] = getAdminUser();
   doc[PARAM_ADMIN_PASS] = getAdminPass();
+  doc[PARAM_LOCALE] = getLocale();
 }
 
 void BaseConfig::parseJsonBase(JsonObject& doc) {
@@ -214,6 +215,8 @@ void BaseConfig::parseJsonBase(JsonObject& doc) {
   // if (!doc[PARAM_ADMIN_USER].isNull())
   //   setAdminUser(doc[PARAM_ADMIN_USER]);
   if (!doc[PARAM_ADMIN_PASS].isNull()) setAdminPass(doc[PARAM_ADMIN_PASS]);
+
+  if (!doc[PARAM_LOCALE].isNull()) setLocale(doc[PARAM_LOCALE]);
 
   _saveNeeded = true;
 }

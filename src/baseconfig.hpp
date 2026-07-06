@@ -66,6 +66,7 @@ class BaseConfig : public WifiConfigInterface,
   char _tempUnit = 'C';
   String _fileName;
   bool _darkMode = false;
+  String _locale = "en";
 
   // Security
 #if defined(ENABLE_REMOTE_UI_DEVELOPMENT)
@@ -308,6 +309,12 @@ class BaseConfig : public WifiConfigInterface,
   // Base
   const char* getID() const { return _id.c_str(); }
 
+  const char* getLocale() const { return _locale.c_str(); }
+  void setLocale(String locale) {
+    _locale = locale;
+    _saveNeeded = true;
+  }
+ 
   char getTempFormat() const {
     return getTempUnit();
   }  // @deprecated, use setTempUnit()

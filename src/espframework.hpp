@@ -61,6 +61,7 @@ void espReset();
 
 // Config
 constexpr auto PARAM_ID = "id";
+constexpr auto PARAM_LOCALE = "locale";
 constexpr auto PARAM_MDNS = "mdns";
 constexpr auto PARAM_CORS_ALLOWED = "cors_allowed";
 constexpr auto PARAM_ADMIN_USER = "admin_user";
