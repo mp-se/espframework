@@ -189,6 +189,7 @@ class BaseWebServer {
   void webHandleRestart(AsyncWebServerRequest *request);
   void webHandlePing(AsyncWebServerRequest *request) const;
   void webHandleFileSystem(AsyncWebServerRequest *request, JsonVariant &json);
+  void webHandleLanguageFileDownload(AsyncWebServerRequest *request);
 
   virtual void setupWebHandlers();
 

@@ -1,11 +1,13 @@
 # Prerequisites
-.pio/*
-.vscode/*
+.pio
+.vscode
+.claude
+script
+html
+
 __pycache__
-script/
 src/demo*.*
 platformio*.ini
-html/*
 /partitions.csv
-/output.map
+*.map
 .DS_Store

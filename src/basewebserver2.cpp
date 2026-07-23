@@ -378,6 +378,54 @@ esp_err_t BaseWebServer::webHandleFileSystem(PsychicRequest *request,
   return ESP_OK;
 }
 
+esp_err_t BaseWebServer::webHandleLanguageFileDownload(
+    PsychicRequest *request, PsychicResponse *response) {
+  if (!isAuthenticated(request)) {
+    return ESP_FAIL;
+  }
+
+  if (!request->hasParam("file")) {
+    return response->send(400);
+  }
+
+  String file = request->getParam("file")->value();
+  if (!file.startsWith("/")) {
+    file = "/" + file;
+  }
+
+  Log.notice(F("WEB : File download requested for %s." CR), file.c_str());
+
+  if (!LittleFS.exists(file)) {
+    Log.warning(F("WEB : File %s does not exist, returning 404." CR),
+                file.c_str());
+    return response->send(404);
+  }
+
+  File f = LittleFS.open(file, "r");
+  if (!f) {
+    return response->send(404);
+  }
+  size_t fileSize = f.size();
+  Log.notice(F("WEB : Sending file %s, size %d bytes, free heap %d." CR),
+             file.c_str(), fileSize, ESP.getFreeHeap());
+
+  response->setContentType("application/octet-stream");
+  response->setContentLength(fileSize);
+  response->sendHeaders();
+
+  static uint8_t dl_chunk_buf[512];
+  size_t len = 0;
+  while (f.available()) {
+    len = f.read(dl_chunk_buf, sizeof(dl_chunk_buf));
+    response->sendChunk(dl_chunk_buf, len);
+    if ((len & 0x3F) == 0) {
+      delay(0);
+    }
+  }
+  f.close();
+  return response->finishChunking();
+}
+
 esp_err_t BaseWebServer::webHandleWifiScan(PsychicRequest *request) {
   PsychicResponse response(request);
   if (!isAuthenticated(request)) {
@@ -562,6 +610,11 @@ void BaseWebServer::setupWebHandlers() {
       (PsychicJsonRequestCallback)std::bind(
           &BaseWebServer::webHandleFileSystem, this, std::placeholders::_1,
           std::placeholders::_2, std::placeholders::_3));
+  _server->on(
+      "/api/language", HTTP_GET,
+      (PsychicHttpRequestCallback)std::bind(
+          &BaseWebServer::webHandleLanguageFileDownload, this,
+          std::placeholders::_1, std::placeholders::_2));
 
   PsychicUploadHandler *firmwareUploadHandler = new PsychicUploadHandler();
 

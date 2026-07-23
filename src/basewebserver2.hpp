@@ -136,13 +136,15 @@ class BaseWebServer {
   esp_err_t webHandlePing(PsychicRequest *request);
   esp_err_t webHandleFileSystem(PsychicRequest *request,
                                 PsychicResponse *response, JsonVariant &json);
+  esp_err_t webHandleLanguageFileDownload(PsychicRequest *request,
+                                PsychicResponse *response);
 
   virtual void setupWebHandlers();
-  virtual PsychicHttpServer *getWebServer() { return _server.get(); }
 
  public:
   explicit BaseWebServer(WebConfigInterface *config);
 
+  virtual PsychicHttpServer *getWebServer() { return _server.get(); }
   virtual bool setupWebServer(bool skipSSL = false,
                               SerialWebSocket *serialWs = nullptr,
                               Print *secondary = nullptr);

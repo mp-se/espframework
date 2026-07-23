@@ -438,6 +438,39 @@ void BaseWebServer::webHandlePing(AsyncWebServerRequest *request) const {
   request->send(response);
 }
 
+void BaseWebServer::webHandleLanguageFileDownload(AsyncWebServerRequest *request) {
+  if (!isAuthenticated(request)) {
+    return;
+  }
+
+  if (!request->hasParam("file")) {
+    request->send(400);
+    return;
+  }
+
+  String file = request->getParam("file")->value();
+  if (!file.startsWith("/")) {
+    file = "/" + file;
+  }
+
+  Log.notice(F("WEB : File download requested for %s." CR), file.c_str());
+
+  if (!LittleFS.exists(file)) {
+    Log.warning(F("WEB : File %s does not exist, returning 404." CR),
+                file.c_str());
+    request->send(404);
+    return;
+  }
+
+  File f = LittleFS.open(file, "r");
+  size_t fileSize = f.size();
+  f.close();
+  Log.notice(F("WEB : Sending file %s, size %d bytes, free heap %d." CR),
+             file.c_str(), fileSize, ESP.getFreeHeap());
+
+  request->send(LittleFS, file, "application/octet-stream");
+}
+
 void BaseWebServer::setupWebHandlers() {
   if (!_server) return;
 
@@ -490,6 +523,10 @@ void BaseWebServer::setupWebHandlers() {
                 std::placeholders::_1, std::placeholders::_2,
                 std::placeholders::_3, std::placeholders::_4,
                 std::placeholders::_5, std::placeholders::_6));
+  _server->on("/api/language", (WebRequestMethodComposite)HTTP_GET,
+              [this](AsyncWebServerRequest *request) {
+                webHandleLanguageFileDownload(request);
+              });
   _server->onNotFound(std::bind(&BaseWebServer::webHandlePageNotFound, this,
                                 std::placeholders::_1));
 }
