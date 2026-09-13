@@ -25,6 +25,7 @@
 #include <Print.h>
 #include <PsychicHttp.h>
 #include <freertos/FreeRTOS.h>
+#include <freertos/semphr.h>
 
 #include <espframework.hpp>
 
@@ -35,6 +36,8 @@ class SerialWebSocket : public Print {
   Print *_secondayLog = 0;
   uint8_t _buf[40] = {0};
   uint32_t _bufSize = 0;
+  SemaphoreHandle_t _mutex = nullptr;  // Guards _buf/_bufSize against
+                                        // concurrent writes from other tasks
 
  public:
   SerialWebSocket() {}

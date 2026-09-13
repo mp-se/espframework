@@ -23,6 +23,8 @@
 #include <serialws2.hpp>
 
 void SerialWebSocket::begin(PsychicHttpServer *server, Print *secondary) {
+  if (!_mutex) _mutex = xSemaphoreCreateMutex();
+
   Log.notice(F("WS  : Starting serial websocket" CR));
   _server = server;
   _secondayLog = secondary;
@@ -31,11 +33,22 @@ void SerialWebSocket::begin(PsychicHttpServer *server, Print *secondary) {
 }
 
 size_t SerialWebSocket::write(uint8_t c) {
+  // _buf/_bufSize are shared state: write() can be called concurrently from
+  // any task that logs (e.g. the Arduino loop task and application background
+  // tasks), so guard every access with a mutex.
+  if (_mutex) xSemaphoreTake(_mutex, portMAX_DELAY);
+
+  // Flush before writing if the buffer is already full, so we never index
+  // past the end of _buf.
+  if (_bufSize >= (sizeof(_buf) - 1)) flush();
+
   _buf[_bufSize++] = c;
 
   if (_bufSize >= (sizeof(_buf) - 1) || c == '\n') {
     flush();
   }
+
+  if (_mutex) xSemaphoreGive(_mutex);
 
   return sizeof(c);
 }
