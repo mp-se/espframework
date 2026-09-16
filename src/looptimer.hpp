@@ -22,18 +22,34 @@
 
 class LoopTimer {
  private:
-  uint64_t _startMillis = 0;
-  uint64_t _interval = 0;
+  uint32_t _startMillis = 0;
+  uint32_t _interval = 0;
   uint64_t _loopCounter = 0;
 
  public:
-  explicit LoopTimer(uint64_t interval) {
+  explicit LoopTimer(uint32_t interval) {
     _interval = interval;
     reset();
   }
 
+  static uint32_t elapsedMillis(uint32_t start, uint32_t now) {
+    return now - start;
+  }
+
+  static uint32_t elapsedMillis(uint32_t start) {
+    return elapsedMillis(start, millis());
+  }
+
+  static bool hasElapsed(uint32_t start, uint32_t interval, uint32_t now) {
+    return elapsedMillis(start, now) >= interval;
+  }
+
+  static bool hasElapsed(uint32_t start, uint32_t interval) {
+    return hasElapsed(start, interval, millis());
+  }
+
   bool hasExpired() {
-    if (abs(static_cast<int32_t>((millis() - _startMillis))) > _interval) {
+    if (hasElapsed(_startMillis, _interval)) {
       _loopCounter++;
       return true;
     }
@@ -42,10 +58,10 @@ class LoopTimer {
 
   void reset() { _startMillis = millis(); }
   uint64_t getLoopCounter() const { return _loopCounter; }
-  int32_t getTimePassed() const {
-    return abs(static_cast<int32_t>(millis() - _startMillis));
+  uint32_t getTimePassed() const {
+    return elapsedMillis(_startMillis);
   }
-  void setInterval(uint64_t interval) { _interval = interval; }
+  void setInterval(uint32_t interval) { _interval = interval; }
 };
 
 #endif  // SRC_LOOPTIMER_HPP_

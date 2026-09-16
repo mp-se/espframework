@@ -39,7 +39,16 @@ test(LoopTimer_IntervalChange) {
 test(LoopTimer_TimePassed) {
   LoopTimer timer(1000);
   delay(30);
-  int32_t passed = timer.getTimePassed();
+  uint32_t passed = timer.getTimePassed();
   assertTrue(passed >= 25 && passed <= 50); // Allow for some timing jitter
+}
+
+test(LoopTimer_RolloverSafe) {
+  const uint32_t start = 0xFFFFFFF0;
+  const uint32_t now = 0x00000004;
+
+  assertTrue(LoopTimer::elapsedMillis(start, now) == 20U);
+  assertTrue(LoopTimer::hasElapsed(start, 20U, now));
+  assertFalse(LoopTimer::hasElapsed(start, 21U, now));
 }
 // EOF
