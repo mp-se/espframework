@@ -16,6 +16,7 @@
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 */
 #include <uptime.hpp>
+#include <looptimer.hpp>
 
 constexpr auto SECONDS = 1000;
 constexpr auto MINUTES = 60 * 1000;
@@ -25,7 +26,10 @@ constexpr auto DAYS = 24 * 60 * 60 * 1000;
 Uptime myUptime;
 
 void Uptime::calculate() {
-  uint64_t t = millis() - _startTime;
+  uint32_t now = millis();
+  _elapsedMillis += LoopTimer::elapsedMillis(_lastMillis, now);
+  _lastMillis = now;
+  uint64_t t = _elapsedMillis;
 
   _seconds = static_cast<int>(floor((t % MINUTES) / SECONDS));
   _minutes = static_cast<int>(floor((t % HOURS) / MINUTES));

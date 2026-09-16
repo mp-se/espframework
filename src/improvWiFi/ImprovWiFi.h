@@ -62,7 +62,7 @@ class ImprovWiFi {
   const char *firmwareName, *version, *chip, *deviceName;
 
   improv::Command pendingResponse;
-  int64_t pendingCmdReceived;
+  uint32_t pendingCmdReceived = 0;
 
   bool infoConfigInitiated = false, infoConfigCompleted = false;
 

@@ -24,6 +24,7 @@ SOFTWARE.
 #ifndef ESPFWK_DISABLE_WIFI
 
 #include <improvWiFi/ImprovWiFi.h>
+#include <looptimer.hpp>
 
 #if defined(ESP8266)
 #include <ESP8266WiFi.h>
@@ -66,7 +67,7 @@ void ImprovWiFi::loop() {
       pendingResponse = improv::Command::UNKNOWN;
     }
 
-    if (millis() - pendingCmdReceived > 10000) {
+    if (LoopTimer::hasElapsed(pendingCmdReceived, 10000U)) {
       infoCallback("WiFI Timed Out");
       infoConfigCompleted = true;
       pendingResponse = improv::Command::UNKNOWN;

@@ -177,7 +177,7 @@ void WifiConnection::startAP(wifi_mode_t _mode) {
 }
 
 void WifiConnection::loop() {
-  if (abs(static_cast<int32_t>((millis() - _timer))) > _timeout) {
+  if (LoopTimer::hasElapsed(_timer, _timeout)) {
     _timer = millis();
     _resetCounter = 0;
     writeReset();

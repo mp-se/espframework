@@ -22,14 +22,15 @@
 
 class Uptime {
  private:
-  uint64_t _startTime = 0;
+  uint32_t _lastMillis = 0;
+  uint64_t _elapsedMillis = 0;
   int _seconds;
   int _minutes;
   int _hours;
   int _days;
 
  public:
-  Uptime() { _startTime = millis(); }
+  Uptime() { _lastMillis = millis(); }
 
   void calculate();
 
