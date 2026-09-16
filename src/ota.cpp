@@ -30,10 +30,17 @@
 #define ESPhttpUpdate httpUpdate
 #endif
 
+#include <climits>
 #include <cstdio>
+#include <cstdlib>
 #include <espframework.hpp>
 #include <log.hpp>
 #include <ota.hpp>
+
+static bool isSafeRelativeFileName(const String& filename) {
+  return filename.length() > 0 && !filename.startsWith("/") &&
+         filename.indexOf("..") == -1 && filename.indexOf('\\') == -1;
+}
 
 OtaUpdate::OtaUpdate(OtaConfigInterface *cfg, String ver, String fileName) {
   _otaConfig = cfg;
@@ -76,6 +83,7 @@ bool OtaUpdate::updateFirmware() {
   WiFiClientSecure wifiSecure;
   HTTPUpdateResult ret;
   String serverPath = _otaConfig->getOtaURL();
+  if (!serverPath.endsWith("/")) serverPath += "/";
   serverPath += _fileName;
 
   Log.notice(F("OTA : Performing ota with %s." CR), serverPath.c_str());
@@ -106,20 +114,47 @@ bool OtaUpdate::updateFirmware() {
   return false;
 }
 
-void OtaUpdate::downloadFile(HTTPClient &http, String &fname) {
+bool OtaUpdate::downloadFile(const String& url, const String& filename) {
+  WiFiClient wifi;
+  WiFiClientSecure wifiSecure;
+  HTTPClient http;
+
+  if (url.startsWith("https://")) {
+    wifiSecure.setInsecure();
+    if (!http.begin(wifiSecure, url)) return false;
+  } else if (!http.begin(wifi, url)) {
+    return false;
+  }
+
   int httpResponseCode = http.GET();
 
   if (httpResponseCode == 200) {
-    File f = LittleFS.open(fname, "w");
-    http.writeToStream(&f);
+    File f = LittleFS.open(filename, "w");
+    if (!f) {
+      Log.error(F("OTA : Failed to open file %s for writing." CR),
+                filename.c_str());
+      http.end();
+      return false;
+    }
+    int written = http.writeToStream(&f);
     f.close();
-    Log.notice(F("OTA : Downloaded file %s." CR), fname.c_str());
+    http.end();
+    if (written < 0) {
+      LittleFS.remove(filename);
+      Log.error(F("OTA : Failed downloading file %s." CR), filename.c_str());
+      return false;
+    }
+    Log.notice(F("OTA : Downloaded file %s." CR), filename.c_str());
+    return true;
   } else {
     Log.error(F("OTA : Failed to download file %s" CR), httpResponseCode);
+    http.end();
+    return false;
   }
 }
 
 bool OtaUpdate::checkFirmwareVersion() {
+  _newFirmware = false;
   if (!_otaConfig->isOtaActive()) {
     Log.verbose(F("OTA : No OTA url defined, skipping." CR));
     return false;
@@ -133,15 +168,16 @@ bool OtaUpdate::checkFirmwareVersion() {
   WiFiClientSecure wifiSecure;
   HTTPClient http;
   String serverPath = _otaConfig->getOtaURL();
-  serverPath += "version.json";
+  if (!serverPath.endsWith("/")) serverPath += "/";
+  String versionPath = serverPath + "version.json";
 
   // Your Domain name with URL path or IP address with path
   if (_otaConfig->isOtaSSL()) {
     wifiSecure.setInsecure();
     Log.notice(F("OTA : OTA, SSL enabled without validation." CR));
-    http.begin(wifiSecure, serverPath);
+    if (!http.begin(wifiSecure, versionPath)) return false;
   } else {
-    http.begin(wifi, serverPath);
+    if (!http.begin(wifi, versionPath)) return false;
   }
 
   // Send HTTP GET request
@@ -191,10 +227,14 @@ bool OtaUpdate::checkFirmwareVersion() {
         JsonArray htmlFiles = ver["files"].as<JsonArray>();
         for (JsonVariant v : htmlFiles) {
           String s = v;
+          if (!isSafeRelativeFileName(s)) {
+            Log.error(F("OTA : Ignoring unsafe file path %s." CR), s.c_str());
+            continue;
+          }
 #if LOG_LEVEL == 6
           Log.verbose(F("OTA : Dowloading file %s" CR), s.c_str());
 #endif
-          downloadFile(http, s);
+          downloadFile(serverPath + s, "/" + s);
         }
       }
     }
@@ -216,18 +256,26 @@ bool OtaUpdate::parseFirmwareVersionString(int (&num)[3], const char *version) {
 #if LOG_LEVEL == 6
   Log.verbose(F("OTA : Parsing version number string %s." CR), version);
 #endif
+  if (!version || !*version) return false;
+
   char temp[80];
-  char *s;
-  char *p = &temp[0];
-  int i = 0;
+  int written = snprintf(temp, sizeof(temp), "%s", version);
+  if (written < 0 || written >= static_cast<int>(sizeof(temp))) return false;
 
-  snprintf(temp, sizeof(temp), "%s", version);
+  char *part = temp;
+  char *save = nullptr;
+  for (int i = 0; i < 3; ++i) {
+    char *token = strtok_r(part, ".", &save);
+    part = nullptr;
+    if (!token || !*token) return false;
 
-  while ((s = strtok_r(p, ".", &p)) != NULL) {
-    num[i++] = atoi(s);
+    char *end = nullptr;
+    long value = strtol(token, &end, 10);
+    if (*end != '\0' || value < 0 || value > INT_MAX) return false;
+    num[i] = static_cast<int>(value);
   }
 
-  return true;
+  return strtok_r(nullptr, ".", &save) == nullptr;
 }
 
 #endif  // ESPFWK_DISABLE_OTA

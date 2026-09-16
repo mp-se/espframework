@@ -38,7 +38,7 @@ class OtaUpdate {
   String _fileName;
 
   bool parseFirmwareVersionString(int (&num)[3], const char* version);
-  void downloadFile(HTTPClient& http, String& fname);
+  bool downloadFile(const String& url, const String& filename);
 
  public:
   OtaUpdate(OtaConfigInterface* cfg, String ver, String filename = "");
