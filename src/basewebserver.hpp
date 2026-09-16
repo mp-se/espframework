@@ -179,7 +179,6 @@ class BaseWebServer {
   void webHandleAuth(AsyncWebServerRequest *request) const;
   void webHandleWifiScan(AsyncWebServerRequest *request);
   void webHandleWifiScanStatus(AsyncWebServerRequest *request);
-  void webHandleWifiClear(AsyncWebServerRequest *request);
   void webHandlePageNotFound(AsyncWebServerRequest *request) const;
   void webHandleUploadFirmware(AsyncWebServerRequest *request, String filename,
                                size_t index, uint8_t *data, size_t len,

@@ -124,7 +124,6 @@ class BaseWebServer {
   esp_err_t webHandleAuth(PsychicRequest *request);
   esp_err_t webHandleWifiScan(PsychicRequest *request);
   esp_err_t webHandleWifiScanStatus(PsychicRequest *request);
-  esp_err_t webHandleWifiClear(PsychicRequest *request);
   esp_err_t webHandlePageNotFound(PsychicRequest *request);
   esp_err_t webHandleUploadFirmware(PsychicRequest *request, String filename,
                                     uint64_t index, uint8_t *data, size_t len,

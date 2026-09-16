@@ -490,31 +490,6 @@ esp_err_t BaseWebServer::webHandleWifiScanStatus(PsychicRequest *request) {
   return ESP_OK;
 }
 
-esp_err_t BaseWebServer::webHandleWifiClear(PsychicRequest *request) {
-  PsychicResponse response(request);
-  if (!isAuthenticated(request)) {
-    return ESP_FAIL;
-  }
-
-  Log.notice(F("WEB : webServer callback for /api/wifi/clear." CR));
-
-  JsonDocument doc;
-  doc[PARAM_STATUS] = true;
-  doc[PARAM_SUCCESS] = true;
-  doc[PARAM_MESSAGE] = "WiFi credentials cleared";
-  doc[PARAM_MESSAGE_CODE] = ESPFWK_WEB_ERR("WIFI_CLEARED");
-
-  response.addHeader("Content-Type", "application/json");
-  String jsonStr;
-  serializeJson(doc, jsonStr);
-  response.send(200, "application/json", jsonStr.c_str());
-
-  // Schedule actual WiFi clear in a moment
-  _rebootTimer = millis();
-  _wifiSetup = true;  // Return to WiFi setup mode
-  return ESP_OK;
-}
-
 esp_err_t BaseWebServer::webHandleRestart(PsychicRequest *request) {
   PsychicResponse response(request);
   if (!isAuthenticated(request)) {
