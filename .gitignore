@@ -3,7 +3,8 @@
 .vscode
 .claude
 script
-html
+graphify-out/
+html/
 
 __pycache__
 src/demo*.*
