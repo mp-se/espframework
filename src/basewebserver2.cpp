@@ -25,10 +25,17 @@
 #include <baseconfig.hpp>
 #include <basewebserver2.hpp>
 #include <espframework.hpp>
+#include <looptimer.hpp>
 #if !defined(MAX_SKETCH_SPACE)
 #define MAX_SKETCH_SPACE 0x1c0000
 #warning "MAX_SKETCH_SPACE is not defined, using default value of 0x1c0000"
 #endif
+
+static bool isSafeLanguageFilePath(const String& path) {
+  return path.length() > 0 && path.length() <= 96 && path.startsWith("/") &&
+         path.indexOf("..") == -1 && path.indexOf('\\') == -1 &&
+         path.endsWith(".json");
+}
 
 BaseWebServer::BaseWebServer(WebConfigInterface *config) {
   _webConfig = config;
@@ -63,8 +70,9 @@ void BaseWebServer::loop() {
   if (!_server) return;
 
   if (_wifiSetup) {
-    if (abs(static_cast<int32_t>((millis() - _wifiPortalTimer))) >
-        (_webConfig->getWifiPortalTimeout() * 1000)) {
+    if (LoopTimer::hasElapsed(
+            _wifiPortalTimer,
+            static_cast<uint32_t>(_webConfig->getWifiPortalTimeout()) * 1000U)) {
       Log.notice(F("WEB : Wifi portal timeout, reboot device." CR));
       delay(500);
       ESP_RESET();
@@ -72,7 +80,7 @@ void BaseWebServer::loop() {
   }
 
   if (_rebootTask) {
-    if (abs(static_cast<int32_t>((millis() - _rebootTimer))) > 1000) {
+    if (LoopTimer::hasElapsed(_rebootTimer, 1000U)) {
       Log.notice(F("WEB : Rebooting..." CR));
       delay(500);
       ESP_RESET();
@@ -176,7 +184,10 @@ esp_err_t BaseWebServer::webHandleUploadFile(PsychicRequest *request,
     return ESP_FAIL;
   }
 
-  uint32_t maxFileSize = LittleFS.totalBytes() - LittleFS.usedBytes() - 4096;
+  uint32_t freeBytes = LittleFS.totalBytes() > LittleFS.usedBytes()
+                           ? LittleFS.totalBytes() - LittleFS.usedBytes()
+                           : 0;
+  uint32_t maxFileSize = freeBytes > 4096 ? freeBytes - 4096 : 0;
   Log.verbose(
       F("WEB : BaseWebHandler callback for /api/filesystem/upload." CR));
 
@@ -253,9 +264,6 @@ esp_err_t BaseWebServer::webHandlePageNotFound(PsychicRequest *request) {
 esp_err_t BaseWebServer::webHandleAuth(PsychicRequest *request) {
   PsychicResponse response(request);
   Log.notice(F("WEB : webServer callback for /api/auth." CR));
-  Log.notice(F("WEB : user: %s, pass: %s." CR), _webConfig->getAdminUser(),
-             _webConfig->getAdminPass());
-
   if (isSslEnabled() && !_wifiSetup) {
     Log.notice(F("WEB : Performing basic authentication." CR));
 
@@ -391,6 +399,11 @@ esp_err_t BaseWebServer::webHandleLanguageFileDownload(
   String file = request->getParam("file")->value();
   if (!file.startsWith("/")) {
     file = "/" + file;
+  }
+
+  if (!isSafeLanguageFilePath(file)) {
+    Log.warning(F("WEB : Invalid language file path." CR));
+    return response->send(400);
   }
 
   Log.notice(F("WEB : File download requested for %s." CR), file.c_str());

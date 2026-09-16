@@ -22,6 +22,7 @@
 #include <baseconfig.hpp>
 #include <basewebserver.hpp>
 #include <espframework.hpp>
+#include <looptimer.hpp>
 
 #ifdef ESP8266
 #undef MAX_SKETCH_SPACE
@@ -44,6 +45,12 @@ INCBIN(AppJs, "html/app.js.gz");
 INCBIN(AppCss, "html/app.css.gz");
 INCBIN(FaviconIco, "html/favicon.ico.gz");
 #endif
+
+static bool isSafeLanguageFilePath(const String& path) {
+  return path.length() > 0 && path.length() <= 96 && path.startsWith("/") &&
+         path.indexOf("..") == -1 && path.indexOf('\\') == -1 &&
+         path.endsWith(".json");
+}
 
 BaseWebServer::BaseWebServer(WebConfigInterface *config) {
   _webConfig = config;
@@ -77,8 +84,9 @@ void BaseWebServer::loop() {
 #endif
 
   if (_wifiSetup) {
-    if (abs(static_cast<int32_t>(millis() - _wifiPortalTimer)) >
-        (_webConfig->getWifiPortalTimeout() * 1000)) {
+    if (LoopTimer::hasElapsed(
+            _wifiPortalTimer,
+            static_cast<uint32_t>(_webConfig->getWifiPortalTimeout()) * 1000U)) {
       Log.notice(F("WEB : Wifi portal timeout, reboot device." CR));
       delay(500);
       ESP_RESET();
@@ -86,7 +94,7 @@ void BaseWebServer::loop() {
   }
 
   if (_rebootTask) {
-    if (abs(static_cast<int32_t>(millis() - _rebootTimer)) > 1000) {
+    if (LoopTimer::hasElapsed(_rebootTimer, 1000U)) {
       Log.notice(F("WEB : Rebooting..." CR));
       delay(500);
       ESP_RESET();
@@ -135,6 +143,7 @@ void BaseWebServer::webHandleUploadFirmware(AsyncWebServerRequest *request,
 
   if (!index) {
     _uploadedSize = 0;
+    _uploadReturn = 500;
 #ifdef ESP8266
     Update.runAsync(true);
 #endif
@@ -142,6 +151,7 @@ void BaseWebServer::webHandleUploadFirmware(AsyncWebServerRequest *request,
       _uploadReturn = 500;
       Log.error(F("WEB : Not enough space to store for this firmware (%d)." CR),
                 request->contentLength());
+      return;
     } else {
       _uploadReturn = 200;
       Log.notice(F("WEB : Start firmware upload, max sketch size %d kb, size "
@@ -150,15 +160,29 @@ void BaseWebServer::webHandleUploadFirmware(AsyncWebServerRequest *request,
     }
   }
 
+  if (_uploadReturn != 200) return;
+
   _uploadedSize += len;
 
   if (_uploadedSize > maxSketchSpace) {
     _uploadReturn = 500;
     Log.error(F("WEB : Firmware file is to large." CR));
+#ifdef ESP8266
+    Update.end();  // Clears the active updater after a failed upload.
+#else
+    Update.abort();
+#endif
+    return;
   } else if (Update.write(data, len) != len) {
     _uploadReturn = 500;
     Log.notice(F("WEB : Writing firmware upload %d (%d)." CR), len,
                maxSketchSpace);
+#ifdef ESP8266
+    Update.end();  // Clears the active updater after a failed upload.
+#else
+    Update.abort();
+#endif
+    return;
   } else {
     EspSerial.print(".");
   }
@@ -166,8 +190,6 @@ void BaseWebServer::webHandleUploadFirmware(AsyncWebServerRequest *request,
   if (final) {
     EspSerial.print("\n");
     Log.notice(F("WEB : Finished firmware upload." CR));
-    request->send(200);
-
     if (Update.end(true)) {
       // Calling reset here will not wait for all the data to be sent, lets wait
       // a second before rebooting in loop.
@@ -192,36 +214,57 @@ void BaseWebServer::webHandleUploadFile(AsyncWebServerRequest *request,
 #ifdef ESP8266
   FSInfo info;
   LittleFS.info(info);
-  uint32_t maxFileSize = info.totalBytes - info.usedBytes - 4096;
+  uint32_t freeBytes = info.totalBytes > info.usedBytes
+                           ? info.totalBytes - info.usedBytes
+                           : 0;
+  uint32_t maxFileSize = freeBytes > 4096 ? freeBytes - 4096 : 0;
 #else
-  uint32_t maxFileSize = LittleFS.totalBytes() - LittleFS.usedBytes() - 4096;
+  uint32_t freeBytes = LittleFS.totalBytes() > LittleFS.usedBytes()
+                           ? LittleFS.totalBytes() - LittleFS.usedBytes()
+                           : 0;
+  uint32_t maxFileSize = freeBytes > 4096 ? freeBytes - 4096 : 0;
 #endif
   Log.verbose(
       F("WEB : BaseWebHandler callback for /api/filesystem/upload." CR));
 
   if (!index) {
+    _uploadReturn = 500;
     Log.notice(F("WEB : Start file upload, free space %d kb, size %d." CR),
                maxFileSize / 1024, request->contentLength());
 
-    if (len > maxFileSize) {
+    if (request->contentLength() > maxFileSize) {
       Log.error(F("WEB : File is to large to fit in file system." CR));
-      request->send(500);
+      _uploadReturn = 500;
       return;
     }
 
     request->_tempFile = LittleFS.open("/" + filename, "w");
+    if (!request->_tempFile) {
+      Log.error(F("WEB : Failed to create file for upload: %s." CR),
+                filename.c_str());
+      _uploadReturn = 500;
+      return;
+    }
     _uploadReturn = 200;
   }
 
+  if (_uploadReturn != 200) return;
+
   if (len) {
-    request->_tempFile.write(data, len);
+    if (request->_tempFile.write(data, len) != len) {
+      Log.error(F("WEB : Failed writing file data, requested %d bytes." CR),
+                len);
+      request->_tempFile.close();
+      LittleFS.remove("/" + filename);
+      _uploadReturn = 500;
+      return;
+    }
     EspSerial.print(".");
   }
 
   if (final) {
     Log.notice(F("WEB : Finished file upload." CR));
     request->_tempFile.close();
-    request->send(200);
   }
 }
 
@@ -451,6 +494,12 @@ void BaseWebServer::webHandleLanguageFileDownload(AsyncWebServerRequest *request
   String file = request->getParam("file")->value();
   if (!file.startsWith("/")) {
     file = "/" + file;
+  }
+
+  if (!isSafeLanguageFilePath(file)) {
+    Log.warning(F("WEB : Invalid language file path." CR));
+    request->send(400);
+    return;
   }
 
   Log.notice(F("WEB : File download requested for %s." CR), file.c_str());
