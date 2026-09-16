@@ -37,8 +37,6 @@ bool JsonFileSystemHelper::saveJson(JsonDocument& doc) {
   //   serializeJson(doc, EspSerial);
   //   EspSerial.print(CR);
   // #endif
-  serializeJson(doc, jsonFile);
-
   if (serializeJson(doc, jsonFile) == 0) {
     Log.error(F("Failed to write to file" CR));
     jsonFile.close();
