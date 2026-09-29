@@ -299,7 +299,7 @@ bool BaseConfig::loadFile() {
   parseJson(obj);
   Log.notice(F("CFG : Configuration file loaded." CR));
 
-  if (strlen(getWifiSSID(0)) > 0 && strlen(getWifiPass(0)) > 0) {
+  if (strlen(getWifiSSID(0)) == 0) {
     getWifiPreference();
   }
 
@@ -310,6 +310,7 @@ void BaseConfig::getWifiPreference() {
 #if !defined(ESP8266)
   String ssid = getPreference("ssid", "espfwk");
   String pass = getPreference("pass", "espfwk");
+  if (!ssid.length()) return;
   setWifiSSID(ssid, 0);
   setWifiPass(pass, 0);
   Log.notice(F("CFG : Using wifi settings from EEPROM." CR));

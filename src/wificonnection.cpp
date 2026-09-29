@@ -242,7 +242,7 @@ void WifiConnection::connectAsync(String ssid, String pass, wifi_mode_t mode) {
     WiFi.begin(_userSSID.c_str(), _userPWD.c_str());
   } else {
     Log.notice(F("WIFI: Connecting to wifi using stored settings %s." CR),
-               ssid);
+               ssid.c_str());
 
     if (_wifiConfig->getWifiScanAP()) {
       const uint8_t *bssid = findStrongestAP(ssid);
@@ -262,7 +262,7 @@ bool WifiConnection::waitForConnection(int maxTime) {
   while (WiFi.status() != WL_CONNECTED) {
     delay(100);
 
-    if (i % 10) EspSerial.print(".");
+    if (i % 10 == 0) EspSerial.print(".");
 
     if (i++ > (maxTime * 10)) {
       Log.error(F("WIFI: Failed to connect to wifi %d" CR), WiFi.status());
@@ -308,6 +308,8 @@ bool WifiConnection::connect(bool wifiDirect, wifi_mode_t mode) {
       Log.warning(F("WIFI: Failed to connect to any SSID." CR));
       return false;
     }
+
+    return true;
   }
 
   return false;

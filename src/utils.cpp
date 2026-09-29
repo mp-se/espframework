@@ -98,7 +98,7 @@ void deepSleep(int t) {
   Log.verbose(F("HELP: Entering sleep mode for %d seconds." CR), t);
 #endif
   ledOff();
-  uint32_t wake = t * 1000000;
+  uint64_t wake = static_cast<uint64_t>(t) * 1000000ULL;
   ESP.deepSleep(wake);
 }
 

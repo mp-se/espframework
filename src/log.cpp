@@ -105,13 +105,13 @@ void SerialDebug::setup(const uint32_t serialSpeed, uint8_t tx, uint8_t rx) {
   _serialSpeed = serialSpeed;
 
 #if defined(ESPFWK_USE_SERIAL_PINS) && !defined(ESP8266)
-  if (tx == -1) tx = TX;
+  if (tx == static_cast<uint8_t>(-1)) tx = TX;
 
-  if (rx == -1) rx = RX;
+  if (rx == static_cast<uint8_t>(-1)) rx = RX;
 
   EspSerial.begin(serialSpeed, SERIAL_8N1, rx, tx, false);
 #elif defined(ESPFWK_USE_SERIAL_PINS) && defined(ESP8266)
-  if (tx == -1) tx = TX;
+  if (tx == static_cast<uint8_t>(-1)) tx = TX;
 
   EspSerial.begin(serialSpeed, SERIAL_8N1, tx);
 #else

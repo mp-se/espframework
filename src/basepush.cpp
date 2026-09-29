@@ -114,7 +114,7 @@ void BasePush::addHttpHeader(String header) {
   if (!header.length()) return;
 
   int i = header.indexOf(":");
-  if (i) {
+  if (i > 0) {
     String name = header.substring(0, i);
     String value = header.substring(i + 1);
     value.trim();
@@ -122,7 +122,8 @@ void BasePush::addHttpHeader(String header) {
                value.c_str());
     _http->addHeader(name, value);
   } else {
-    Log.error(F("PUSH: Unable to set header, invalid value %s" CR), header);
+    Log.error(F("PUSH: Unable to set header, invalid value %s" CR),
+              header.c_str());
   }
 }
 
@@ -137,7 +138,8 @@ String BasePush::sendTcp(String& payload, const char* target) {
   Log.verbose(F("PUSH: json %s." CR), payload.c_str());
 #endif
 
-  String input(target), host;
+  String input(target);
+  String host = input;
   int port = 80;
 
   int idx = input.indexOf(':');
@@ -310,17 +312,31 @@ void BasePush::sendMqtt(String& payload, const char* target, int port,
     mqtt->begin(target, port, *_wifi);
   }
 
-  mqtt->connect(_config->getMDNS(), user, pass);
+  if (!mqtt->connect(_config->getMDNS(), user, pass)) {
+    _lastResponseCode = mqtt->lastError();
+    Log.error(F("PUSH: MQTT connect failed with error %d" CR),
+              _lastResponseCode);
+    mqtt->disconnect();
+
+    if (port > 8000) {
+      _wifiSecure->stop();
+    } else {
+      _wifi->stop();
+    }
+
+    tcp_cleanup();
+    return;
+  }
 
 #if LOG_LEVEL == 6
   Log.verbose(F("PUSH: url %s." CR), target);
   Log.verbose(F("PUSH: data %s." CR), payload.c_str());
 #endif
 
-  int lines = 1;
+  int lines = payload.length() ? 1 : 0;
   // Find out how many lines are in the document. Each line is one
   // topic/message. | is used as new line.
-  for (unsigned int i = 0; i < payload.length() - 1; i++) {
+  for (unsigned int i = 0; i + 1 < payload.length(); i++) {
     if (payload.charAt(i) == '|') lines++;
   }
 

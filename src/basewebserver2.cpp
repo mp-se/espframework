@@ -722,7 +722,9 @@ bool BaseWebServer::setupWebServer(bool skipSSL, SerialWebSocket *serialWs,
     Log.notice(F("WEB : File=%s, %d bytes" CR), f.name(), f.size());
     if (!f.size()) {
       Log.notice(F("WEB : Empty file detected, removing file." CR));
-      LittleFS.remove(f.name());
+      String path = f.path();
+      f.close();
+      LittleFS.remove(path);
     }
 
     f = root.openNextFile();

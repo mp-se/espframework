@@ -147,7 +147,8 @@ bool OtaUpdate::downloadFile(const String& url, const String& filename) {
     Log.notice(F("OTA : Downloaded file %s." CR), filename.c_str());
     return true;
   } else {
-    Log.error(F("OTA : Failed to download file %s" CR), httpResponseCode);
+    Log.error(F("OTA : Failed to download file %s, response=%d" CR),
+              filename.c_str(), httpResponseCode);
     http.end();
     return false;
   }
