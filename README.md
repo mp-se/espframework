@@ -88,6 +88,13 @@ when using asyncwebserver its also recommended to add
 Note! When using TX/RX pins for serial output then ARDUINO_USB_CDC_ON_BOOT=0 must be disabled for this to work. On some boards 
 this is set by default and others it needs to be defined. This applies to boards with an USBC port.
 
+## Build time overrides
+
+These set a value instead of enabling a feature. The default is used if the flag is not defined.
+
+- ESPFWK_OTA_VERSION_FILE, name of the file on the OTA server with the latest version (default "version.json"), e.g. `-D ESPFWK_OTA_VERSION_FILE=\"version32c3.json\"`
+- ESPFWK_WIFI_PORTAL_TIMEOUT, default time in seconds that the wifi portal is active (default 120), e.g. `-D ESPFWK_WIFI_PORTAL_TIMEOUT=600`
+
 ## Create own SSL cert and key
 
 openssl req -x509 -newkey rsa:4096 -nodes -keyout server.key -out server.crt -sha256 -days 1000
