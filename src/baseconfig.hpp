@@ -21,6 +21,12 @@
 #include <espframework.hpp>
 #include <interface.hpp>
 
+// Default time (seconds) the wifi portal is active. Can be overridden at build
+// time, e.g. -D ESPFWK_WIFI_PORTAL_TIMEOUT=600
+#if !defined(ESPFWK_WIFI_PORTAL_TIMEOUT)
+#define ESPFWK_WIFI_PORTAL_TIMEOUT 120
+#endif
+
 class BaseConfig : public WifiConfigInterface,
                    public OtaConfigInterface,
                    public WebConfigInterface,
@@ -33,7 +39,7 @@ class BaseConfig : public WifiConfigInterface,
   String _wifiDirectSSID = "";
   String _wifiDirectPASS = "";
   int _wifiConnectionTimeout = 30;
-  int _wifiPortalTimeout = 120;
+  int _wifiPortalTimeout = ESPFWK_WIFI_PORTAL_TIMEOUT;
   bool _wifiScanAP = false;
 
   // OtaConfig

@@ -37,6 +37,12 @@
 #include <log.hpp>
 #include <ota.hpp>
 
+// File on the OTA server that contains the latest version information. Can be
+// overridden at build time, e.g. -D ESPFWK_OTA_VERSION_FILE=\"version32c3.json\"
+#if !defined(ESPFWK_OTA_VERSION_FILE)
+#define ESPFWK_OTA_VERSION_FILE "version.json"
+#endif
+
 static bool isSafeRelativeFileName(const String& filename) {
   return filename.length() > 0 && !filename.startsWith("/") &&
          filename.indexOf("..") == -1 && filename.indexOf('\\') == -1;
@@ -170,7 +176,7 @@ bool OtaUpdate::checkFirmwareVersion() {
   HTTPClient http;
   String serverPath = _otaConfig->getOtaURL();
   if (!serverPath.endsWith("/")) serverPath += "/";
-  String versionPath = serverPath + "version.json";
+  String versionPath = serverPath + ESPFWK_OTA_VERSION_FILE;
 
   // Your Domain name with URL path or IP address with path
   if (_otaConfig->isOtaSSL()) {
@@ -186,7 +192,8 @@ bool OtaUpdate::checkFirmwareVersion() {
   int httpResponseCode = http.GET();
 
   if (httpResponseCode == 200) {
-    Log.notice(F("OTA : Found version.json, response=%d" CR), httpResponseCode);
+    Log.notice(F("OTA : Found %s, response=%d" CR), ESPFWK_OTA_VERSION_FILE,
+               httpResponseCode);
 
     String payload = http.getString();
 #if LOG_LEVEL == 6
@@ -194,7 +201,7 @@ bool OtaUpdate::checkFirmwareVersion() {
 #endif
     DeserializationError err = deserializeJson(ver, payload);
     if (err) {
-      Log.error(F("OTA : Failed to parse version.json" CR));
+      Log.error(F("OTA : Failed to parse %s" CR), ESPFWK_OTA_VERSION_FILE);
     } else {
 #if LOG_LEVEL == 6
       Log.verbose(F("OTA : Project %s version %s." CR),
@@ -240,8 +247,8 @@ bool OtaUpdate::checkFirmwareVersion() {
       }
     }
   } else {
-    Log.error(F("OTA : OTA error checking version.json, response=%d" CR),
-              httpResponseCode);
+    Log.error(F("OTA : OTA error checking %s, response=%d" CR),
+              ESPFWK_OTA_VERSION_FILE, httpResponseCode);
   }
   http.end();
 
