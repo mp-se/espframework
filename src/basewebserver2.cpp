@@ -25,6 +25,7 @@
 #include <baseconfig.hpp>
 #include <basewebserver2.hpp>
 #include <espframework.hpp>
+#include <firmware_check.hpp>
 #include <looptimer.hpp>
 #if !defined(MAX_SKETCH_SPACE)
 #define MAX_SKETCH_SPACE 0x1c0000
@@ -125,6 +126,14 @@ esp_err_t BaseWebServer::webHandleUploadFirmware(PsychicRequest *request,
 
   if (!index) {
     _uploadedSize = 0;
+
+    String error;
+    if (!validateFirmwareImage(data, len, error)) {
+      _uploadReturn = 400;
+      Log.error(F("WEB : Rejected firmware upload: %s." CR), error.c_str());
+      return ESP_FAIL;
+    }
+
     if (!Update.begin(request->contentLength(), U_FLASH, LED_BUILTIN)) {
       _uploadReturn = 500;
       Log.error(F("WEB : Not enough space to store for this firmware (%d)." CR),

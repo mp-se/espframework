@@ -22,6 +22,7 @@
 #include <baseconfig.hpp>
 #include <basewebserver.hpp>
 #include <espframework.hpp>
+#include <firmware_check.hpp>
 #include <looptimer.hpp>
 
 #ifdef ESP8266
@@ -144,6 +145,14 @@ void BaseWebServer::webHandleUploadFirmware(AsyncWebServerRequest *request,
   if (!index) {
     _uploadedSize = 0;
     _uploadReturn = 500;
+
+    String error;
+    if (!validateFirmwareImage(data, len, error)) {
+      _uploadReturn = 400;
+      Log.error(F("WEB : Rejected firmware upload: %s." CR), error.c_str());
+      return;
+    }
+
 #ifdef ESP8266
     Update.runAsync(true);
 #endif
