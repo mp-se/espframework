@@ -27,15 +27,18 @@
  * OTA_GUARD_MAX_FAILED_BOOTS failed boots the previous known good image is
  * selected as boot partition and the device restarts.
  *
- * Usage:
+ * Usage (ESP32 only, the class does not exist on other platforms so guard the
+ * instance and every call with #if defined(ESP32)):
  *   OtaGuard myOtaGuard;
  *   setup():  myOtaGuard.begin();       // as early as possible
  *   ...       myOtaGuard.markValid();   // when the firmware has proven itself
  *   loop():   myOtaGuard.loop();        // optional, validates after a delay
  *
  * Limits: only protects updates *to* an image that contains this code, and can
- * not catch images that never reach begin(). No-op on ESP8266.
+ * not catch images that never reach begin().
  */
+
+#if defined(ESP32)
 
 #define OTA_GUARD_MAX_FAILED_BOOTS 3
 #define OTA_GUARD_VALIDATE_AFTER_MS 15000  // Uptime needed for loop() to validate
@@ -64,8 +67,6 @@ struct OtaBootloaderInfo {
   int otaState = -1;  // esp_ota_img_states_t, -1 = not available
 };
 
-#if defined(ESP32)
-
 class OtaGuard {
  private:
   bool _pending = false;  // Running image is not yet known to be good
@@ -90,24 +91,6 @@ class OtaGuard {
   void loop();
 
   bool isPending() const { return _pending; }
-};
-
-#else
-
-class OtaGuard {
- public:
-  const OtaBootloaderInfo& checkBootloader() {
-    static const OtaBootloaderInfo info;
-    return info;
-  }
-  const OtaBootloaderInfo& getBootloaderInfo() const {
-    static const OtaBootloaderInfo info;
-    return info;
-  }
-  void begin() {}
-  void markValid() {}
-  void loop() {}
-  bool isPending() const { return false; }
 };
 
 #endif  // ESP32
