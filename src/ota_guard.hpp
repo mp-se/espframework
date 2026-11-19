@@ -42,6 +42,10 @@
 
 #define OTA_GUARD_MAX_FAILED_BOOTS 3
 #define OTA_GUARD_VALIDATE_AFTER_MS 15000  // Uptime needed for loop() to validate
+// A pending image that has not validated by now is considered hung and the
+// device is restarted (counts as a failed boot). Must be well above the time
+// the slowest validation point needs.
+#define OTA_GUARD_HANG_TIMEOUT_MS 60000
 
 #include <Arduino.h>
 
@@ -79,7 +83,11 @@ class OtaGuard {
 
   const OtaBootloaderInfo& getBootloaderInfo() const { return _bootloader; }
 
-  // Call as early as possible in setup(). May restart into the previous image.
+  // Call as the very first thing in setup(), anything before it is not
+  // protected. May restart into the previous image. For a pending image with a
+  // known good fallback it also arms a timer that restarts the device if the
+  // image has not validated within OTA_GUARD_HANG_TIMEOUT_MS, so a hang (not
+  // only a crash) ends up in a rollback.
   void begin();
 
   // Call when the running image has proven itself. Cheap and safe to call

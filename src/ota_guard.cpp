@@ -19,6 +19,8 @@
 
 #include <esp_ota_ops.h>
 #include <esp_partition.h>
+#include <esp_system.h>
+#include <esp_timer.h>
 
 #include <esp_flash.h>
 #include <esp_flash_partitions.h>
@@ -37,6 +39,32 @@
 #define OTAG_KEY_SLOT "slot"    // partition label it runs from
 #define OTAG_KEY_BOOTS "boots"  // failed boots of pending image
 #define OTAG_SHA_LEN 32
+
+static esp_timer_handle_t otagHangTimer = NULL;
+
+static void otagHangCallback(void*) {
+  Log.error(F("OTAG: Image did not validate in time, restarting." CR));
+  esp_restart();
+}
+
+static void otagStopHangTimer() {
+  if (!otagHangTimer) return;
+  esp_timer_stop(otagHangTimer);
+  esp_timer_delete(otagHangTimer);
+  otagHangTimer = NULL;
+}
+
+static void otagStartHangTimer() {
+  esp_timer_create_args_t args = {};
+  args.callback = otagHangCallback;
+  args.name = "otaguard";
+
+  if (esp_timer_create(&args, &otagHangTimer) != ESP_OK) {
+    otagHangTimer = NULL;
+    return;
+  }
+  esp_timer_start_once(otagHangTimer, OTA_GUARD_HANG_TIMEOUT_MS * 1000ULL);
+}
 
 static bool otagSameSha(const uint8_t* a, const uint8_t* b) {
   return memcmp(a, b, OTAG_SHA_LEN) == 0;
@@ -185,6 +213,9 @@ void OtaGuard::begin() {
 
   Log.notice(F("OTAG: New image pending validation (boot %d)." CR), boots);
   prefs.end();
+
+  // Without a fallback a restart would not help, so only arm with one.
+  if (hasGood) otagStartHangTimer();
 }
 
 void OtaGuard::markValid() {
@@ -204,6 +235,7 @@ void OtaGuard::markValid() {
   prefs.putUChar(OTAG_KEY_BOOTS, 0);
   prefs.end();
   _pending = false;
+  otagStopHangTimer();
 
   // Only has an effect if the bootloader was built with rollback support.
   esp_ota_mark_app_valid_cancel_rollback();
