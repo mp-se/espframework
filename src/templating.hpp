@@ -24,7 +24,7 @@
 #include <memory>
 #include <utils.hpp>
 
-constexpr auto MAX_KEY_VAL = 30;
+constexpr auto MAX_KEY_VAL = 40;
 
 class TemplatingEngine {
  private:
