@@ -156,7 +156,8 @@ const OtaBootloaderInfo& OtaGuard::checkBootloader() {
 
   if (_bootloader.hasDescriptor) {
     Log.notice(F("OTAG: Bootloader version %u, idf %s, built %s." CR),
-               _bootloader.version, _bootloader.idfVersion.c_str(),
+               static_cast<uint64_t>(_bootloader.version),
+               _bootloader.idfVersion.c_str(),
                _bootloader.buildDate.c_str());
   } else {
     Log.notice(F("OTAG: Bootloader has no descriptor (old IDF or bootloader)." CR));

@@ -73,7 +73,8 @@ void PerfLogging::print() {
   PerfEntry* pe = first;
 
   while (pe != 0) {
-    Log.notice(F("PERF: %s %ums" CR), pe->key, pe->max);
+    Log.notice(F("PERF: %s %ums" CR), pe->key,
+               static_cast<uint64_t>(pe->max));
     pe = pe->next;
   }
 }
